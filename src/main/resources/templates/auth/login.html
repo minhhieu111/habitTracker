@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+
+</head>
+<body>
+<div class="login-container">
+    <div class="login-box">
+        <div class="logo">BeBet</div>
+
+        <h2 class="login-title">Đăng nhập</h2>
+
+        <form th:action="@{/login}" method="post">
+            <div class="input-group">
+                    <span class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </span>
+                <input type="text" name="username" placeholder="Tên đăng nhập" required>
+            </div>
+
+            <div class="input-group">
+                    <span class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </span>
+                <input type="password" name="password" placeholder="Mật Khẩu" required>
+            </div>
+
+            <button type="submit" class="login-button">Đăng Nhập</button>
+        </form>
+
+        <a href="#" class="forgot-password" th:href="@{/forgot-password}">Quên mật khẩu?</a>
+
+        <div>
+            <span>Chưa có tài khoản </span>
+            <a href="#" class="register-link" th:href="@{/register}">Đăng ký ngay</a>
+        </div>
+    </div>
+</div>
+</body>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: #333;
+    }
+
+    .login-container {
+        width: 100%;
+        max-width: 800px;
+        padding: 20px;
+    }
+
+    .login-box {
+        background-color: #f2f2f2;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+        font-size: 48px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .login-title {
+        font-size: 28px;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .input-group {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 15px 15px 15px 50px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #888;
+    }
+
+    .login-button {
+        background-color: #f7b924;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 15px;
+        width: 100%;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    .forgot-password {
+        display: block;
+        text-align: center;
+        margin-bottom: 15px;
+        color: #666;
+        text-decoration: none;
+    }
+
+    .register-link {
+        color: #0099ff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+</style>
+</html>
+
