@@ -21,6 +21,7 @@ public class Daily {
     private String description;
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
+    @Enumerated(EnumType.STRING)
     private RepeatFrequency repeatFrequency;
     private LocalDateTime createAt = LocalDateTime.now();
 

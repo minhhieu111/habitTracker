@@ -21,6 +21,7 @@ public class User {
     private String userName;
     private String password;
     private String email;
+    @Enumerated(EnumType.STRING)
     private Role role;
     private Long exp;
     private Long coins;
