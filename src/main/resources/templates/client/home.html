@@ -1,10 +1,375 @@
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Thói Quen</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/client_home.css">
+
 </head>
 <body>
-    <h1>home</h1>
+<!-- Sidebar -->
+<nav id="sidebar">
+    <!-- Toggle Button -->
+    <button id="sidebarCollapse" class="btn btn-link text-dark position-fixed" style="top: 10px; left: 10px; z-index: 1040;">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="sidebar-header">
+        <h5>BeBet</h5>
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link active" href="#">
+                <i class="fas fa-home"></i>
+                <span>Trang chủ</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-clock"></i>
+                <span>Thói quen</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-calendar"></i>
+                <span>Hằng ngày</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-list"></i>
+                <span>Việc cần làm</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-trophy"></i>
+                <span>Thử thách</span>
+            </a>
+        </li>
+        <!-- Các mục phụ ở dưới cùng -->
+        <li class="nav-item mt-auto">
+            <a class="nav-link" href="#">
+                <i class="fas fa-user"></i>
+                <span>Hồ sơ</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-danger" href="/logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Đăng xuất</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<!-- Page Content -->
+<div id="content">
+
+
+    <div class="container-fluid mt-5">
+        <!-- User Profile -->
+        <div class="user-profile d-flex align-items-center">
+            <div class="d-flex flex-column align-items-center me-2">
+                <div class="user-avatar">
+                    <i class="fas fa-smile text-white"></i>
+                </div>
+                <p>Cấp độ: <span th:text="${user.getLevel()}"></span></p>
+            </div>
+
+            <div class="flex-grow-1">
+                <h5 class="mb-1">Danh Hiệu: <span th:text="${username}"></span></h5>
+                <p>Người dùng: <span th:text="${user.getUserName()}"></span></p>
+
+                <div class="progress mt-1">
+                    <div class="progress-bar" role="progressbar"
+                         th:style="'width: ' + (${experience} * 100 / ${maxExperience}) + '%'"
+                         style="width: 60%"></div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="me-2" th:text="'Kinh Nghiệm: ' + ${experience} + '/' + ${maxExperience}">Kinh Nghiệm: 120/200</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Row -->
+        <div class="row">
+            <!-- Left Column: Welcome Box and Habits Section -->
+            <div class="col-lg-9">
+                <!-- Welcome Box -->
+                <div class="welcome-box">
+                    <h4>Chào bạn!</h4>
+                    <p th:text="'Bạn đang ở ngày thứ ' + ${challengeDay} + ' của thử thách Thay đổi lối sống'">
+                    Bạn đang ở ngày thứ 24 của thử thách "Thay đổi lối sống"
+                    </p>
+                    <p>Cố gắng tiếp tục nhé! <i class="fas fa-fire text-danger"></i></p>
+
+                    <div class="mt-3">
+                        <h5>Hôm nay bạn có 4 thói quen cần hoàn thành:</h5>
+                        <ul>
+                            <li>Uống 1 cốc nước</li>
+                            <li>Ngủ trước 10h</li>
+                        </ul>
+                        <a href="#" class="text-primary">Xem chi tiết</a>
+                    </div>
+                </div>
+
+                <!-- Habits Section -->
+                <div class="habits-section">
+                    <div class="row">
+                        <div th:each="habit : ${habits}" class="col-md-6 mb-3">
+                            <div class="habit-card">
+                                <div class="habit-progress">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="background" cx="50" cy="50" r="40"></circle>
+                                        <circle class="progress" cx="50" cy="50" r="40"
+                                                th:style="'--progress: ' + ${habit.progress}"></circle>
+                                    </svg>
+                                    <div class="habit-progress-text" th:text="${habit.progress} + '%'">50%</div>
+                                </div>
+                                <div class="habit-info">
+                                    <div class="habit-title" th:text="${habit.name}">Chơi Thể Thao</div>
+                                    <div class="habit-tasks" th:text="'Bạn có ' + ${habit.tasksCount} + ' công việc cần làm'">
+                                        Bạn có 4 công việc cần làm
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Calendar and Rewards Section -->
+            <div class="col-lg-3">
+                <!-- Calendar -->
+                <div class="calendar">
+                    <div class="calendar__header">
+                        <div class="calendar__month-year">
+                            <span>April</span> <span>2021</span>
+                        </div>
+                        <div class="calendar__nav">
+                            <button class="calendar__nav-btn" id="prevMonth">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="calendar__nav-btn" id="nextMonth">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="calendar__opts">
+                        <select name="calendar__month" id="calendar__month">
+                            <option th:each="month, stat : ${months}"
+                                    th:selected="${stat.count == currentMonth}"
+                                    th:text="${month}"></option>
+                        </select>
+
+                        <select name="calendar__year" id="calendar__year">
+                            <option th:each="year : ${#numbers.sequence(currentYear - 5, currentYear + 5)}"
+                                    th:selected="${year == currentYear}"
+                                    th:text="${year}"></option>
+                        </select>
+                    </div>
+
+                    <div class="calendar__body">
+                        <div class="calendar__days">
+                            <div>Su</div>
+                            <div>Mo</div>
+                            <div>Tu</div>
+                            <div>We</div>
+                            <div>Th</div>
+                            <div>Fr</div>
+                            <div>Sa</div>
+                        </div>
+
+                        <div class="calendar__dates" id="calendarDates">
+                            <!-- Calendar dates will be generated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="info-box" id="dayInfo">Chọn ngày để xem thông tin</div>
+                </div>
+
+                <!-- Rewards Section -->
+                <div class="rewards-section">
+                    <div class="rewards-header">
+                        <div class="rewards-title">Phần Thưởng</div>
+                        <button class="add-reward-btn">
+                            <i class="fas fa-plus"></i> Thêm Mục
+                        </button>
+                    </div>
+
+                    <div th:each="reward : ${rewards}" class="reward-item">
+                        <div th:text="${reward.name}">Xem Phim</div>
+                        <div class="reward-points" th:text="${reward.points}">10</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script th:inline="javascript">
+    $(document).ready(function() {
+        // Toggle sidebar
+        $('#sidebarCollapse').on('click', function() {
+            $('#sidebar').toggleClass('collapsed');
+            $('#content').toggleClass('expanded');
+        });
+
+        $('.nav-link').on('click', function() {
+            $('.nav-link').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        // Calendar functionality
+        const time = new Date();
+        const currentYear = [[${currentYear}]];
+        const currentMonth = [[${currentMonth}]];
+
+        generateCalendar(currentYear, currentMonth);
+
+        function generateCalendar(year, month) {
+            const calendarDates = document.getElementById('calendarDates');
+            calendarDates.innerHTML = '';
+
+            const yearMonth = new Date(year, month - 1);
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0);
+
+            const firstDayOfWeek = firstDay.getDay(); // 0 = Sunday
+            const daysInMonth = lastDay.getDate();
+
+            // Update header
+            document.querySelector('.calendar__month-year').innerHTML =
+                `<span>${[[${months}]][month-1]}</span> <span>${year}</span>`;
+
+            // Previous month days
+            const prevMonthLastDay = new Date(year, month - 1, 0).getDate();
+            for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+                const greyDay = prevMonthLastDay - i;
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'calendar__date calendar__date--grey';
+                dateDiv.innerHTML = `<span>${greyDay}</span>`;
+                calendarDates.appendChild(dateDiv);
+            }
+
+            // Current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'calendar__date';
+                dateDiv.innerHTML = `<span>${day}</span>`;
+                dateDiv.setAttribute('data-date', dateStr);
+                dateDiv.addEventListener('click', function() {
+                    selectDay(dateStr, this);
+                });
+
+                // Highlight today
+                const today = new Date();
+                if (year === today.getFullYear() && month === today.getMonth() + 1 && day === today.getDate()) {
+                    dateDiv.classList.add('calendar__date--selected');
+                }
+
+                calendarDates.appendChild(dateDiv);
+            }
+
+            // Next month days
+            const totalCells = firstDayOfWeek + daysInMonth;
+            const remainingCells = 42 - totalCells; // 6 rows x 7 columns = 42 cells
+
+            for (let i = 1; i <= remainingCells; i++) {
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'calendar__date calendar__date--grey';
+                dateDiv.innerHTML = `<span>${i}</span>`;
+                calendarDates.appendChild(dateDiv);
+            }
+        }
+
+        // Month and year change handlers
+        $('#calendar__month, #calendar__year').on('change', function() {
+            const selectedMonth = $('#calendar__month').prop('selectedIndex') + 1;
+            const selectedYear = parseInt($('#calendar__year').val());
+            generateCalendar(selectedYear, selectedMonth);
+        });
+
+        // Previous and next month buttons
+        $('#prevMonth').on('click', function() {
+            let selectedMonth = $('#calendar__month').prop('selectedIndex');
+            let selectedYear = parseInt($('#calendar__year').val());
+
+            selectedMonth--;
+            if (selectedMonth < 0) {
+                selectedMonth = 11;
+                selectedYear--;
+            }
+
+            $('#calendar__month').prop('selectedIndex', selectedMonth);
+            $('#calendar__year').val(selectedYear);
+            generateCalendar(selectedYear, selectedMonth + 1);
+        });
+
+        $('#nextMonth').on('click', function() {
+            let selectedMonth = $('#calendar__month').prop('selectedIndex');
+            let selectedYear = parseInt($('#calendar__year').val());
+
+            selectedMonth++;
+            if (selectedMonth > 11) {
+                selectedMonth = 0;
+                selectedYear++;
+            }
+
+            $('#calendar__month').prop('selectedIndex', selectedMonth);
+            $('#calendar__year').val(selectedYear);
+            generateCalendar(selectedYear, selectedMonth + 1);
+        });
+
+        // Day selection
+        let selectedDateElement = null;
+
+        function selectDay(date, element) {
+            if (element.classList.contains('calendar__date--grey')) {
+                return;
+            }
+
+            if (selectedDateElement) {
+                selectedDateElement.classList.remove('calendar__date--selected');
+            }
+
+            selectedDateElement = element;
+
+            // Fetch day info
+            fetch(`/api/calendar/${date}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Lỗi mạng hoặc API không phản hồi");
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById("dayInfo").textContent = data;
+                })
+                .catch(error => {
+                    document.getElementById("dayInfo").textContent = "Lỗi khi tải dữ liệu: " + error.message;
+                });
+        }
+
+        // Initialize with April 2021 (as shown in the image)
+        generateCalendar(currentYear, currentMonth);
+    });
+</script>
 </body>
 </html>
+
+
+
