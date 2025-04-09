@@ -88,11 +88,11 @@
 
                 <div class="progress mt-1">
                     <div class="progress-bar" role="progressbar"
-                         th:style="'width: ' + (${experience} * 100 / ${maxExperience}) + '%'"
+                         th:style="'width: ' + (${user.getExp()} * 100 / ${maxExperience}) + '%'"
                          style="width: 60%"></div>
                 </div>
                 <div class="d-flex align-items-center">
-                    <span class="me-2" th:text="'Kinh Nghiệm: ' + ${experience} + '/' + ${maxExperience}">Kinh Nghiệm: 120/200</span>
+                    <span class="me-2" th:text="'Kinh Nghiệm: ' + ${user.getExp()} + '/' + ${maxExperience}">Kinh Nghiệm: 120/200</span>
                 </div>
             </div>
         </div>
@@ -120,28 +120,28 @@
                 </div>
 
                 <!-- Habits Section -->
-                <div class="habits-section">
+                <a href="" class="habits-section">
                     <div class="row">
-                        <div th:each="habit : ${habits}" class="col-md-6 mb-3">
+                        <div th:each="habit : ${user.getChallenges()}" class="col-md-6 mb-3">
                             <div class="habit-card">
                                 <div class="habit-progress">
                                     <svg viewBox="0 0 100 100">
                                         <circle class="background" cx="50" cy="50" r="40"></circle>
                                         <circle class="progress" cx="50" cy="50" r="40"
-                                                th:style="'--progress: ' + ${habit.progress}"></circle>
+                                                th:style="'--progress: ' + ${habit.getParticipantCount()}"></circle>
                                     </svg>
-                                    <div class="habit-progress-text" th:text="${habit.progress} + '%'">50%</div>
+                                    <div class="habit-progress-text" th:text="${habit.getStreak()} + '%'">50%</div>
                                 </div>
                                 <div class="habit-info">
-                                    <div class="habit-title" th:text="${habit.name}">Chơi Thể Thao</div>
-                                    <div class="habit-tasks" th:text="'Bạn có ' + ${habit.tasksCount} + ' công việc cần làm'">
+                                    <div class="habit-title" th:text="${habit.getTitle()}">Chơi Thể Thao</div>
+                                    <div class="habit-tasks" th:text="'Bạn có ' + ${habit.getIsPublic()} + ' công việc cần làm'">
                                         Bạn có 4 công việc cần làm
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <!-- Right Column: Calendar and Rewards Section -->
@@ -204,9 +204,12 @@
                         </button>
                     </div>
 
-                    <div th:each="reward : ${rewards}" class="reward-item">
-                        <div th:text="${reward.name}">Xem Phim</div>
-                        <div class="reward-points" th:text="${reward.points}">10</div>
+                    <div th:each="reward : ${user.getRewards()}" class="reward-item">
+                        <div class="reward-name" th:text="${reward.getTitle()}">Phần thưởng</div>
+                        <div class="reward-points">
+                            <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
+                            <span th:text="${reward.getCoinCost()}">10</span>
+                        </div>
                     </div>
                 </div>
             </div>

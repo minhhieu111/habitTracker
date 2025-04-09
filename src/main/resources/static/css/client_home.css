@@ -104,8 +104,8 @@ body {
 }
 
 .user-avatar {
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 50px;
     background-color: #f7b924;
     border-radius: 50%;
     display: flex;
@@ -276,7 +276,11 @@ select {
 /* Habit cards */
 .habits-section {
     margin-bottom: 20px;
+    text-decoration: none;
+    color: #1a1a1a;
 }
+
+.habits-section
 
 .habit-card {
     background-color: #f2f2f2;
@@ -286,6 +290,12 @@ select {
     position: relative;
     display: flex;
     align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.habit-card:hover {
+    transform: translateY(-5px);
 }
 
 .habit-progress {
@@ -375,11 +385,38 @@ select {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
     background-color: #fff;
-    border-radius: 8px;
-    margin-bottom: 10px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    height: 50px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.reward-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #222;
 }
 
 .reward-points {
-    background-color: var(--primary-color);}
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffedb4;
+    padding: 0 10px;
+    min-width: 60px;
+    height: 100%;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.reward-name{
+    margin-left: 20px;
+}
+
+.coin-icon {
+    width: 20px;
+    height: 20px;
+}

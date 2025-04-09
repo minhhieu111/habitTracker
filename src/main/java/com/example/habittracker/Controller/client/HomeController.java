@@ -55,46 +55,6 @@ public class HomeController {
         model.addAttribute("maxExperience", 200);
         model.addAttribute("challengeDay", 24);
 
-        // Habits data
-        Map<String, Object> sportsHabit = new HashMap<>();
-        sportsHabit.put("name", "Chơi Thể Thao");
-        sportsHabit.put("progress", 50);
-        sportsHabit.put("tasksCount", 4);
-
-        Map<String, Object> programmingHabit = new HashMap<>();
-        programmingHabit.put("name", "Học Lập Trình");
-        programmingHabit.put("progress", 20);
-        programmingHabit.put("tasksCount", 16);
-
-        Map<String, Object> lifestyleHabit = new HashMap<>();
-        lifestyleHabit.put("name", "Lối Sống");
-        lifestyleHabit.put("progress", 63);
-        lifestyleHabit.put("tasksCount", 6);
-
-        Map<String, Object> financeHabit = new HashMap<>();
-        financeHabit.put("name", "Tài chính");
-        financeHabit.put("progress", 0);
-        financeHabit.put("tasksCount", 5);
-
-        model.addAttribute("habits", new Object[]{sportsHabit, programmingHabit, lifestyleHabit, financeHabit});
-
-        // Rewards data
-        Map<String, Object> watchMovieReward = new HashMap<>();
-        watchMovieReward.put("name", "Xem Phim");
-        watchMovieReward.put("points", 10);
-
-        Map<String, Object> eatReward = new HashMap<>();
-        eatReward.put("name", "Ăn Vặt");
-        eatReward.put("points", 20);
-
-        Map<String, Object> playReward = new HashMap<>();
-        playReward.put("name", "Đi ngủ");
-        playReward.put("points", 40);
-
-
-
-        model.addAttribute("rewards", new Object[]{watchMovieReward, eatReward, playReward});
-
         return "client/home";
     }
 

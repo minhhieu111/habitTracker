@@ -40,8 +40,8 @@ public class User {
 
     @ManyToMany
     @JoinTable(name = "user_challenge",
-    joinColumns = {@JoinColumn(name = "challenge_id")},
-    inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    joinColumns = {@JoinColumn(name = "user_id")},
+    inverseJoinColumns = {@JoinColumn(name = "challenge_id")})
     List<Challenge> challenges;
 
     @OneToMany(mappedBy = "user")
@@ -50,8 +50,8 @@ public class User {
 
     @ManyToMany
     @JoinTable(name = "user_achievement",
-            joinColumns = {@JoinColumn(name = "achievement_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "achievement_id")})
     List<Achievement> achievements;
 
 
