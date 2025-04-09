@@ -72,29 +72,41 @@
 <div id="content">
 
 
-    <div class="container-fluid mt-5">
+    <div class="container-fluid">
         <!-- User Profile -->
-        <div class="user-profile d-flex align-items-center">
-            <div class="d-flex flex-column align-items-center me-2">
+        <div class="user-profile row align-items-center">
+            <!-- Avatar và Cấp độ -->
+            <div class="user-info d-flex flex-column align-items-end col-1">
                 <div class="user-avatar">
                     <i class="fas fa-smile text-white"></i>
                 </div>
-                <p>Cấp độ: <span th:text="${user.getLevel()}"></span></p>
+                <p class="mt-2">Cấp độ: <span th:text="${user.getLevel()}"></span></p>
             </div>
 
-            <div class="flex-grow-1">
-                <h5 class="mb-1">Danh Hiệu: <span th:text="${username}"></span></h5>
+            <!-- Thông tin chi tiết -->
+            <div class="col-3">
+                <span class="mb-1">Danh Hiệu: <span th:text="${username}"></span></span>
                 <p>Người dùng: <span th:text="${user.getUserName()}"></span></p>
-
                 <div class="progress mt-1">
                     <div class="progress-bar" role="progressbar"
                          th:style="'width: ' + (${user.getExp()} * 100 / ${maxExperience}) + '%'"
-                         style="width: 60%"></div>
+                         style="width: 60%">
+                    </div>
                 </div>
-                <div class="d-flex align-items-center">
+                <div class="user-experiment">
                     <span class="me-2" th:text="'Kinh Nghiệm: ' + ${user.getExp()} + '/' + ${maxExperience}">Kinh Nghiệm: 120/200</span>
                 </div>
             </div>
+
+            <!-- Coin -->
+            <div th:style="'height:100%; width:20px'" class="d-flex flex-column align-items-center col-7 ms-auto">
+                <img src="/images/coin-icon.png" alt="coin" class="user-coin">
+                <span th:text="${user.getCoins()}">100</span>
+            </div>
+        </div>
+
+
+
         </div>
 
         <!-- Main Content Row -->
