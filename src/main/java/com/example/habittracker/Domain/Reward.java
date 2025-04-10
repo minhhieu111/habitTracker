@@ -1,6 +1,8 @@
 package com.example.habittracker.Domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -13,8 +15,12 @@ public class Reward {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rewardId;
+
+    @NotBlank(message = "Nhập tiêu đề")
     private String title;
     private String description;
+
+    @NotNull
     private Long coinCost;
 
     @ManyToOne()

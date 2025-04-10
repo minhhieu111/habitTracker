@@ -12,61 +12,18 @@
 
 </head>
 <body>
-<!-- Sidebar -->
-<nav id="sidebar">
-    <!-- Toggle Button -->
-    <button id="sidebarCollapse" class="btn btn-link text-dark position-fixed" style="top: 10px; left: 10px; z-index: 1040;">
-        <i class="fas fa-bars"></i>
-    </button>
-    <div class="sidebar-header">
-        <h5>BeBet</h5>
+<!-- Toast Notification -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    <div id="Toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="2000">
+        <div class="toast-body">
+            <span th:if="${failed}" th:text="${failed}"></span>
+            <span th:if="${success}" th:text="${success}"></span>
+        </div>
     </div>
-    <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link active" href="#">
-                <i class="fas fa-home"></i>
-                <span>Trang chủ</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-clock"></i>
-                <span>Thói quen</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-calendar"></i>
-                <span>Hằng ngày</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-list"></i>
-                <span>Việc cần làm</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-trophy"></i>
-                <span>Thử thách</span>
-            </a>
-        </li>
-        <!-- Các mục phụ ở dưới cùng -->
-        <li class="nav-item mt-auto">
-            <a class="nav-link" href="#">
-                <i class="fas fa-user"></i>
-                <span>Hồ sơ</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-danger" href="/logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Đăng xuất</span>
-            </a>
-        </li>
-    </ul>
-</nav>
+</div>
+
+<!-- Sidebar -->
+<div th:replace="layout/sidebar.html"></div>
 
 <!-- Page Content -->
 <div id="content">
@@ -94,14 +51,14 @@
                     </div>
                 </div>
                 <div class="user-experiment">
-                    <span class="me-2" th:text="'Kinh Nghiệm: ' + ${user.getExp()} + '/' + ${maxExperience}">Kinh Nghiệm: 120/200</span>
+                    <span class="me-2" th:text="'Kinh Nghiệm: ' + ${user.getExp()} + '/' + ${maxExperience}">Kinh Nghiệm: </span>
                 </div>
             </div>
 
             <!-- Coin -->
             <div th:style="'height:100%; width:20px'" class="d-flex flex-column align-items-center col-7 ms-auto">
                 <img src="/images/coin-icon.png" alt="coin" class="user-coin">
-                <span th:text="${user.getCoins()}">100</span>
+                <span th:text="${user.getCoins()}">0</span>
             </div>
         </div>
 
@@ -208,19 +165,57 @@
                 </div>
 
                 <!-- Rewards Section -->
-                <div class="rewards-section">
+                <div class="rewards-section" style="max-height: 400px; overflow-y: auto;">
                     <div class="rewards-header">
                         <div class="rewards-title">Phần Thưởng</div>
-                        <button class="add-reward-btn">
+                        <button class="add-reward-btn" data-bs-toggle="modal" data-bs-target="#modalReward" >
                             <i class="fas fa-plus"></i> Thêm Mục
                         </button>
                     </div>
 
-                    <div th:each="reward : ${user.getRewards()}" class="reward-item">
+                    <div th:each="reward : ${user.getRewards()}" class="reward-item" >
                         <div class="reward-name" th:text="${reward.getTitle()}">Phần thưởng</div>
                         <div class="reward-points">
                             <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
                             <span th:text="${reward.getCoinCost()}">10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Reward-->
+            <div class="modal fade" id="modalReward" tabindex="-1" aria-labelledby="modalRewardLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalRewardLabel">Tạo Phần Thưởng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="rewardForm" th:action="@{/rewards/save}" method="post" th:object="${newReward}">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" th:field="*{title}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Ghi chú</label>
+                                    <textarea class="form-control" id="notes" th:field="*{description}" rows="3" placeholder="Thêm ghi chú"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="coinCost" class="form-label">Chi phí</label>
+                                    <div class="input-group">
+                                <span class="input-group-text">
+                                    <img src="/images/coin-icon.png" alt="coin" class="coin-icon" style="width: 16px; height: 16px;">
+                                </span>
+                                        <input type="number" class="form-control" id="coinCost" th:field="*{coinCost}" value="10" min="1">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                    <button type="button" class="btn btn-danger" id="deleteRewardBtn" style="display: none;" onclick="deleteReward()">Xóa Phần Thưởng Này</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -236,6 +231,13 @@
 
 <script th:inline="javascript">
     $(document).ready(function() {
+        // Show toast if there is an error message
+        if ([[${failed}]] != null || [[${success}]] != null) {
+            var toastEl = document.getElementById('Toast');
+            var toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
         // Toggle sidebar
         $('#sidebarCollapse').on('click', function() {
             $('#sidebar').toggleClass('collapsed');
