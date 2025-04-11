@@ -396,6 +396,19 @@ select {
     gap: 5px;
     cursor: pointer;
 }
+.rewards-contain {
+    max-height: calc(4 * 62px); /* giả sử mỗi reward-item cao 80px */
+    overflow-y: auto;
+}
+
+.rewards-contain::-webkit-scrollbar {
+    width: 8px;
+}
+
+.rewards-contain::-webkit-scrollbar-thumb {
+    background-color: #d3d3d3;
+    border-radius: 4px;
+}
 
 .reward-item {
     display: flex;
@@ -423,9 +436,14 @@ select {
     background-color: #ffedb4;
     padding: 0 10px;
     min-width: 60px;
+    max-width: 60px;
     height: 100%;
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
+    overflow-y: hidden;
+}
+.reward-points::-webkit-scrollbar{
+    display: none;
 }
 
 .reward-name{

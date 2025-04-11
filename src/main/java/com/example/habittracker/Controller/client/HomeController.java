@@ -40,8 +40,6 @@ public class HomeController {
 
         model.addAttribute("user", user);
 
-
-
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();
         int currentMonth = today.getMonthValue();

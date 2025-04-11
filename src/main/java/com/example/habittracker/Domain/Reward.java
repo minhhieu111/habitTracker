@@ -20,8 +20,7 @@ public class Reward {
     private String title;
     private String description;
 
-    @NotNull
-    private Long coinCost;
+    private Long coinCost = 0L;
 
     @ManyToOne()
     @JoinColumn(name="user_id")
