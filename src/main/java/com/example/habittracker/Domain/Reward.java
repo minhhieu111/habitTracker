@@ -15,11 +15,8 @@ public class Reward {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rewardId;
-
-    @NotBlank(message = "Nhập tiêu đề")
     private String title;
     private String description;
-
     private Long coinCost = 0L;
 
     @ManyToOne()

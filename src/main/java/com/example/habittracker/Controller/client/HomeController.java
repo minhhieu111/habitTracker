@@ -57,6 +57,7 @@ public class HomeController {
         model.addAttribute("challengeDay", 24);
 
         model.addAttribute("newReward", new Reward());
+        model.addAttribute("updateReward", new Reward());
         return "client/home";
     }
 

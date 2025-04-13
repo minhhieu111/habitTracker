@@ -10,15 +10,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="/css/client_home.css">
 
+
 </head>
 <body>
 <!-- Toast Notification -->
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
     <div id="Toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
-        <div class="toast-body">
-            <span th:if="${failed}" th:text="${failed}"></span>
-            <span th:if="${success}" th:text="${success}"></span>
-        </div>
+        <div class="toast-body text-bg-danger" th:if="${failed}" th:text="${failed}"/>
+        <div class="toast-body text-bg-success" th:if="${success}" th:text="${success}"/>
     </div>
 </div>
 
@@ -30,8 +29,6 @@
 
 
     <div class="container-fluid">
-
-
         <!-- Main Content Row -->
         <div class="row">
             <!-- Left Column: Welcome Box and Habits Section -->
@@ -43,13 +40,16 @@
                         <div class="user-avatar">
                             <i class="fas fa-smile text-white"></i>
                         </div>
-                        <p class="mt-2">Cấp độ: <span th:text="${user.getLevel()}"></span></p>
                     </div>
 
                     <!-- Thông tin chi tiết -->
                     <div class="col-3">
-                        <span class="mb-1">Danh Hiệu: <span th:text="${username}"></span></span>
+                        <strong>
+                            <span class="mb-1">Danh Hiệu: <span th:text="${username}"></span></span>
+                        </strong>
+
                         <p>Người dùng: <span th:text="${user.getUserName()}"></span></p>
+                        <strong>Cấp độ: <span th:text="${user.getLevel()}"></span></strong>
                         <div class="progress mt-1">
                             <div class="progress-bar" role="progressbar"
                                  th:style="'width: ' + (${user.getExp()} * 100 / ${maxExperience}) + '%'"
@@ -172,7 +172,11 @@
                     </div>
                     <div class="rewards-contain">
                         <div th:each="reward : ${user.getRewards()}" class="reward-item" >
-                            <div class="reward-name" th:text="${reward.getTitle()}">Phần thưởng</div>
+
+                            <button class="add-reward-btn reward-name" th:data-reward-id="${reward.getRewardId()}" onclick="openEditRewardModal(this.getAttribute('data-reward-id'))" >
+                                <div th:text="${reward.getTitle()}">Phần thưởng</div>
+                            </button>
+
                             <div class="reward-points">
                                 <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
                                 <span th:text="${reward.getCoinCost()}">10</span>
@@ -183,7 +187,7 @@
                 </div>
             </div>
 
-            <!-- Modal Reward-->
+            <!-- Modal Create Reward-->
             <div class="modal fade" id="modalReward" tabindex="-1" aria-labelledby="modalRewardLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -197,6 +201,7 @@
                                 <div class="mb-3">
                                     <label for="title" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="title" th:field="*{title}">
+                                    <div id="titleError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="notes" class="form-label">Ghi chú</label>
@@ -214,13 +219,80 @@
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                                     <button type="submit" class="btn btn-primary">Lưu</button>
-                                    <button type="button" class="btn btn-danger" id="deleteRewardBtn" style="display: none;" onclick="deleteReward()">Xóa Phần Thưởng Này</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Modal Edit Reward -->
+            <div class="modal fade" id="editReward" tabindex="-1" aria-labelledby="modalEditRewardLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditRewardLabel">Chỉnh Sửa Phần Thưởng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="rewardUpdateForm" th:action="@{/rewards/update}" method="post" th:object="${updateReward}">
+                                <input type="hidden" id="updateRewardId" th:field="*{rewardId}">
+                                <div class="mb-3">
+                                    <label for="updateTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="updateTitle" th:field="*{title}">
+                                    <div id="titleUpdateError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
+
+                                </div>
+                                <div class="mb-3">
+                                    <label for="updateDescription" class="form-label">Ghi chú</label>
+                                    <textarea class="form-control" id="updateDescription" rows="3" placeholder="Thêm ghi chú" th:field="*{description}"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="updateCoinCost" class="form-label">Chi phí</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <img src="/images/coin-icon.png" alt="coin" class="coin-icon" style="width: 16px; height: 16px;">
+                                        </span>
+                                        <input type="number" class="form-control" id="updateCoinCost" name="coinCost" min="0" th:field="*{coinCost}">
+                                    </div>
+                                </div>
+                                <div class="modal-footer d-flex justify-content-between">
+                                    <div>
+                                        <button type="button" class="btn btn-danger" id="deleteRewardBtn" onclick="deleteReward()">Xóa</button>
+                                    </div>
+                                    <div><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <button type="submit" class="btn btn-primary">Lưu</button>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Delete Reward -->
+<!--            <div class="modal fade" id="exampleModal-${account.accountId}" tabindex="-1" aria-labelledby="modalDeleteRewardLabel" aria-hidden="true">-->
+<!--                <div class="modal-dialog">-->
+<!--                    <div class="modal-content">-->
+<!--                        <div class="modal-header">-->
+<!--                            <h1 class="modal-title fs-5" id="exampleModalLabel">Delete account ${account.accountId}-->
+<!--                            </h1>-->
+<!--                            <button type="button" class="btn-close" data-bs-dismiss="modal"-->
+<!--                                    aria-label="Close"></button>-->
+<!--                        </div>-->
+<!--                        <div class="modal-body">-->
+<!--                            Are you sure delete this account ?-->
+<!--                        </div>-->
+<!--                        <div class="modal-footer">-->
+<!--                            <button type="button" class="btn btn-secondary"-->
+<!--                                    data-bs-dismiss="modal">Close</button>-->
+<!--                            <a th:href="@{reward/delete}" class="btn btn-primary">Confirm</a>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
         </div>
     </div>
 </div>
@@ -231,9 +303,30 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script th:inline="javascript">
+
+
     $(document).ready(function() {
 
-    // Show toast if there is an error message
+        // Function to open edit reward modal
+        window.openEditRewardModal = function (rewardId) {
+            fetch('/rewards/' + rewardId)
+                .then(response => response.json())
+                .then(reward => {
+                    document.getElementById('updateRewardId').value = reward.rewardId;
+                    document.getElementById('updateTitle').value = reward.title;
+                    document.getElementById('updateDescription').value = reward.description || '';
+                    document.getElementById('updateCoinCost').value = reward.coinCost;
+
+                    // Mở modal
+                    const editModal = new bootstrap.Modal(document.getElementById('editReward'));
+                    editModal.show();
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu phần thưởng:', error);
+                    alert('Không thể lấy dữ liệu phần thưởng.');
+                });
+        }
+        // Show toast if there is an error message
         if ([[${failed}]] != null || [[${success}]] != null) {
             var toastEl = document.getElementById('Toast');
             var toast = new bootstrap.Toast(toastEl);
@@ -251,9 +344,52 @@
             $(this).addClass('active');
         });
 
+        //Model create & edit validation
+        const form = document.getElementById("rewardForm");
+        const formUpdate = document.getElementById("rewardUpdateForm");
+        const titleInput = document.getElementById("title");
+        const titleUpdateInput = document.getElementById("updateTitle");
+        const titleError = document.getElementById("titleError");
+        const titleUpdateError = document.getElementById("titleUpdateError");
+
+        form.addEventListener("submit", (e) => {
+            let valid = true;
+            if (titleInput.value.trim() === "") {
+                titleError.style.display = "block";
+                valid = false;
+            } else {
+                titleError.style.display = "none";
+            }
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+
+        formUpdate.addEventListener("submit", (e) => {
+            let valid = true;
+
+            if (titleUpdateInput.value.trim() === "") {
+                titleUpdateError.style.display = "block";
+                valid = false;
+                console.log(valid)
+            } else {
+                titleUpdateError.style.display = "none";
+            }
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+
+        // Ẩn lỗi khi người dùng bắt đầu nhập
+        titleInput.addEventListener("input", function () {
+            if (titleInput.value.trim() !== "") {
+                titleError.style.display = "none";
+            }
+        });
+
         // Calendar functionality
         const time = new Date();
-        const currentYear = [[${currentYear}]];
+        const currentYear = [[${currentYear}]] ;
         const currentMonth = [[${currentMonth}]];
 
         generateCalendar(currentYear, currentMonth);
@@ -270,8 +406,7 @@
             const daysInMonth = lastDay.getDate();
 
             // Update header
-            document.querySelector('.calendar__month-year').innerHTML =
-                `<span>${[[${months}]][month-1]}</span> <span>${year}</span>`;
+            document.querySelector('.calendar__month-year').innerHTML = `<span>${[[${months}]][month-1]}</span> <span>${year}</span>`;
 
             // Previous month days
             const prevMonthLastDay = new Date(year, month - 1, 0).getDate();
@@ -315,14 +450,14 @@
             }
         }
 
-        // Month and year change handlers
+// Month and year change handlers
         $('#calendar__month, #calendar__year').on('change', function() {
             const selectedMonth = $('#calendar__month').prop('selectedIndex') + 1;
             const selectedYear = parseInt($('#calendar__year').val());
             generateCalendar(selectedYear, selectedMonth);
         });
 
-        // Previous and next month buttons
+// Previous and next month buttons
         $('#prevMonth').on('click', function() {
             let selectedMonth = $('#calendar__month').prop('selectedIndex');
             let selectedYear = parseInt($('#calendar__year').val());
@@ -353,7 +488,7 @@
             generateCalendar(selectedYear, selectedMonth + 1);
         });
 
-        // Day selection
+// Day selection
         let selectedDateElement = null;
 
         function selectDay(date, element) {
@@ -383,8 +518,9 @@
                 });
         }
 
-        // Initialize with April 2021 (as shown in the image)
+// Initialize with April 2021 (as shown in the image)
         generateCalendar(currentYear, currentMonth);
+
     });
 </script>
 </body>

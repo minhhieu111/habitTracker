@@ -103,14 +103,6 @@ body {
     position: relative;
 }
 
-.user-profile p {
-    margin: 0px;
-}
-
-.user-profile .user-info {
-    padding: 0px;
-}
-
 .user-avatar {
     width: 50px;
     height: 50px;
@@ -263,7 +255,7 @@ select {
     font-size: 0.9rem;
     cursor: pointer;
     position: relative;
-    border-radius: 50%;
+    border-radius: 20%;
     margin: 2px;
 }
 
@@ -295,8 +287,6 @@ select {
     text-decoration: none;
     color: #1a1a1a;
 }
-
-.habits-section
 
 .habit-card {
     background-color: #f2f2f2;
@@ -435,8 +425,8 @@ select {
     justify-content: center;
     background-color: #ffedb4;
     padding: 0 10px;
-    min-width: 60px;
-    max-width: 60px;
+    min-width: 18%;
+    max-width: 18%;
     height: 100%;
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
@@ -447,7 +437,12 @@ select {
 }
 
 .reward-name{
-    margin-left: 20px;
+    background: none;
+    text-decoration: none;
+    color: #1a1a1a;
+    width: 82%;
+    height: 100%;
+    padding: 15px 15px 15px 30px ;
 }
 
 .coin-icon {
