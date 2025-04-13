@@ -94,6 +94,15 @@ body {
     margin-left: var(--sidebar-collapsed-width);
 }
 
+/*Toast*/
+.toast-body{
+    font-size: 20px;
+}
+.toast-body img{
+    height: 27px;
+    width: 27px;
+}
+
 /* User profile */
 .user-profile {
     background-color: #ffffff;
@@ -104,8 +113,8 @@ body {
 }
 
 .user-avatar {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     background-color: #f7b924;
     border-radius: 50%;
     display: flex;
@@ -207,20 +216,13 @@ body {
 
 select {
     background-color: #f3f4f6;
-    padding: 10px 15px;
+    padding: 10px 30px 10px 15px;
     border-radius: 20px;
     border: none;
     font-family: inherit;
     font-weight: 600;
     font-size: 0.9rem;
     -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 16px;
-    padding-right: 30px;
 }
 
 .calendar__body {
@@ -419,18 +421,13 @@ select {
 }
 
 .reward-points {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     background-color: #ffedb4;
-    padding: 0 10px;
     min-width: 18%;
     max-width: 18%;
     height: 100%;
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
     overflow-y: hidden;
+    text-decoration: none;
+    color: #1a1a1a;
 }
 .reward-points::-webkit-scrollbar{
     display: none;

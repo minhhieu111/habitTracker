@@ -16,8 +16,9 @@
 <!-- Toast Notification -->
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
     <div id="Toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
-        <div class="toast-body text-bg-danger" th:if="${failed}" th:text="${failed}"/>
+        <div class="toast-body text-bg-danger" th:if="${failed}">Lỗi: <span th:text="${failed}"/></div>
         <div class="toast-body text-bg-success" th:if="${success}" th:text="${success}"/>
+        <div class="toast-body text-bg-warning d-flex justify-content-end" th:if="${exchange}">-<span class="me-2" th:text="${exchange}"></span><img src="/images/coin-icon.png" alt="coin" class="coin-icon"></div>
     </div>
 </div>
 
@@ -36,10 +37,8 @@
                 <!-- User Profile -->
                 <div class="user-profile row align-items-center">
                     <!-- Avatar và Cấp độ -->
-                    <div class="user-info d-flex flex-column align-items-end col-1">
-                        <div class="user-avatar">
-                            <i class="fas fa-smile text-white"></i>
-                        </div>
+                    <div class="user-avatar">
+                        <i class="fas fa-smile text-white"></i>
                     </div>
 
                     <!-- Thông tin chi tiết -->
@@ -177,10 +176,10 @@
                                 <div th:text="${reward.getTitle()}">Phần thưởng</div>
                             </button>
 
-                            <div class="reward-points">
+                            <a th:href="@{'rewards/exchange/'+${reward.getRewardId()}}" class="reward-points d-flex flex-column justify-content-center align-items-center">
                                 <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
                                 <span th:text="${reward.getCoinCost()}">10</span>
-                            </div>
+                            </a>
                         </div>
                     </div>
 
@@ -258,9 +257,11 @@
                                 </div>
                                 <div class="modal-footer d-flex justify-content-between">
                                     <div>
-                                        <button type="button" class="btn btn-danger" id="deleteRewardBtn" onclick="deleteReward()">Xóa</button>
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                th:data-bs-target="'#deleteRewardModal__' + ${updateReward.rewardId}">Xóa</button>
                                     </div>
-                                    <div><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                                         <button type="submit" class="btn btn-primary">Lưu</button>
                                     </div>
 
@@ -272,26 +273,26 @@
             </div>
 
             <!-- Modal Delete Reward -->
-<!--            <div class="modal fade" id="exampleModal-${account.accountId}" tabindex="-1" aria-labelledby="modalDeleteRewardLabel" aria-hidden="true">-->
-<!--                <div class="modal-dialog">-->
-<!--                    <div class="modal-content">-->
-<!--                        <div class="modal-header">-->
-<!--                            <h1 class="modal-title fs-5" id="exampleModalLabel">Delete account ${account.accountId}-->
-<!--                            </h1>-->
-<!--                            <button type="button" class="btn-close" data-bs-dismiss="modal"-->
-<!--                                    aria-label="Close"></button>-->
-<!--                        </div>-->
-<!--                        <div class="modal-body">-->
-<!--                            Are you sure delete this account ?-->
-<!--                        </div>-->
-<!--                        <div class="modal-footer">-->
-<!--                            <button type="button" class="btn btn-secondary"-->
-<!--                                    data-bs-dismiss="modal">Close</button>-->
-<!--                            <a th:href="@{reward/delete}" class="btn btn-primary">Confirm</a>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
+            <div class="modal fade" th:id="'deleteRewardModal__' + ${updateReward.rewardId}" tabindex="-1" aria-labelledby="modalDeleteRewardLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa phần thưởng <span th:text="${updateReward.rewardId}"></span>
+                            </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Đóng"></button>
+                        </div>
+                        <div class="modal-body">
+                            Bạn có chắc chắn muốn xóa phần thưởng này?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Đóng</button>
+                            <a id="deleteReward" class="btn btn-primary">Đồng ý</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -307,27 +308,8 @@
 
     $(document).ready(function() {
 
-        // Function to open edit reward modal
-        window.openEditRewardModal = function (rewardId) {
-            fetch('/rewards/' + rewardId)
-                .then(response => response.json())
-                .then(reward => {
-                    document.getElementById('updateRewardId').value = reward.rewardId;
-                    document.getElementById('updateTitle').value = reward.title;
-                    document.getElementById('updateDescription').value = reward.description || '';
-                    document.getElementById('updateCoinCost').value = reward.coinCost;
-
-                    // Mở modal
-                    const editModal = new bootstrap.Modal(document.getElementById('editReward'));
-                    editModal.show();
-                })
-                .catch(error => {
-                    console.error('Lỗi khi lấy dữ liệu phần thưởng:', error);
-                    alert('Không thể lấy dữ liệu phần thưởng.');
-                });
-        }
         // Show toast if there is an error message
-        if ([[${failed}]] != null || [[${success}]] != null) {
+        if ([[${failed}]] != null || [[${success}]] != null || [[${exchange}]] != null) {
             var toastEl = document.getElementById('Toast');
             var toast = new bootstrap.Toast(toastEl);
             toast.show();
@@ -343,6 +325,26 @@
             $('.nav-link').removeClass('active');
             $(this).addClass('active');
         });
+
+        // Function to open edit reward modal
+        window.openEditRewardModal = function (rewardId) {
+            fetch('/rewards/' + rewardId)
+                .then(response => response.json())
+                .then(reward => {
+                    document.getElementById('updateRewardId').value = reward.rewardId;
+                    document.getElementById('updateTitle').value = reward.title;
+                    document.getElementById('updateDescription').value = reward.description || '';
+                    document.getElementById('updateCoinCost').value = reward.coinCost;
+                    document.getElementById('deleteReward').setAttribute("href", '/rewards/delete/' + reward.rewardId);
+
+                    const editModal = new bootstrap.Modal(document.getElementById('editReward'));
+                    editModal.show();
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu phần thưởng:', error);
+                    alert('Không thể lấy dữ liệu phần thưởng.');
+                });
+        }
 
         //Model create & edit validation
         const form = document.getElementById("rewardForm");
@@ -377,13 +379,6 @@
             }
             if (!valid) {
                 e.preventDefault();
-            }
-        });
-
-        // Ẩn lỗi khi người dùng bắt đầu nhập
-        titleInput.addEventListener("input", function () {
-            if (titleInput.value.trim() !== "") {
-                titleError.style.display = "none";
             }
         });
 

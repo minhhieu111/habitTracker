@@ -18,9 +18,6 @@ public class RewardService {
 
     public void save(Reward reward, String userName) {
         User user = userRepository.findUserByUserName(userName);
-        if(user == null) {
-            throw new RuntimeException("Thêm thất bại không tìm thấy người dùng!");
-        }
         if (reward.getTitle().isEmpty()) {
             System.out.println(reward.getTitle());
             throw new RuntimeException("Thêm thất bại tiêu đề đang trống");
@@ -55,5 +52,26 @@ public class RewardService {
         updateReward.setCoinCost(reward.getCoinCost());
 
         this.rewardRepository.save(updateReward);
+    }
+
+    public void deleteReward(Long rewardId) {
+        Reward reward = this.rewardRepository.findById(rewardId).get();
+        if(reward == null) {
+            throw new RuntimeException("Không tìm thấy phần thưởng cần xóa!");
+        }
+        this.rewardRepository.delete(reward);
+    }
+
+    public Long exchangeReward(User user, Reward reward) {
+        if(user==null || reward==null) {
+            throw new RuntimeException("Không tìm thấy người dùng hoặc phần thưởng!");
+        }
+        if(user.getCoins()<reward.getCoinCost()) {
+            throw new RuntimeException("Xu không đủ!");
+        }
+        Long exchange =reward.getCoinCost();
+        user.setCoins(user.getCoins() - reward.getCoinCost());
+        this.userRepository.save(user);
+        return exchange;
     }
 }
