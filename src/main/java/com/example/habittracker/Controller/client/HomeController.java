@@ -2,6 +2,7 @@ package com.example.habittracker.Controller.client;
 
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
+import com.example.habittracker.Domain.Reward;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,6 +56,8 @@ public class HomeController {
         model.addAttribute("maxExperience", 200);
         model.addAttribute("challengeDay", 24);
 
+        model.addAttribute("newReward", new Reward());
+        model.addAttribute("updateReward", new Reward());
         return "client/home";
     }
 

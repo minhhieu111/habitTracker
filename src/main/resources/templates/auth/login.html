@@ -15,6 +15,12 @@
 
         <h2 class="login-title">Đăng nhập</h2>
 
+        <div th:if="${expired}" class="alert alert-warning alert-dismissible fade show" role="alert">
+            <span th:text="${expired}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
         <div th:if="${fail}" class="alert alert-danger" th:text="${fail}"></div>

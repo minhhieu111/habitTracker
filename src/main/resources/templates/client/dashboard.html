@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Thói Quen</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --primary-color: #f7b924;
+            --primary-hover: #e5a91f;
+            --dark-bg: #1a1a1a;
+            --light-bg: #f2f2f2;
+            --sidebar-bg: #f2f2f2;
+            --sidebar-color: #333;
+            --progress-bar-height: 8px;
+            --yellow-color: #ffcc00;
+            --green-color: #00b25a;
+            --red-color: #ff3860;
+            --blue-color: #3298dc;
+            --gray-bg: #f2f2f2;
+            --card-radius: 10px;
+            --task-radius: 8px;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: #fff;
+            font-family: "Nunito", sans-serif;
+        }
+
+        /* Sidebar styles */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-color);
+            transition: all 0.3s;
+            z-index: 1020;
+            overflow-y: auto;
+            border-right: 1px solid #ddd;
+        }
+
+        #sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        #sidebar .nav-link {
+            padding: 0.8rem 1rem;
+            color: var(--sidebar-color);
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        #sidebar .nav-link:hover,
+        #sidebar .nav-link.active {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-left-color: var(--primary-color);
+        }
+
+        #sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        #sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        /* Main content area */
+        #content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        #content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        /* Header styles */
+        .app-header {
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background-color: var(--gray-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .username {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .exp-bar {
+            height: var(--progress-bar-height);
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            width: 200px;
+        }
+
+        .exp-progress {
+            height: 100%;
+            background-color: var(--yellow-color);
+        }
+
+        .exp-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .level-badge {
+            background-color: var(--gray-bg);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .gold-badge {
+            background-color: var(--yellow-color);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Progress section */
+        .progress-section {
+            background-color: var(--gray-bg);
+            border-radius: var(--card-radius);
+            padding: 15px;
+            margin: 15px;
+        }
+
+        .progress-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-label {
+            width: 100px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--blue-color);
+        }
+
+        .progress-text {
+            width: 50px;
+            text-align: right;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Challenge card */
+        .challenge-card {
+            background-color: var(--yellow-color);
+            color: #000;
+            border-radius: var(--card-radius);
+            padding: 20px;
+            margin: 15px;
+            text-align: center;
+        }
+
+        .challenge-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .challenge-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .challenge-progress {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .challenge-streak {
+            font-size: 1rem;
+        }
+
+        /* Search bar */
+        .search-container {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-bar {
+            display: flex;
+            background-color: var(--gray-bg);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            background-color: transparent;
+            padding: 10px 15px;
+            outline: none;
+        }
+
+        .search-button {
+            background-color: transparent;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        /* Task columns */
+        .tasks-container {
+            display: flex;
+            padding: 0 15px;
+        }
+
+        .task-column {
+            flex: 1;
+            padding: 15px;
+            min-width: 0;
+        }
+
+        .column-header {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .add-task-button {
+            background-color: var(--gray-bg);
+            border: none;
+            border-radius: var(--task-radius);
+            padding: 10px;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .add-task-button i {
+            margin-right: 10px;
+        }
+
+        /* Task items */
+        .task-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            border-radius: var(--task-radius);
+            overflow: hidden;
+        }
+
+        .task-color-bar {
+            width: 5px;
+            height: 50px;
+            flex-shrink: 0;
+        }
+
+        .task-color-bar.yellow {
+            background-color: var(--yellow-color);
+        }
+
+        .task-color-bar.green {
+            background-color: var(--green-color);
+        }
+
+        .task-color-bar.red {
+            background-color: var(--red-color);
+        }
+
+        .task-content {
+            flex: 1;
+            background-color: var(--gray-bg);
+            padding: 10px 15px;
+            min-width: 0;
+        }
+
+        .task-name {
+            font-weight: bold;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .task-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .task-actions {
+            display: flex;
+        }
+
+        .task-action-button {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        .task-action-button.plus {
+            background-color: var(--yellow-color);
+            color: #fff;
+        }
+
+        .task-action-button.minus {
+            background-color: var(--red-color);
+            color: #fff;
+        }
+
+        .task-count {
+            background-color: var(--gray-bg);
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        /* Daily and Todo items */
+        .daily-item, .todo-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            border-radius: var(--task-radius);
+            overflow: hidden;
+        }
+
+        .task-checkbox {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .task-checkbox.yellow {
+            background-color: var(--yellow-color);
+        }
+
+        .task-checkbox.green {
+            background-color: var(--green-color);
+        }
+
+        .task-checkbox.red {
+            background-color: var(--red-color);
+        }
+
+        .task-checkbox i {
+            color: #fff;
+        }
+
+        .completed .task-content {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        /* Journal section */
+        .journal-section {
+            padding: 15px;
+        }
+
+        .journal-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .journal-day {
+            background-color: var(--gray-bg);
+            border-radius: var(--task-radius);
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .journal-day-expanded {
+            background-color: var(--gray-bg);
+            border-radius: var(--task-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .column-footer {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .tasks-container {
+                flex-direction: column;
+            }
+
+            .task-column {
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: calc(var(--sidebar-width) * -1);
+            }
+
+            #sidebar.active {
+                margin-left: 0;
+            }
+
+            #content {
+                margin-left: 0;
+            }
+
+            #content.expanded {
+                margin-left: 0;
+            }
+
+            .user-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .exp-bar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<nav id="sidebar">
+    <div class="p-3">
+        <h5>Quản Lý Thói Quen</h5>
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link active" href="#">
+                <i class="fas fa-home"></i>
+                <span>Tổng quan</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-tasks"></i>
+                <span>Thói quen</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-calendar-check"></i>
+                <span>Hàng ngày</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Việc cần làm</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-trophy"></i>
+                <span>Thử thách</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-chart-line"></i>
+                <span>Thống kê</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-cog"></i>
+                <span>Cài đặt</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<!-- Page Content -->
+<div id="content">
+    <!-- Header -->
+    <div class="app-header">
+        <!-- Toggle Button -->
+        <button id="sidebarCollapse" class="btn btn-link text-dark">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-smile text-warning"></i>
+            </div>
+            <div class="user-details">
+                <div class="username" th:text="${username}">Danh hiệu: Người mới bắt đầu</div>
+                <div class="exp-text" th:text="'Kinh Nghiệm: ' + ${experience} + '/' + ${maxExperience}">Kinh Nghiệm: 120/200</div>
+                <div class="exp-bar">
+                    <div class="exp-progress" th:style="'width: ' + (${experience} * 100 / ${maxExperience}) + '%'"></div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="level-badge" th:text="'Cấp độ: ' + ${level}">Cấp độ: 2</div>
+                <div class="gold-badge" th:text="${gold}">100</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mx-0">
+        <div class="col-md-6">
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <h5>Tiến độ</h5>
+                <div class="progress-row">
+                    <div class="progress-label">Chuỗi: <span th:text="${streakCount}">5</span></div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" th:style="'width: ' + (${streakCount} * 100 / ${maxStreak}) + '%'" style="background-color: var(--blue-color);"></div>
+                    </div>
+                    <div class="progress-text" th:text="'/' + ${maxStreak}">/ 15</div>
+                </div>
+                <div class="progress-row">
+                    <div class="progress-label">Tuần này</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" th:style="'width: ' + (${weeklyProgress} * 100 / ${weeklyTotal}) + '%'" style="background-color: var(--blue-color);"></div>
+                    </div>
+                    <div class="progress-text" th:text="${weeklyProgress} + '/' + ${weeklyTotal}">5/7</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <!-- Challenge Card -->
+            <div class="challenge-card">
+                <div class="challenge-title">Thử thách</div>
+                <div class="challenge-subtitle" th:text="${challengeName}">Lối Sống</div>
+                <div class="challenge-progress" th:text="'Ngày ' + ${challengeDay} + '/' + ${challengeTotalDays}">Ngày 24/30</div>
+                <div class="challenge-streak">
+                    <span th:text="'Chuỗi: ' + ${streak} + ' ngày liên tiếp'">Chuỗi: 5 ngày liên tiếp</span>
+                    <i class="fas fa-fire text-danger"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search">
+            <button class="search-button">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tasks Container -->
+    <div class="tasks-container">
+        <!-- Habits Column -->
+        <div class="task-column">
+            <div class="column-header">Thói quen</div>
+
+            <button class="add-task-button">
+                <i class="fas fa-plus"></i> Thêm công việc
+            </button>
+
+            <div th:each="habit : ${habits}" class="task-item">
+                <div th:class="'task-color-bar ' + ${habit.color}"></div>
+                <div class="task-content">
+                    <div class="task-name" th:text="${habit.name}">Uống nước</div>
+                    <div class="task-description" th:text="${habit.description}">Uống nước mỗi 1 giờ</div>
+                </div>
+                <div class="task-actions">
+                    <button class="task-action-button plus" th:attr="data-id=${habit.id}">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="task-count" th:text="'+' + ${habit.count}">+11</div>
+                    <button class="task-action-button minus" th:attr="data-id=${habit.id}">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="column-footer">
+                Duy trì các thói quen tốt và cùng loại bỏ thói quen xấu
+            </div>
+        </div>
+
+        <!-- Dailies Column -->
+        <div class="task-column">
+            <div class="column-header">Hàng ngày</div>
+
+            <button class="add-task-button">
+                <i class="fas fa-plus"></i> Thêm công việc
+            </button>
+
+            <div th:each="daily : ${dailies}" th:class="'daily-item ' + (${daily.completed} ? 'completed' : '')">
+                <div th:class="'task-checkbox ' + ${daily.color}" th:attr="data-id=${daily.id}">
+                    <i class="fas fa-check" th:if="${daily.completed}"></i>
+                </div>
+                <div class="task-content">
+                    <div class="task-name" th:text="${daily.name}">Ngủ trước 10 giờ</div>
+                </div>
+                <div class="task-count" th:text="${daily.count}">11</div>
+            </div>
+
+            <div class="column-footer">
+                Hãy cố gắng hoàn thành công việc đã đặt ra của ngày hôm nay
+            </div>
+        </div>
+
+        <!-- Todos Column -->
+        <div class="task-column">
+            <div class="column-header">Việc cần làm</div>
+
+            <button class="add-task-button">
+                <i class="fas fa-plus"></i> Thêm công việc
+            </button>
+
+            <div class="dropdown mb-3">
+                <button class="btn btn-light dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown">
+                    Làm việc nhà
+                    type="button" data-bs-toggle="dropdown">
+                    Làm việc nhà
+                </button>
+                <ul class="dropdown-menu w-100">
+                    <li><a class="dropdown-item" href="#">Tất cả</a></li>
+                    <li><a class="dropdown-item" href="#">Chưa hoàn thành</a></li>
+                    <li><a class="dropdown-item" href="#">Đã hoàn thành</a></li>
+                </ul>
+            </div>
+
+            <div th:each="todo : ${todos}" th:class="'todo-item ' + (${todo.completed} ? 'completed' : '')">
+                <div th:class="'task-checkbox ' + ${todo.color}" th:attr="data-id=${todo.id}">
+                    <i class="fas fa-check" th:if="${todo.completed}"></i>
+                </div>
+                <div class="task-content">
+                    <div class="task-name" th:text="${todo.name}">Làm việc nhà</div>
+                </div>
+            </div>
+
+            <div class="column-footer">
+                Đi chợ <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+
+        <!-- Journal Column -->
+        <div class="task-column">
+            <div class="column-header">Viết Nhật Ký</div>
+
+            <div class="journal-day">
+                <span>Ngày 1</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+
+            <div class="journal-day">
+                <span>Ngày 2</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+
+            <div class="journal-day">
+                <span>Ngày 3</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+
+            <div class="column-footer">
+                Hãy ghi lại những thay đổi của bạn hôm nay
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Toggle sidebar
+        $('#sidebarCollapse').on('click', function() {
+            $('#sidebar').toggleClass('collapsed');
+            $('#content').toggleClass('expanded');
+        });
+
+        // Handle habit plus/minus buttons
+        $('.task-action-button.plus').on('click', function() {
+            const id = $(this).data('id');
+            const countElement = $(this).next('.task-count');
+            const currentCount = parseInt(countElement.text().replace('+', ''));
+
+            // Call API to increment habit
+            fetch(`/api/habit/${id}/increment`)
+                .then(response => response.text())
+                .then(data => {
+                    if (data === 'success') {
+                        countElement.text(`+${currentCount + 1}`);
+                    }
+                });
+        });
+
+        $('.task-action-button.minus').on('click', function() {
+            const id = $(this).data('id');
+            const countElement = $(this).prev('.task-count');
+            const currentCount = parseInt(countElement.text().replace('+', ''));
+
+            // Call API to decrement habit
+            fetch(`/api/habit/${id}/decrement`)
+                .then(response => response.text())
+                .then(data => {
+                    if (data === 'success') {
+                        countElement.text(`+${currentCount - 1}`);
+                    }
+                });
+        });
+
+        // Handle daily and todo checkboxes
+        $('.daily-item .task-checkbox, .todo-item .task-checkbox').on('click', function() {
+            const id = $(this).data('id');
+            const item = $(this).closest('.daily-item, .todo-item');
+            const isDaily = item.hasClass('daily-item');
+            const isCompleted = item.hasClass('completed');
+
+            // Call API to toggle completion
+            fetch(`/api/${isDaily ? 'daily' : 'todo'}/${id}/toggle`)
+                .then(response => response.text())
+                .then(data => {
+                    if (data === 'success') {
+                        if (isCompleted) {
+                            item.removeClass('completed');
+                            $(this).html('');
+                        } else {
+                            item.addClass('completed');
+                            $(this).html('<i class="fas fa-check"></i>');
+                        }
+                    }
+                });
+        });
+
+        // Handle journal day expansion
+        $('.journal-day').on('click', function() {
+            $(this).toggleClass('active');
+            const icon = $(this).find('i');
+
+            if ($(this).hasClass('active')) {
+                icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+            } else {
+                icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            }
+        });
+
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+</body>
+</html>

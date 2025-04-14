@@ -1,0 +1,54 @@
+<nav id="sidebar" th:fragment="sidebar">
+    <!-- Toggle Button -->
+    <button id="sidebarCollapse" class="btn btn-link text-dark position-fixed" style="top: 10px; left: 10px; z-index: 1040;">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="sidebar-header">
+        <h5>BeBet</h5>
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link active" href="#">
+                <i class="fas fa-home"></i>
+                <span>Trang chủ</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-clock"></i>
+                <span>Thói quen</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-calendar"></i>
+                <span>Hằng ngày</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-list"></i>
+                <span>Việc cần làm</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-trophy"></i>
+                <span>Thử thách</span>
+            </a>
+        </li>
+        <!-- Các mục phụ ở dưới cùng -->
+        <li class="nav-item mt-auto">
+            <a class="nav-link" href="#">
+                <i class="fas fa-user"></i>
+                <span>Hồ sơ</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-danger" href="/logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Đăng xuất</span>
+            </a>
+        </li>
+    </ul>
+</nav>
