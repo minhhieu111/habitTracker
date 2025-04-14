@@ -1,0 +1,423 @@
+:root {
+    --sidebar-width: 250px;
+    --sidebar-collapsed-width: 70px;
+    --primary-color: #f7b924;
+    --primary-hover: #e5a91f;
+    --dark-bg: #1a1a1a;
+    --light-bg: #f2f2f2;
+    --sidebar-bg: #f2f2f2;
+    --sidebar-color: #333;
+    --progress-bar-height: 8px;
+    --yellow-color: #ffcc00;
+    --green-color: #00b25a;
+    --red-color: #ff3860;
+    --blue-color: #3298dc;
+    --gray-bg: #f2f2f2;
+    --card-radius: 10px;
+    --task-radius: 8px;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: #fff;
+    font-family: "Nunito", sans-serif;
+}
+
+
+/* Main content area */
+#content {
+    margin-left: var(--sidebar-width);
+    transition: all 0.3s;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+#content.expanded {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+/* User info section */
+.user-info-section {
+    background-color: #f2f2f2;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #f7b924;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    margin-right: 15px;
+}
+
+.user-details h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.exp-info {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.level-info {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.progress-container {
+    background-color: #e0e0e0;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #f7b924;
+}
+
+.badge-container {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.badge-icon {
+    width: 50px;
+    height: 50px;
+    background-color: #f7b924;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+}
+
+.badge-number {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background-color: #f7b924;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    font-size: 14px;
+}
+
+/* Progress section */
+.progress-section {
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    padding: 35px;
+    margin: 15px;
+}
+
+.progress-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.progress-row {
+ width: 70%;
+}
+
+.progress-label {
+    width: 120px;
+    font-size: 14px;
+}
+
+.progress-bar-container {
+    flex: 1;
+    background-color: #e0e0e0;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #3298dc;
+}
+
+.progress-value {
+    width: 200px;
+    text-align: right;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Challenge card */
+.challenge-card {
+    background-color: #ffcc00;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px;
+    text-align: center;
+    color: black;
+}
+
+.challenge-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.challenge-subtitle {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.challenge-progress {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.challenge-streak {
+    font-size: 16px;
+}
+
+.challenge-streak i {
+    color: #ff3860;
+}
+
+/* Search bar */
+.search-container {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.search-bar {
+    position: relative;
+    width: 25%;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 15px;
+    padding-right: 40px;
+    border: none;
+    border-radius: 20px;
+    background-color: #f2f2f2;
+}
+
+.search-button {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+/* Task columns */
+.tasks-container {
+    display: flex;
+    padding: 15px;
+}
+
+.task-column {
+    flex: 1;
+    padding: 0 10px;
+}
+
+.column-header {
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.add-task-button {
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    background-color: #f2f2f2;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.add-task-button i {
+    margin-right: 5px;
+}
+
+/* Task items */
+.task-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.color-indicator {
+    width: 5px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.yellow-indicator {
+    background-color: #ffcc00;
+}
+
+.green-indicator {
+    background-color: #00b25a;
+}
+
+.red-indicator {
+    background-color: #ff3860;
+}
+
+.task-content {
+    flex: 1;
+    background-color: #f2f2f2;
+    padding: 10px;
+}
+
+.task-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.task-description {
+    font-size: 12px;
+    color: #666;
+}
+
+.task-actions {
+    display: flex;
+    align-items: center;
+}
+
+.action-button {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+
+.plus-button {
+    background-color: #ffcc00;
+    color: white;
+}
+
+.minus-button {
+    background-color: #ff3860;
+    color: white;
+}
+
+.task-count {
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.task-checkbox {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+}
+
+.yellow-checkbox {
+    background-color: #ffcc00;
+}
+
+.green-checkbox {
+    background-color: #00b25a;
+}
+
+.red-checkbox {
+    background-color: #ff3860;
+}
+
+.completed .task-content {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* Journal section */
+.journal-day {
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.column-footer {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+@media (max-width: 992px) {
+    .tasks-container {
+        flex-wrap: wrap;
+    }
+
+    .task-column {
+        flex: 1 0 50%;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .task-column {
+        flex: 1 0 100%;
+    }
+
+    #content {
+        margin-left: 0;
+    }
+
+    #sidebar {
+        margin-left: -250px;
+    }
+
+    #sidebar.active {
+        margin-left: 0;
+    }
+}

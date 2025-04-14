@@ -1,0 +1,17 @@
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;" th:fragment="toast(failed, success, exchange)">
+    <div id="Toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="toast-body text-bg-danger" th:if="${failed}">Lỗi: <span th:text="${failed}"/></div>
+        <div class="toast-body text-bg-success" th:if="${success}" th:text="${success}"/>
+        <div class="toast-body text-bg-warning d-flex justify-content-end" th:if="${exchange}">-<span class="me-2" th:text="${exchange}"></span><img src="/images/coin-icon.png" alt="coin" class="coin-icon"></div>
+    </div>
+
+    <script th:inline="javascript">
+        // Show toast if there is an error message
+        if ([[${failed}]] != null || [[${success}]] != null || [[${exchange}]] != null) {
+            var toastEl = document.getElementById('Toast');
+            var toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+    </script>
+</div>
+
