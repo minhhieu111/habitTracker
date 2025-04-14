@@ -18,8 +18,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
+    @NotBlank(message = "Nhập tên người dùng")
     private String userName;
+
+    @NotBlank(message = "Nhập mật khẩu")
     private String password;
+
+    @NotBlank(message = "Nhập email")
     private String email;
     @Enumerated(EnumType.STRING)
     private Role role;

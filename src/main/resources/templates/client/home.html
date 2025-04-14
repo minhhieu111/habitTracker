@@ -10,97 +10,63 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="/css/client_home.css">
 
+
 </head>
 <body>
-<!-- Sidebar -->
-<nav id="sidebar">
-    <!-- Toggle Button -->
-    <button id="sidebarCollapse" class="btn btn-link text-dark position-fixed" style="top: 10px; left: 10px; z-index: 1040;">
-        <i class="fas fa-bars"></i>
-    </button>
-    <div class="sidebar-header">
-        <h5>BeBet</h5>
+<!-- Toast Notification -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    <div id="Toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+        <div class="toast-body text-bg-danger" th:if="${failed}">Lỗi: <span th:text="${failed}"/></div>
+        <div class="toast-body text-bg-success" th:if="${success}" th:text="${success}"/>
+        <div class="toast-body text-bg-warning d-flex justify-content-end" th:if="${exchange}">-<span class="me-2" th:text="${exchange}"></span><img src="/images/coin-icon.png" alt="coin" class="coin-icon"></div>
     </div>
-    <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link active" href="#">
-                <i class="fas fa-home"></i>
-                <span>Trang chủ</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-clock"></i>
-                <span>Thói quen</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-calendar"></i>
-                <span>Hằng ngày</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-list"></i>
-                <span>Việc cần làm</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-trophy"></i>
-                <span>Thử thách</span>
-            </a>
-        </li>
-        <!-- Các mục phụ ở dưới cùng -->
-        <li class="nav-item mt-auto">
-            <a class="nav-link" href="#">
-                <i class="fas fa-user"></i>
-                <span>Hồ sơ</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-danger" href="/logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Đăng xuất</span>
-            </a>
-        </li>
-    </ul>
-</nav>
+</div>
+
+<!-- Sidebar -->
+<div th:replace="layout/sidebar.html"></div>
 
 <!-- Page Content -->
 <div id="content">
 
 
-    <div class="container-fluid mt-5">
-        <!-- User Profile -->
-        <div class="user-profile d-flex align-items-center">
-            <div class="d-flex flex-column align-items-center me-2">
-                <div class="user-avatar">
-                    <i class="fas fa-smile text-white"></i>
-                </div>
-                <p>Cấp độ: <span th:text="${user.getLevel()}"></span></p>
-            </div>
-
-            <div class="flex-grow-1">
-                <h5 class="mb-1">Danh Hiệu: <span th:text="${username}"></span></h5>
-                <p>Người dùng: <span th:text="${user.getUserName()}"></span></p>
-
-                <div class="progress mt-1">
-                    <div class="progress-bar" role="progressbar"
-                         th:style="'width: ' + (${user.getExp()} * 100 / ${maxExperience}) + '%'"
-                         style="width: 60%"></div>
-                </div>
-                <div class="d-flex align-items-center">
-                    <span class="me-2" th:text="'Kinh Nghiệm: ' + ${user.getExp()} + '/' + ${maxExperience}">Kinh Nghiệm: 120/200</span>
-                </div>
-            </div>
-        </div>
-
+    <div class="container-fluid">
         <!-- Main Content Row -->
         <div class="row">
             <!-- Left Column: Welcome Box and Habits Section -->
             <div class="col-lg-9">
+                <!-- User Profile -->
+                <div class="user-profile row align-items-center">
+                    <!-- Avatar và Cấp độ -->
+                    <div class="user-avatar">
+                        <i class="fas fa-smile text-white"></i>
+                    </div>
+
+                    <!-- Thông tin chi tiết -->
+                    <div class="col-3">
+                        <strong>
+                            <span class="mb-1">Danh Hiệu: <span th:text="${username}"></span></span>
+                        </strong>
+
+                        <p>Người dùng: <span th:text="${user.getUserName()}"></span></p>
+                        <strong>Cấp độ: <span th:text="${user.getLevel()}"></span></strong>
+                        <div class="progress mt-1">
+                            <div class="progress-bar" role="progressbar"
+                                 th:style="'width: ' + (${user.getExp()} * 100 / ${maxExperience}) + '%'"
+                                 style="width: 60%">
+                            </div>
+                        </div>
+                        <div class="user-experiment">
+                            <span class="me-2" th:text="'Kinh Nghiệm: ' + ${user.getExp()} + '/' + ${maxExperience}">Kinh Nghiệm: </span>
+                        </div>
+                    </div>
+
+                    <!-- Coin -->
+                    <div th:style="'height:100%; width:20px'" class="d-flex flex-column align-items-center col-7 ms-auto">
+                        <img src="/images/coin-icon.png" alt="coin" class="user-coin">
+                        <span th:text="${user.getCoins()}">0</span>
+                    </div>
+                </div>
+
                 <!-- Welcome Box -->
                 <div class="welcome-box">
                     <h4>Chào bạn!</h4>
@@ -196,23 +162,138 @@
                 </div>
 
                 <!-- Rewards Section -->
-                <div class="rewards-section">
+                <div class="rewards-section" style="max-height: 400px; overflow-y: auto;">
                     <div class="rewards-header">
                         <div class="rewards-title">Phần Thưởng</div>
-                        <button class="add-reward-btn">
+                        <button class="add-reward-btn" data-bs-toggle="modal" data-bs-target="#modalReward" >
                             <i class="fas fa-plus"></i> Thêm Mục
                         </button>
                     </div>
+                    <div class="rewards-contain">
+                        <div th:each="reward : ${user.getRewards()}" class="reward-item" >
 
-                    <div th:each="reward : ${user.getRewards()}" class="reward-item">
-                        <div class="reward-name" th:text="${reward.getTitle()}">Phần thưởng</div>
-                        <div class="reward-points">
-                            <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
-                            <span th:text="${reward.getCoinCost()}">10</span>
+                            <button class="add-reward-btn reward-name" th:data-reward-id="${reward.getRewardId()}" onclick="openEditRewardModal(this.getAttribute('data-reward-id'))" >
+                                <div th:text="${reward.getTitle()}">Phần thưởng</div>
+                            </button>
+
+                            <a th:href="@{'rewards/exchange/'+${reward.getRewardId()}}" class="reward-points d-flex flex-column justify-content-center align-items-center">
+                                <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
+                                <span th:text="${reward.getCoinCost()}">10</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Modal Create Reward-->
+            <div class="modal fade" id="modalReward" tabindex="-1" aria-labelledby="modalRewardLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalRewardLabel">Tạo Phần Thưởng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="rewardForm" th:action="@{/rewards/save}" method="post" th:object="${newReward}">
+                                <input type="text" class="form-label" style="display: none;" th:field="*{user}" th:value="${user}"/>
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" th:field="*{title}">
+                                    <div id="titleError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Ghi chú</label>
+                                    <textarea class="form-control" id="notes" th:field="*{description}" rows="3" placeholder="Thêm ghi chú"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="coinCost" class="form-label">Chi phí</label>
+                                    <div class="input-group">
+                                <span class="input-group-text">
+                                    <img src="/images/coin-icon.png" alt="coin" class="coin-icon" style="width: 16px; height: 16px;">
+                                </span>
+                                        <input type="number" class="form-control" id="coinCost" th:field="*{coinCost}" min="0">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Modal Edit Reward -->
+            <div class="modal fade" id="editReward" tabindex="-1" aria-labelledby="modalEditRewardLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditRewardLabel">Chỉnh Sửa Phần Thưởng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="rewardUpdateForm" th:action="@{/rewards/update}" method="post" th:object="${updateReward}">
+                                <input type="hidden" id="updateRewardId" th:field="*{rewardId}">
+                                <div class="mb-3">
+                                    <label for="updateTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="updateTitle" th:field="*{title}">
+                                    <div id="titleUpdateError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
+
+                                </div>
+                                <div class="mb-3">
+                                    <label for="updateDescription" class="form-label">Ghi chú</label>
+                                    <textarea class="form-control" id="updateDescription" rows="3" placeholder="Thêm ghi chú" th:field="*{description}"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="updateCoinCost" class="form-label">Chi phí</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <img src="/images/coin-icon.png" alt="coin" class="coin-icon" style="width: 16px; height: 16px;">
+                                        </span>
+                                        <input type="number" class="form-control" id="updateCoinCost" name="coinCost" min="0" th:field="*{coinCost}">
+                                    </div>
+                                </div>
+                                <div class="modal-footer d-flex justify-content-between">
+                                    <div>
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                th:data-bs-target="'#deleteRewardModal__' + ${updateReward.rewardId}">Xóa</button>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <button type="submit" class="btn btn-primary">Lưu</button>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Delete Reward -->
+            <div class="modal fade" th:id="'deleteRewardModal__' + ${updateReward.rewardId}" tabindex="-1" aria-labelledby="modalDeleteRewardLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa phần thưởng <span th:text="${updateReward.rewardId}"></span>
+                            </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Đóng"></button>
+                        </div>
+                        <div class="modal-body">
+                            Bạn có chắc chắn muốn xóa phần thưởng này?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Đóng</button>
+                            <a id="deleteReward" class="btn btn-primary">Đồng ý</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -223,7 +304,17 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script th:inline="javascript">
+
+
     $(document).ready(function() {
+
+        // Show toast if there is an error message
+        if ([[${failed}]] != null || [[${success}]] != null || [[${exchange}]] != null) {
+            var toastEl = document.getElementById('Toast');
+            var toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
         // Toggle sidebar
         $('#sidebarCollapse').on('click', function() {
             $('#sidebar').toggleClass('collapsed');
@@ -235,9 +326,65 @@
             $(this).addClass('active');
         });
 
+        // Function to open edit reward modal
+        window.openEditRewardModal = function (rewardId) {
+            fetch('/rewards/' + rewardId)
+                .then(response => response.json())
+                .then(reward => {
+                    document.getElementById('updateRewardId').value = reward.rewardId;
+                    document.getElementById('updateTitle').value = reward.title;
+                    document.getElementById('updateDescription').value = reward.description || '';
+                    document.getElementById('updateCoinCost').value = reward.coinCost;
+                    document.getElementById('deleteReward').setAttribute("href", '/rewards/delete/' + reward.rewardId);
+
+                    const editModal = new bootstrap.Modal(document.getElementById('editReward'));
+                    editModal.show();
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu phần thưởng:', error);
+                    alert('Không thể lấy dữ liệu phần thưởng.');
+                });
+        }
+
+        //Model create & edit validation
+        const form = document.getElementById("rewardForm");
+        const formUpdate = document.getElementById("rewardUpdateForm");
+        const titleInput = document.getElementById("title");
+        const titleUpdateInput = document.getElementById("updateTitle");
+        const titleError = document.getElementById("titleError");
+        const titleUpdateError = document.getElementById("titleUpdateError");
+
+        form.addEventListener("submit", (e) => {
+            let valid = true;
+            if (titleInput.value.trim() === "") {
+                titleError.style.display = "block";
+                valid = false;
+            } else {
+                titleError.style.display = "none";
+            }
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+
+        formUpdate.addEventListener("submit", (e) => {
+            let valid = true;
+
+            if (titleUpdateInput.value.trim() === "") {
+                titleUpdateError.style.display = "block";
+                valid = false;
+                console.log(valid)
+            } else {
+                titleUpdateError.style.display = "none";
+            }
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+
         // Calendar functionality
         const time = new Date();
-        const currentYear = [[${currentYear}]];
+        const currentYear = [[${currentYear}]] ;
         const currentMonth = [[${currentMonth}]];
 
         generateCalendar(currentYear, currentMonth);
@@ -254,8 +401,7 @@
             const daysInMonth = lastDay.getDate();
 
             // Update header
-            document.querySelector('.calendar__month-year').innerHTML =
-                `<span>${[[${months}]][month-1]}</span> <span>${year}</span>`;
+            document.querySelector('.calendar__month-year').innerHTML = `<span>${[[${months}]][month-1]}</span> <span>${year}</span>`;
 
             // Previous month days
             const prevMonthLastDay = new Date(year, month - 1, 0).getDate();
@@ -299,14 +445,14 @@
             }
         }
 
-        // Month and year change handlers
+// Month and year change handlers
         $('#calendar__month, #calendar__year').on('change', function() {
             const selectedMonth = $('#calendar__month').prop('selectedIndex') + 1;
             const selectedYear = parseInt($('#calendar__year').val());
             generateCalendar(selectedYear, selectedMonth);
         });
 
-        // Previous and next month buttons
+// Previous and next month buttons
         $('#prevMonth').on('click', function() {
             let selectedMonth = $('#calendar__month').prop('selectedIndex');
             let selectedYear = parseInt($('#calendar__year').val());
@@ -337,7 +483,7 @@
             generateCalendar(selectedYear, selectedMonth + 1);
         });
 
-        // Day selection
+// Day selection
         let selectedDateElement = null;
 
         function selectDay(date, element) {
@@ -367,8 +513,9 @@
                 });
         }
 
-        // Initialize with April 2021 (as shown in the image)
+// Initialize with April 2021 (as shown in the image)
         generateCalendar(currentYear, currentMonth);
+
     });
 </script>
 </body>

@@ -1,6 +1,8 @@
 package com.example.habittracker.Domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -15,7 +17,7 @@ public class Reward {
     private Long rewardId;
     private String title;
     private String description;
-    private Long coinCost;
+    private Long coinCost = 0L;
 
     @ManyToOne()
     @JoinColumn(name="user_id")
