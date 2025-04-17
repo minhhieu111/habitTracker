@@ -20,7 +20,7 @@
 <div id="content">
     <!-- Main content matching the image -->
     <div class="row mx-0">
-        <div class="col-md-8">
+        <div class="col-md-8 head-content">
             <!-- Include user information from existing template -->
             <div th:replace="layout/userinformation.html :: user(user=${user})"></div>
             <!-- Progress Section -->
@@ -76,65 +76,30 @@
         <!-- Habits Column -->
         <div class="task-column">
             <div class="column-header">Thói quen</div>
-
             <button class="add-task-button">
                 <i class="fas fa-plus"></i> Thêm công việc
             </button>
-
-            <!-- First habit item -->
-            <div class="task-item">
-                <div class="color-indicator yellow-indicator"></div>
-                <div class="task-content">
-                    <div class="task-name">Uống nước</div>
-                    <div class="task-description">Uống nước mỗi 1 giờ</div>
-                </div>
-                <div class="task-actions">
+            <div class="tasks-contain">
+                <!-- Habit item -->
+                <div th:each="habit : ${userHabits}" class="task-item">
                     <button class="action-button plus-button">
                         <i class="fas fa-plus"></i>
                     </button>
-                    <div class="task-count">+11</div>
+                    <div class="task-content">
+                        <div class="task-detail">
+                            <div class="fw-bold mb-1" th:text="${habit.getTitle()}">Uống nước</div>
+                            <div class="task-description" th:text="${habit.getDescription()}">Uống nước mỗi 1 giờ</div>
+                        </div>
+                        <div class="task-count d-flex justify-content-end"><span>+11 | 2-</span></div>
+                    </div>
+                    <div class="task-actions">
+
+                    </div>
                     <button class="action-button minus-button">
                         <i class="fas fa-minus"></i>
                     </button>
                 </div>
             </div>
-
-            <!-- Second habit item -->
-            <div class="task-item">
-                <div class="color-indicator green-indicator"></div>
-                <div class="task-content">
-                    <div class="task-name">Đọc sách</div>
-                    <div class="task-description">Đọc 10 phút</div>
-                </div>
-                <div class="task-actions">
-                    <button class="action-button plus-button">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <div class="task-count">+10</div>
-                    <button class="action-button minus-button">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Third habit item -->
-            <div class="task-item">
-                <div class="color-indicator red-indicator"></div>
-                <div class="task-content">
-                    <div class="task-name">Dậy muộn</div>
-                    <div class="task-description">Mỗi lần muộn -1</div>
-                </div>
-                <div class="task-actions">
-                    <button class="action-button plus-button">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <div class="task-count">+12</div>
-                    <button class="action-button minus-button">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-
             <div class="column-footer">
                 Duy trì các thói quen tốt và cùng loại bỏ thói quen xấu
             </div>
@@ -142,43 +107,28 @@
 
         <!-- Dailies Column -->
         <div class="task-column">
+
             <div class="column-header">Hàng ngày</div>
 
             <button class="add-task-button">
                 <i class="fas fa-plus"></i> Thêm công việc
             </button>
+            <div class="tasks-contain">
+                <div class="tasks-contain">
+                    <!-- Daily task item -->
+                    <div th:each="userDaily : ${userDailies}" class="checkbox-item">
+                        <div class="daily-checkbox"></div>
+                        <div class="task-content">
+                            <div class="task-detail">
+                                <div class="fw-bold mb-1" th:text="${userDaily.getDaily().getTitle()}">Ngủ trước 10 giờ</div>
+                                <div class="task-description" th:text="${userDaily.getDaily().getDescription()}">Uống nước mỗi 1 giờ</div>
+                            </div>
+                            <span class="task-count d-flex justify-content-end" th:text="${userDaily.getStreak()}">11</span>
+                        </div>
 
-            <!-- Daily task item -->
-            <div class="checkbox-item">
-                <div class="task-checkbox yellow-checkbox">
-                    <!-- Empty for unchecked, add check icon when checked -->
+                    </div>
                 </div>
-                <div class="task-content">
-                    <div class="task-name">Ngủ trước 10 giờ</div>
-                </div>
-                <div class="task-count">11</div>
-            </div>
 
-            <!-- Daily task item - checked -->
-            <div class="checkbox-item completed">
-                <div class="task-checkbox green-checkbox">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div class="task-content">
-                    <div class="task-name">Tập thể dục</div>
-                </div>
-                <div class="task-count">20</div>
-            </div>
-
-            <!-- Daily task item -->
-            <div class="checkbox-item">
-                <div class="task-checkbox red-checkbox">
-                    <!-- Empty for unchecked, add check icon when checked -->
-                </div>
-                <div class="task-content">
-                    <div class="task-name">Học Tiếng Anh</div>
-                </div>
-                <div class="task-count">17</div>
             </div>
 
             <div class="column-footer">
@@ -272,14 +222,22 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Toggle sidebar
-        $('#sidebarToggle').on('click', function() {
-            $('#sidebar').toggleClass('collapsed');
-            $('#content').toggleClass('expanded');
+        $('.plus-button').on('click', function() {
+            var countEl = $(this).next('.task-count');
+            var count = parseInt(countEl.text().replace('+', ''));
+            countEl.text('+' + (count + 1));
+        });
+
+        // Handle habit increment/decrement
+
+        $('.minus-button').on('click', function() {
+            var countEl = $(this).prev('.task-count');
+            var count = parseInt(countEl.text().replace('+', ''));
+            countEl.text('+' + (count - 1));
         });
 
         // Handle task checkbox clicks
-        $('.task-checkbox').on('click', function() {
+        $('.daily-checkbox').on('click', function() {
             $(this).closest('.checkbox-item').toggleClass('completed');
             if ($(this).closest('.checkbox-item').hasClass('completed')) {
                 $(this).html('<i class="fas fa-check"></i>');
@@ -288,18 +246,6 @@
             }
         });
 
-        // Handle habit increment/decrement
-        $('.plus-button').on('click', function() {
-            var countEl = $(this).next('.task-count');
-            var count = parseInt(countEl.text().replace('+', ''));
-            countEl.text('+' + (count + 1));
-        });
-
-        $('.minus-button').on('click', function() {
-            var countEl = $(this).prev('.task-count');
-            var count = parseInt(countEl.text().replace('+', ''));
-            countEl.text('+' + (count - 1));
-        });
 
         // Handle journal day expansion
         $('.journal-day').on('click', function() {
