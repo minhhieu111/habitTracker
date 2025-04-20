@@ -17,6 +17,6 @@ public class DailyService {
     }
 
     public List<UserDaily> getUserDaily(User user){
-        return this.dailyRepository.findUserDailiesByUserId(user.getUserId());
+        return this.dailyRepository.findUserDailiesByUserId(user.getUserId()).get();
     }
 }

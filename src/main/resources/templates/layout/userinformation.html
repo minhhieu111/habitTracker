@@ -14,11 +14,11 @@
         <strong>Cấp độ: <span th:text="${user.getLevel()}"></span></strong>
         <div class="progress mt-1">
             <div class="progress-bar" role="progressbar"
-                 th:style="'width: ' + (${user.getExp()} * 100 / ${maxExperience}) + '%'">
+                 th:style="'width: ' + (${user.getExp()} * 100 / ${user.getLevel()}) + '%'">
             </div>
         </div>
         <div class="user-experiment">
-            <span class="me-2" th:text="'Kinh Nghiệm: ' + ${user.getExp()} + '/' + ${maxExperience}">Kinh Nghiệm: </span>
+            <span class="me-2" th:text="'Kinh Nghiệm: ' + ${user.getExp()} + '/' + ${user.getLevel()}">Kinh Nghiệm: </span>
         </div>
     </div>
 

@@ -54,7 +54,7 @@
 .toast-body{
     font-size: 20px;
 }
-.toast-body img{
+.toast-body .exchange img{
     height: 27px;
     width: 27px;
 }

@@ -8,12 +8,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DailyRepository extends JpaRepository<Daily,Long> {
     @Query("SELECT ud.daily FROM UserDaily ud WHERE ud.user.userId = :userId")
-    List<Daily> findDailiesForUser(@Param("userId") Long userId);
+    Optional<List<Daily>> findDailiesForUser(@Param("userId") Long userId);
 
     @Query("SELECT ud FROM UserDaily ud WHERE ud.user.userId = :userId")
-    List<UserDaily> findUserDailiesByUserId(@Param("userId") Long userId);
+    Optional<List<UserDaily>> findUserDailiesByUserId(@Param("userId") Long userId);
 }

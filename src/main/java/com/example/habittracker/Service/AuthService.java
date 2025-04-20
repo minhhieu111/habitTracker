@@ -47,10 +47,7 @@ public class AuthService {
     }
 
     public User login(Login login) {
-        User user = userRepository.findUserByUserName(login.getUserName());
-        if (user == null) {
-            throw new RuntimeException("Tên đăng nhập không đúng!");
-        }
+        User user = userRepository.findUserByUserName(login.getUserName()).orElseThrow(()->new RuntimeException("Tên đăng nhập không đúng!"));
         if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
             throw new RuntimeException("Mật khẩu không chính xác!");
         }

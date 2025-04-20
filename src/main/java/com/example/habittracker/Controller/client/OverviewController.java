@@ -2,9 +2,11 @@ package com.example.habittracker.Controller.client;
 
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
+import com.example.habittracker.DTO.HabitDTO;
 import com.example.habittracker.Domain.*;
 import com.example.habittracker.Repository.DailyRepository;
 import com.example.habittracker.Repository.HabitRepository;
+import com.example.habittracker.Service.ChallengeService;
 import com.example.habittracker.Service.DailyService;
 import com.example.habittracker.Service.HabitService;
 import com.example.habittracker.Service.UserService;
@@ -27,13 +29,15 @@ public class OverviewController {
     private final UserService userService;
     private final HabitService habitService;
     private final DailyService dailyService;
+    private final ChallengeService challengeService;
 
-    public OverviewController(JwtUtil jwtUtil, TokenUtil tokenUtil, UserService userService, HabitService habitService, DailyService dailyService) {
+    public OverviewController(JwtUtil jwtUtil, TokenUtil tokenUtil, UserService userService, HabitService habitService, DailyService dailyService, ChallengeService challengeService) {
         this.jwtUtil = jwtUtil;
         this.tokenUtil = tokenUtil;
         this.userService = userService;
         this.habitService = habitService;
         this.dailyService = dailyService;
+        this.challengeService = challengeService;
     }
 
     @GetMapping("")
@@ -46,13 +50,11 @@ public class OverviewController {
 
 
         model.addAttribute("user", user);
-        model.addAttribute("username", "Người mới bắt đầu");
-        model.addAttribute("level", 2);
-        model.addAttribute("experience", 120);
-        model.addAttribute("maxExperience", 200);
-        model.addAttribute("gold", 100);
 
         // Challenge data
+        List<UserChallenge> userChallenges  = this.challengeService.getChallenges(user.getUserId());
+        model.addAttribute("userChallenges", userChallenges);
+
         model.addAttribute("challengeName", "Lối Sống");
         model.addAttribute("challengeDay", 24);
         model.addAttribute("challengeTotalDays", 30);
@@ -65,13 +67,16 @@ public class OverviewController {
         model.addAttribute("weeklyTotal", 7);
 
         // Habits
-        List<Habit> userhabit = this.habitService.getUserHabits(user);
+        model.addAttribute("newHabit",new HabitDTO());
+        List<UserHabit> userhabit = this.habitService.getUserHabits(user);
         model.addAttribute("userHabits",userhabit);
 
 
         // Dailies
+        model.addAttribute("newDaily",new Daily());
         List<UserDaily> userdaily = this.dailyService.getUserDaily(user);
         model.addAttribute("userDailies",userdaily);
+
         return "client/overview";
     }
 }

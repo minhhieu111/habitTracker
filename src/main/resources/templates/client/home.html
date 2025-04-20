@@ -16,7 +16,9 @@
 <body>
 
 <!-- Toast Notification -->
-<div th:replace="layout/toastnotification.html :: toast(failed=${failed}, success=${success}, exchange=${exchange})"></div>
+<div th:replace="layout/toastnotification.html :: toast(failed=${failed}, success=${success})"></div>
+
+<div th:replace="layout/toastresponse.html :: toastresponse"></div>
 
 <!-- Sidebar -->
 <div th:replace="layout/sidebar.html"></div>
@@ -49,22 +51,22 @@
                     </div>
                 </div>
 
-                <!-- Habits Section -->
+                <!-- challenge Section -->
                 <a href="" class="habits-section">
                     <div class="row">
-                        <div th:each="habit : ${user.getChallenges()}" class="col-md-6 mb-3">
+                        <div th:each="challenge : ${userChallenges}" class="col-md-6 mb-3">
                             <div class="habit-card">
                                 <div class="habit-progress">
                                     <svg viewBox="0 0 100 100">
                                         <circle class="background" cx="50" cy="50" r="40"></circle>
                                         <circle class="progress" cx="50" cy="50" r="40"
-                                                th:style="'--progress: ' + ${habit.getParticipantCount()}"></circle>
+                                                th:style="'--progress: ' + ${challenge.getStreak()}"></circle>
                                     </svg>
-                                    <div class="habit-progress-text" th:text="${habit.getStreak()} + '%'">50%</div>
+                                    <div class="habit-progress-text" th:text="${challenge.getStreak()} + '%'">50%</div>
                                 </div>
                                 <div class="habit-info">
-                                    <div class="habit-title" th:text="${habit.getTitle()}">Chơi Thể Thao</div>
-                                    <div class="habit-tasks" th:text="'Bạn có ' + ${habit.getIsPublic()} + ' công việc cần làm'">
+                                    <div class="habit-title" th:text="${challenge.getChallenge().getTitle()}">Chơi Thể Thao</div>
+                                    <div class="habit-tasks" th:text="'Bạn có ' + ${challenge.getBestStreak()} + ' công việc cần làm'">
                                         Bạn có 4 công việc cần làm
                                     </div>
                                 </div>
@@ -130,10 +132,12 @@
                                 <div th:text="${reward.getTitle()}">Phần thưởng</div>
                             </button>
 
-                            <a th:href="@{'rewards/exchange/'+${reward.getRewardId()}}" class="reward-points d-flex flex-column justify-content-center align-items-center">
+                            <button class="reward-points d-flex flex-column justify-content-center align-items-center"
+                                    th:attr="data-reward-id=${reward.getRewardId()}"
+                                    onclick="exchangeReward(this.getAttribute('data-reward-id'))">
                                 <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
                                 <span th:text="${reward.getCoinCost()}">10</span>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -257,7 +261,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script th:inline="javascript">
-    $(document).ready(function() {
+    document.addEventListener("DOMContentLoaded", function() {
 
         // Function to open edit reward modal
         window.openEditRewardModal = function (rewardId) {
@@ -411,8 +415,10 @@
                     document.getElementById("dayInfo").textContent = "Lỗi khi tải dữ liệu: " + error.message;
                 });
         }
-
     });
+
+
+
 </script>
 </body>
 </html>

@@ -44,11 +44,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     List<Todo> todos;
 
-    @ManyToMany
-    @JoinTable(name = "user_challenge",
-    joinColumns = {@JoinColumn(name = "user_id")},
-    inverseJoinColumns = {@JoinColumn(name = "challenge_id")})
-    List<Challenge> challenges;
+    @OneToMany(mappedBy = "user")
+    List<UserChallenge> userChallenges;
 
     @OneToMany(mappedBy = "user")
     List<Reward> rewards;
