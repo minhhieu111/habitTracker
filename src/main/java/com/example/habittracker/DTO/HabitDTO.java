@@ -3,10 +3,7 @@ package com.example.habittracker.DTO;
 import com.example.habittracker.Domain.Habit;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +11,9 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class HabitDTO {
+    private Long habitId;
     private String title;
     private String description;
     private Habit.Difficulty difficulty;

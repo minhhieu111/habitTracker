@@ -154,7 +154,6 @@
                         </div>
                         <div class="modal-body">
                             <form id="rewardForm" th:action="@{/rewards/save}" method="post" th:object="${newReward}">
-                                <input type="text" class="form-label" style="display: none;" th:field="*{user}" th:value="${user}"/>
                                 <div class="mb-3">
                                     <label for="title" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="title" th:field="*{title}">

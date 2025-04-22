@@ -329,6 +329,14 @@ body {
 
 .task-detail{
     width: 100%;
+    text-align: left;
+    border: none;
+    background-color: inherit;
+
+}
+.task-detail:hover{
+    background-color: rgba(102, 102, 102, 0.18);
+    transition: 0.5s ease;
 }
 
 .task-description {

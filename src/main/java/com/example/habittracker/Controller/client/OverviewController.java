@@ -70,6 +70,7 @@ public class OverviewController {
         model.addAttribute("newHabit",new HabitDTO());
         List<UserHabit> userhabit = this.habitService.getUserHabits(user);
         model.addAttribute("userHabits",userhabit);
+        model.addAttribute("updateHabit",new HabitDTO());
 
 
         // Dailies
