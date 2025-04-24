@@ -2,6 +2,7 @@ package com.example.habittracker.Controller.client;
 
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
+import com.example.habittracker.DTO.DailyDTO;
 import com.example.habittracker.DTO.HabitDTO;
 import com.example.habittracker.Domain.*;
 import com.example.habittracker.Repository.DailyRepository;
@@ -72,11 +73,11 @@ public class OverviewController {
         model.addAttribute("userHabits",userhabit);
         model.addAttribute("updateHabit",new HabitDTO());
 
-
         // Dailies
-        model.addAttribute("newDaily",new Daily());
+        model.addAttribute("newDaily",new DailyDTO());
         List<UserDaily> userdaily = this.dailyService.getUserDaily(user);
         model.addAttribute("userDailies",userdaily);
+        model.addAttribute("updateDaily",new DailyDTO());
 
         return "client/overview";
     }

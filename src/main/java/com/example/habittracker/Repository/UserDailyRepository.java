@@ -1,0 +1,9 @@
+package com.example.habittracker.Repository;
+
+import com.example.habittracker.Domain.UserDaily;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UserDailyRepository extends JpaRepository<UserDaily,Long> {
+}
