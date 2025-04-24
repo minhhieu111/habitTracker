@@ -17,24 +17,18 @@ public class Challenge {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long challengeId;
     private String title;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private Long day;
     @Enumerated(EnumType.STRING)
     private Visibility isPublic;
-    @Enumerated(EnumType.STRING)
-    private Status status;
     private Long participantCount;
-    private Long streak;
-    private Long bestStreak;
 
-    @ManyToMany(mappedBy = "challenges")
-    private List<User> users;
+
+    @OneToMany(mappedBy = "challenge")
+    List<UserChallenge> userChallenges;
 
     enum Visibility {
         PUBLIC, PRIVATE
     }
-    public enum Status{
-        ACTIVE,COMPLETE
-    }
+
 
 }

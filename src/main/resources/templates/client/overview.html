@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Thói Quen</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/overview.css">
+    <link rel="stylesheet" href="/css/layout.css">
+
+</head>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<body>
+<div th:replace="layout/toastnotification.html :: toast(failed=${failed}, success=${success})"></div>
+
+<div th:replace="layout/toastresponse.html :: toastresponse"></div>
+
+<!-- Include sidebar from existing template -->
+<div th:replace="layout/sidebar.html"></div>
+
+<!-- Main Content -->
+<div id="content">
+    <!-- Main content matching the image -->
+    <div class="row mx-0">
+        <div class="col-md-8 head-content">
+            <!-- Include user information from existing template -->
+            <div th:replace="layout/userinformation.html :: user(user=${user})"></div>
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <div class="progress-title">Tiến độ</div>
+                <div class="progress-row">
+                    <div class="d-flex justify-content-between">
+                        <div class="progress-label">Chuỗi: <span th:text="${streakCount}">5</span></div>
+                        <div class="progress-value" th:text="'Chuỗi cao nhất:' + ${maxStreak}"> 15</div>
+                    </div>
+                    <div class="progress-bar-container mb-3">
+                        <div class="progress-bar-fill" th:style="'width: ' + (${streakCount} * 100 / ${maxStreak}) + '%'"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div class="progress-label">Tuần này</div>
+                        <div class="progress-value" th:text="${weeklyProgress} + '/' + ${weeklyTotal}">5/7</div>
+                    </div>
+
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" th:style="'width: ' + (${weeklyProgress} * 100 / ${weeklyTotal}) + '%'"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-4 d-flex flex-column justify-content-center">
+            <!-- Challenge Card -->
+            <div class="challenge-card">
+                <div class="challenge-title">Thử thách</div>
+                <div class="challenge-subtitle" th:text="${challengeName}">Lối Sống</div>
+                <div class="challenge-progress" th:text="'Ngày ' + ${challengeDay} + '/' + ${challengeTotalDays}">Ngày 24/30</div>
+                <div class="challenge-streak">
+                    <span th:text="'Chuỗi: ' + ${streak} + ' ngày liên tiếp'">Chuỗi: 5 ngày liên tiếp</span>
+                    <i class="fas fa-fire"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container d-flex justify-content-center">
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search">
+            <button class="search-button">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tasks Container -->
+    <div class="tasks-container">
+        <!-- Habits Column -->
+        <div class="task-column">
+            <div class="column-header">Thói quen</div>
+            <button class="add-task-button" data-bs-toggle="modal" data-bs-target="#modalHabitCreate">
+                <i class="fas fa-plus"></i> Thêm công việc
+            </button>
+            <div class="tasks-contain">
+                <!-- Habit item -->
+                <div th:each="habit : ${userHabits}" class="task-item">
+                    <button class="action-button plus-button">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="task-content">
+                        <button class="task-detail" th:data-habit-id="${habit.getHabit().getHabitId()}" onclick="openHabitUpdateModal(this.getAttribute('data-habit-id'))">
+                            <div class="fw-bold mb-1" th:text="${habit.getHabit().getTitle()}">Uống nước</div>
+                            <div class="task-description" th:text="${habit.getHabit().getDescription()}">Uống nước mỗi 1 giờ</div>
+                        </button>
+                        <div class="task-count d-flex justify-content-end"><span>+11 | 2-</span></div>
+                    </div>
+                    <div class="task-actions">
+
+                    </div>
+                    <button class="action-button minus-button">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="column-footer">
+                Duy trì các thói quen tốt và cùng loại bỏ thói quen xấu
+            </div>
+        </div>
+
+        <!-- Modal Create Habit-->
+        <div class="modal fade" id="modalHabitCreate" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="habitForm" th:action="@{/habits/save}" method="post" th:object="${newHabit}">
+                        <div class="modal-header text-bg-warning p-4">
+                            <div class="w-100 ">
+                                <h4 class="fw-bold mb-3">Tạo mới</h4>
+                                <div class="mb-3" >
+                                    <label for="habitTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="habitTitle" th:field="*{title}">
+                                    <div id="habitTitleError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
+                                </div>
+                                <div class="mb-3" >
+                                    <label for="notes" class="form-label">Ghi chú</label>
+                                    <textarea class="form-control" id="notes" th:field="*{description}" rows="3" placeholder="Thêm ghi chú"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label for="type" class="form-label">Loại</label>
+                                <select class="form-control" id="type" th:field="*{type}">
+                                    <option value="NEGATIVE">Tích cực</option>
+                                    <option value="POSITIVE">Tiêu cực</option>
+                                    <option value="BOTH">Cả 2</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="difficulty" class="form-label">Độ khó</label>
+                                <select class="form-control" name="difficulty" id="difficulty" th:field="*{difficulty}">
+                                    <option value="EASY">Dễ</option>
+                                    <option value="MEDIUM">Trung Bình</option>
+                                    <option value="HARD">Khó</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="target" class="form-label">Mục tiêu</label>
+                                <input type="number" class="form-control" id="target" th:field="*{targetCount}">
+                                <div id="targetError" class="text-danger mt-1" style="display: none;">Vui lòng chọn mục tiêu >1</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="challenge"  class="form-label">Thử thách</label>
+                                <select class="form-control"  id="challenge" th:field="*{challengeId}">
+                                    <option th:value="${null}" selected>Không có</option>
+                                    <option th:each="challenge : ${userChallenges}" th:value="${challenge.getChallenge().getChallengeId()}" th:text="${challenge.getChallenge().getTitle()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-primary">Lưu</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Habit -->
+        <div class="modal fade" id="updateHabit" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="habitUpdateForm" th:action="@{/habits/update}" method="post" th:object="${updateHabit}">
+                        <div class="modal-header text-bg-warning p-4">
+                            <div class="w-100 ">
+                                <h4 class="fw-bold mb-3">Chỉnh sửa</h4>
+                                <div class="mb-3" >
+                                    <label for="habitUpdateTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="habitUpdateTitle" th:field="*{title}">
+                                    <div id="habitTitleUpdateError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
+                                </div>
+                                <div class="mb-3" >
+                                    <label for="upDescription" class="form-label">Ghi chú</label>
+                                    <textarea class="form-control" id="upDescription" th:field="*{description}" rows="3" placeholder="Thêm ghi chú"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body p-4">
+                            <input type="text" class="form-label" style="display: none;" id="upHabitId" th:field="*{habitId}"/>
+                            <div class="mb-3">
+                                <label for="upType" class="form-label">Loại</label>
+                                <select class="form-control" id="upType" th:field="*{type}">
+                                    <option value="NEGATIVE">Tích cực</option>
+                                    <option value="POSITIVE">Tiêu cực</option>
+                                    <option value="BOTH">Cả 2</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="upDifficulty" class="form-label">Độ khó</label>
+                                <select class="form-control" name="difficulty" id="upDifficulty" th:field="*{difficulty}">
+                                    <option value="EASY">Dễ</option>
+                                    <option value="MEDIUM">Trung Bình</option>
+                                    <option value="HARD">Khó</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="upTarget" class="form-label">Mục tiêu</label>
+                                <input type="number" class="form-control" id="upTarget" th:field="*{targetCount}">
+                                <div id="updateTargetError" class="text-danger mt-1" style="display: none;">Vui lòng chọn mục tiêu >1</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="UpChallenge"  class="form-label">Thử thách</label>
+                                <select class="form-control"  id="UpChallenge" th:field="*{challengeId}">
+                                    <option th:value="${null}">Không có</option>
+                                    <option th:each="challenge : ${userChallenges}" th:value="${challenge.getChallenge().getChallengeId()}" th:text="${challenge.getChallenge().getTitle()}">Không có</option>
+                                </select>
+                            </div>
+
+                            <div class="modal-footer d-flex justify-content-between">
+                                <div>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                            data-bs-target="#deleteHabitModal">Xóa</button>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+<!--         Modal Delete Reward-->
+        <div class="modal fade" id="deleteHabitModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa Thói quen</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn xóa thói quen này?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">Đóng</button>
+                        <a id="deleteHabit" class="btn btn-primary">Đồng ý</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dailies Column -->
+        <div class="task-column">
+
+            <div class="column-header">Hàng ngày</div>
+
+            <button class="add-task-button">
+                <i class="fas fa-plus"></i> Thêm công việc
+            </button>
+            <div class="tasks-contain">
+                <div class="tasks-contain">
+                    <!-- Daily task item -->
+                    <div th:each="userDaily : ${userDailies}" class="checkbox-item">
+                        <div class="daily-checkbox"></div>
+                        <div class="task-content">
+                            <div class="task-detail">
+                                <div class="fw-bold mb-1" th:text="${userDaily.getDaily().getTitle()}">Ngủ trước 10 giờ</div>
+                                <div class="task-description" th:text="${userDaily.getDaily().getDescription()}">Uống nước mỗi 1 giờ</div>
+                            </div>
+                            <span class="task-count d-flex justify-content-end" th:text="${userDaily.getStreak()}">11</span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="column-footer">
+                Hãy cố gắng hoàn thành công việc đã đặt ra của ngày hôm nay
+            </div>
+        </div>
+
+        <!-- Todos Column -->
+        <div class="task-column">
+            <div class="column-header">Việc cần làm</div>
+
+            <button class="add-task-button">
+                <i class="fas fa-plus"></i> Thêm công việc
+            </button>
+
+            <!-- Dropdown for categories -->
+            <div class="dropdown mb-3">
+                <button class="btn btn-light dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown">
+                    Làm việc nhà
+                </button>
+                <ul class="dropdown-menu w-100">
+                    <li><a class="dropdown-item" href="#">Tất cả</a></li>
+                    <li><a class="dropdown-item" href="#">Chưa hoàn thành</a></li>
+                    <li><a class="dropdown-item" href="#">Đã hoàn thành</a></li>
+                </ul>
+            </div>
+
+            <!-- Todo task item - completed -->
+            <div class="checkbox-item completed">
+                <div class="task-checkbox green-checkbox">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="task-content">
+                    <div class="task-name">Dọn phòng</div>
+                </div>
+            </div>
+
+            <!-- Todo task item -->
+            <div class="checkbox-item">
+                <div class="task-checkbox green-checkbox">
+                    <!-- Empty for unchecked -->
+                </div>
+                <div class="task-content">
+                    <div class="task-name">Quét, lau nhà</div>
+                </div>
+            </div>
+
+            <!-- Todo task item -->
+            <div class="checkbox-item">
+                <div class="task-checkbox red-checkbox">
+                    <!-- Empty for unchecked -->
+                </div>
+                <div class="task-content">
+                    <div class="task-name">Giặt quần, áo</div>
+                </div>
+            </div>
+
+            <div class="column-footer">
+                Đi chợ <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+
+        <!-- Journal Column -->
+        <div class="task-column">
+            <div class="column-header">Viết Nhật Ký</div>
+
+            <div class="journal-day">
+                <span>Ngày 1</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+
+            <div class="journal-day">
+                <span>Ngày 2</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+
+            <div class="journal-day">
+                <span>Ngày 3</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+
+            <div class="column-footer">
+                Hãy ghi lại những thay đổi của bạn hôm nay
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and other scripts -->
+<script>
+    document.addEventListener("DOMContentLoaded", function (){
+
+        //Model create & edit validation habit
+        const habitForm = document.getElementById("habitForm");
+        const habitFormUpdate = document.getElementById("habitUpdateForm");
+        const habitTitleInput = document.getElementById("habitTitle");
+        const habitTitleUpdateInput = document.getElementById("habitUpdateTitle");
+        const habitTitleError = document.getElementById("habitTitleError");
+        const habitTitleUpdateError = document.getElementById("habitTitleUpdateError");
+        const habitTarget = document.getElementById("target")
+        const habitTargetError = document.getElementById("targetError")
+        const habitUpdateTarget = document.getElementById("upTarget")
+        const habitUpdateTargetError = document.getElementById("updateTargetError")
+
+        habitForm.addEventListener("submit", (e) => {
+            let valid = true;
+            if (habitTitleInput.value.trim() === "") {
+                habitTitleError.style.display = "block";
+                valid = false;
+            }
+            if(habitTarget.value<1){
+                habitTargetError.style.display = "block"
+                valid = false
+            }
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+
+        habitFormUpdate.addEventListener("submit", (e) => {
+            let valid = true;
+            if (habitTitleUpdateInput.value.trim() === "") {
+                habitTitleUpdateError.style.display = "block";
+                valid = false;
+                console.log(valid)
+            }
+            if(habitUpdateTarget.value<1){
+                habitUpdateTargetError.style.display = "block"
+                valid = false
+            }
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+
+        //Open update habit modal
+        window.openHabitUpdateModal = (habitId) => {
+            fetch("/habits/"+habitId)
+                .then(response => response.json())
+                .then(habit =>{
+                    document.getElementById("upHabitId").value=habitId
+                    document.getElementById("habitUpdateTitle").value=habit.title;
+                    document.getElementById("upDescription").value=habit.description;
+                    document.getElementById("upDifficulty").value=habit.difficulty;
+                    document.getElementById("upType").value = habit.type;
+                    document.getElementById("upTarget").value = habit.targetCount;
+                    document.getElementById("UpChallenge").value =habit.challengeId === null ? '' : habit.challengeId;
+                    document.getElementById("deleteHabit").setAttribute("href","/habits/delete/"+habitId);
+
+                    const updateHabitModal = new bootstrap.Modal(document.getElementById("updateHabit"))
+                    updateHabitModal.show()
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu phần thưởng:', error);
+                    alert('Không thể lấy dữ liệu phần thưởng.');
+                });
+        }
+
+        // Xử lý nút cộng
+        document.querySelectorAll('.plus-button').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const countEl = this.nextElementSibling;
+                let count = parseInt(countEl.textContent.replace('+', '')) || 0;
+                countEl.textContent = '+' + (count + 1);
+            });
+        });
+
+        // Xử lý nút trừ
+        document.querySelectorAll('.minus-button').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const countEl = this.previousElementSibling;
+                let count = parseInt(countEl.textContent.replace('+', '')) || 0;
+                countEl.textContent = '+' + (count - 1);
+            });
+        });
+
+        // Checkbox daily toggle
+        document.querySelectorAll('.daily-checkbox').forEach(function (checkbox) {
+            checkbox.addEventListener('click', function () {
+                const item = this.closest('.checkbox-item');
+                item.classList.toggle('completed');
+
+                if (item.classList.contains('completed')) {
+                    this.innerHTML = '<i class="fas fa-check"></i>';
+                } else {
+                    this.innerHTML = '';
+                }
+            });
+        });
+
+        // Mở rộng nhật ký
+        document.querySelectorAll('.journal-day').forEach(function (journal) {
+            journal.addEventListener('click', function () {
+                this.classList.toggle('expanded');
+                const icon = this.querySelector('i');
+                if (this.classList.contains('expanded')) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                } else {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>

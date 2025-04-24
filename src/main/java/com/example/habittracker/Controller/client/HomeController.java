@@ -4,6 +4,9 @@ import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.Domain.Reward;
 import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.UserChallenge;
+import com.example.habittracker.Service.ChallengeService;
+import com.example.habittracker.Service.RewardService;
 import com.example.habittracker.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.token.TokenService;
@@ -16,6 +19,7 @@ import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -24,12 +28,14 @@ public class HomeController {
     private final UserService userService;
     private final TokenUtil tokenUtil;
     private final JwtUtil jwtUtil;
+    private final ChallengeService challengeService;
 
-    public HomeController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil) {
+    public HomeController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService) {
         this.userService = userService;
         this.tokenUtil = tokenUtil;
 
         this.jwtUtil = jwtUtil;
+        this.challengeService = challengeService;
     }
 
     @GetMapping("/home")
@@ -39,6 +45,10 @@ public class HomeController {
         User user = this.userService.getUser(userName);
 
         model.addAttribute("user", user);
+
+        //challenge
+        List<UserChallenge> userChallenges  = this.challengeService.getChallenges(user.getUserId());
+        model.addAttribute("userChallenges", userChallenges);
 
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();

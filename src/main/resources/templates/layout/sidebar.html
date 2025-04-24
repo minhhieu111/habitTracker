@@ -3,14 +3,21 @@
     <button id="sidebarCollapse" class="btn btn-link text-dark position-fixed" style="top: 10px; left: 10px; z-index: 1040;">
         <i class="fas fa-bars"></i>
     </button>
-    <div class="sidebar-header">
-        <h5>BeBet</h5>
+    <div class="sidebar-header d-flex justify-content-center mb-4">
+        <img src="/images/logo.png" style="height: 60px; width: 60px" alt="bebet" class="logo">
+        <h3 class="my-3 mx-2">Bebet</h3>
     </div>
     <ul class="nav flex-column">
         <li class="nav-item">
-            <a class="nav-link active" href="#">
+            <a class="nav-link" href="/home">
                 <i class="fas fa-home"></i>
                 <span>Trang chủ</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/overview">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>Tổng quan</span>
             </a>
         </li>
         <li class="nav-item">
@@ -37,7 +44,12 @@
                 <span>Thử thách</span>
             </a>
         </li>
-        <!-- Các mục phụ ở dưới cùng -->
+        <li class="nav-item mt-auto">
+            <a class="nav-link" href="#">
+                <i class="fa-solid fa-users"></i>
+                <span>Cộng đồng</span>
+            </a>
+        </li>
         <li class="nav-item mt-auto">
             <a class="nav-link" href="#">
                 <i class="fas fa-user"></i>
@@ -52,3 +64,21 @@
         </li>
     </ul>
 </nav>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('sidebarCollapse').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('content').classList.toggle('expanded');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function () {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    });
+</script>
+
+

@@ -13,6 +13,6 @@ public class UserService {
     }
 
     public User getUser(String username) {
-        return this.userRepository.findUserByUserName(username);
+        return this.userRepository.findUserByUserName(username).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
     }
 }

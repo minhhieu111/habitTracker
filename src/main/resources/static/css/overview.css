@@ -1,0 +1,472 @@
+:root {
+    --sidebar-width: 250px;
+    --sidebar-collapsed-width: 70px;
+    --primary-color: #f7b924;
+    --primary-hover: #e5a91f;
+    --dark-bg: #1a1a1a;
+    --light-bg: #f2f2f2;
+    --sidebar-bg: #f2f2f2;
+    --sidebar-color: #333;
+    --progress-bar-height: 8px;
+    --yellow-color: #ffcc00;
+    --green-color: #00b25a;
+    --red-color: #ff3860;
+    --blue-color: #3298dc;
+    --gray-bg: #f2f2f2;
+    --card-radius: 10px;
+    --task-radius: 8px;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: #fff;
+    font-family: "Nunito", sans-serif;
+}
+
+
+/* Main content area */
+#content {
+    margin-left: var(--sidebar-width);
+    transition: all 0.3s;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+#content.expanded {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+.head-content{
+    border-right: 1px solid #eee;
+}
+
+/* User info section */
+.user-info-section {
+    background-color: #f2f2f2;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #f7b924;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    margin-right: 15px;
+}
+
+.user-details h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.exp-info {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.level-info {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.progress-container {
+    background-color: #e0e0e0;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #f7b924;
+}
+
+.badge-container {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.badge-icon {
+    width: 50px;
+    height: 50px;
+    background-color: #f7b924;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+}
+
+.badge-number {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background-color: #f7b924;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    font-size: 14px;
+}
+
+/* Progress section */
+.progress-section {
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    padding: 35px;
+    margin: 15px;
+}
+
+.progress-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.progress-row {
+ width: 70%;
+}
+
+.progress-label {
+    width: 120px;
+    font-size: 14px;
+}
+
+.progress-bar-container {
+    flex: 1;
+    background-color: #e0e0e0;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #3298dc;
+}
+
+.progress-value {
+    width: 200px;
+    text-align: right;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Challenge card */
+.challenge-card {
+    background-color: #ffcc00;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px;
+    text-align: center;
+    color: black;
+}
+
+.challenge-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.challenge-subtitle {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.challenge-progress {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.challenge-streak {
+    font-size: 16px;
+}
+
+.challenge-streak i {
+    color: #ff3860;
+}
+
+/* Search bar */
+.search-container {
+    padding: 15px;
+    border-top: 1px solid #eee;
+}
+
+.search-bar {
+    position: relative;
+    width: 25%;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 15px;
+    padding-right: 40px;
+    border: none;
+    border-radius: 20px;
+    background-color: #f2f2f2;
+}
+
+.search-button {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+/* Task columns */
+.tasks-container {
+    display: flex;
+    padding: 15px;
+}
+
+.task-column {
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    padding: 20px;
+    flex: 1;
+    margin: 10px;
+    position: relative;
+}
+
+.column-header {
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.add-task-button {
+    width: 100%;
+    margin-bottom: 15px;
+    background-color: #c1c1c1;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.add-task-button i {
+    margin-right: 5px;
+}
+
+.tasks-contain {
+    max-height: calc(4 * 87px); /*  reward-item: 50px + 12px (margin-bottom) */
+    overflow-y: auto;
+}
+
+.tasks-contain::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tasks-contain::-webkit-scrollbar-thumb {
+    background-color: #d3d3d3;
+    border-radius: 4px;
+}
+
+/* Habit items */
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    height: 75px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    background-color: #ffcc00;
+}
+
+.color-indicator {
+    width: 5px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.yellow-indicator {
+    background-color: #ffcc00;
+}
+
+.green-indicator {
+    background-color: #00b25a;
+}
+
+.red-indicator {
+    background-color: #ff3860;
+}
+
+.task-content {
+    width: 84%;
+    background-color: #ffffff;
+    padding: 5px 10px 5px 20px;
+    height: 100%;
+}
+
+.task-detail{
+    width: 100%;
+    text-align: left;
+    border: none;
+    background-color: inherit;
+
+}
+.task-detail:hover{
+    background-color: rgba(102, 102, 102, 0.18);
+    transition: 0.5s ease;
+}
+
+.task-description {
+    width: 100%;
+    font-size: 12px;
+    color: #666;
+    text-overflow: ellipsis;
+}
+
+.task-actions {
+    display: flex;
+    align-items: center;
+}
+
+.action-button {
+    margin: 10px;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 99%;
+    overflow-y: hidden;
+    text-decoration: none;
+    color: white;
+    background-color: rgba(158, 158, 158, 0.29);
+}
+
+.task-count {
+    width: 100%;
+    font-weight: bold;
+    font-size: small;
+}
+
+/*Habit Modal*/
+.modal-header input, .modal-header textarea{
+    background-color: rgba(253, 253, 253, 0.5);
+}
+
+.modal-header input:focus, .modal-header textarea:focus{
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+/*Daily item*/
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #ffcc00;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    height: 75px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    padding-left: 2px;
+}
+
+.daily-checkbox {
+    width: 30px;
+    height: 30px;
+    margin: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #393939;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.yellow-checkbox {
+    background-color: #ffcc00;
+}
+
+.green-checkbox {
+    background-color: #00b25a;
+}
+
+.red-checkbox {
+    background-color: #ff3860;
+}
+
+.completed .task-detail>div{
+    text-decoration: line-through;
+}
+
+/* Journal section */
+.journal-day {
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.column-footer {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 15px;
+    padding: 0px 50px;
+    position: absolute;
+    bottom: 10px;
+}
+
+@media (max-width: 992px) {
+    .tasks-container {
+        flex-wrap: wrap;
+    }
+
+    .task-column {
+        flex: 1 0 50%;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .task-column {
+        flex: 1 0 100%;
+    }
+
+    #content {
+        margin-left: 0;
+    }
+
+    #sidebar {
+        margin-left: -250px;
+    }
+
+    #sidebar.active {
+        margin-left: 0;
+    }
+}
