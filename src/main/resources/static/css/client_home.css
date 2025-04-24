@@ -31,57 +31,6 @@ body {
     color: #fff !important;
 }
 
-/* Sidebar styles */
-#sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: var(--sidebar-width);
-    background-color: var(--sidebar-bg);
-    color: var(--sidebar-color);
-    transition: all 0.3s;
-    z-index: 1020;
-    overflow-y: auto;
-    border-right: 1px solid #ddd;
-    padding-top: 50px;
-}
-
-#sidebar.collapsed {
-    width: var(--sidebar-collapsed-width);
-    padding-top: 50px;
-}
-
-#sidebar .nav-link {
-    padding: 0.8rem 1rem;
-    color: var(--sidebar-color);
-    border-left: 3px solid transparent;
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-}
-
-#sidebar .nav-link:hover,
-#sidebar .nav-link.active {
-    background-color: rgba(0, 0, 0, 0.05);
-    border-left-color: var(--primary-color);
-}
-
-#sidebar .nav-link i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
-}
-
-#sidebar.collapsed .nav-link span {
-    display: none;
-}
-
-#sidebar .sidebar-header {
-    padding: 1rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
 /* Main content area */
 #content {
     margin-left: var(--sidebar-width);
@@ -94,69 +43,6 @@ body {
     margin-left: var(--sidebar-collapsed-width);
 }
 
-/*Toast*/
-.toast-body{
-    font-size: 20px;
-}
-.toast-body img{
-    height: 27px;
-    width: 27px;
-}
-
-/* User profile */
-.user-profile {
-    background-color: #ffffff;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    position: relative;
-}
-
-.user-avatar {
-    width: 70px;
-    height: 70px;
-    background-color: #f7b924;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    margin-right: 15px;
-}
-
-.user-experiment span{
-    opacity: 50%;
-    font-size: 14px;
-}
-.user-coin{
-    width: 30px;
-    height: 100%;
-}
-.progress-bar {
-    background-color: var(--primary-color);
-    height: var(--progress-bar-height);
-}
-
-.progress {
-    height: var(--progress-bar-height);
-    background-color: #e9ecef;
-    width: 300px;
-}
-
-.level-badge {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background-color: var(--primary-color);
-    color: #fff;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
 
 /* Welcome box */
 .welcome-box {
@@ -179,11 +65,8 @@ body {
 }
 
 .calendar__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     padding: 15px var(--side-padding);
-    border-bottom: 1px solid #eee;
+    border-radius: 10px 10px 0px 0px;
 }
 
 .calendar__month-year {
@@ -389,7 +272,7 @@ select {
     cursor: pointer;
 }
 .rewards-contain {
-    max-height: calc(4 * 62px); /* giả sử mỗi reward-item cao 80px */
+    max-height: calc(4 * 62px); /*  reward-item: 50px + 12px (margin-bottom) */
     overflow-y: auto;
 }
 
@@ -421,12 +304,12 @@ select {
 }
 
 .reward-points {
+    border: none;
     background-color: #ffedb4;
     min-width: 18%;
     max-width: 18%;
     height: 100%;
     overflow-y: hidden;
-    text-decoration: none;
     color: #1a1a1a;
 }
 .reward-points::-webkit-scrollbar{

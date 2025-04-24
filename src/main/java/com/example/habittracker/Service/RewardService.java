@@ -17,7 +17,7 @@ public class RewardService {
     }
 
     public void save(Reward reward, String userName) {
-        User user = userRepository.findUserByUserName(userName);
+        User user = userRepository.findUserByUserName(userName).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
         if (reward.getTitle().isEmpty()) {
             System.out.println(reward.getTitle());
             throw new RuntimeException("Thêm thất bại tiêu đề đang trống");

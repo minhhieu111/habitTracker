@@ -1,0 +1,30 @@
+<div class="user-profile row align-items-center" th:fragment="user(user)">
+    <!-- Avatar và Cấp độ -->
+    <div class="user-avatar">
+        <i class="fas fa-smile text-white"></i>
+    </div>
+
+    <!-- Thông tin chi tiết -->
+    <div class="col-3">
+        <strong>
+            <span class="mb-1">Danh Hiệu: <span th:text="${username}"></span></span>
+        </strong>
+
+        <p>Người dùng: <span th:text="${user.getUserName()}"></span></p>
+        <strong>Cấp độ: <span th:text="${user.getLevel()}"></span></strong>
+        <div class="progress mt-1">
+            <div class="progress-bar" role="progressbar"
+                 th:style="'width: ' + (${user.getExp()} * 100 / ${user.getLevel()}) + '%'">
+            </div>
+        </div>
+        <div class="user-experiment">
+            <span class="me-2" th:text="'Kinh Nghiệm: ' + ${user.getExp()} + '/' + ${user.getLevel()}">Kinh Nghiệm: </span>
+        </div>
+    </div>
+
+    <!-- Coin -->
+    <div th:style="'height:100%; width:20px'" class="d-flex flex-column align-items-center col-7 ms-auto">
+        <img src="/images/coin-icon.png" alt="coin" class="user-coin">
+        <span th:text="${user.getCoins()}">0</span>
+    </div>
+</div>
