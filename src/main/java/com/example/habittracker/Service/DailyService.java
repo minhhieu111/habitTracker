@@ -52,4 +52,42 @@ public class DailyService {
                 .build();
         userDailyRepository.save(userDaily);
     }
+
+    @Transactional
+    public DailyDTO getUpdateDaily(Long dailyId, String username) {
+        User dailyUser = this.userService.getUser(username);
+        Daily daily = this.dailyRepository.findById(dailyId).get();
+        DailyDTO dailyDTO = new DailyDTO().builder()
+                .dailyId(daily.getDailyId())
+                .userId(dailyUser.getUserId())
+                .title(daily.getTitle())
+                .description(daily.getDescription())
+                .difficulty(daily.getDifficulty())
+                .repeatFrequency(daily.getRepeatFrequency())
+                .repeatEvery(daily.getRepeatEvery())
+                .repeatDays(daily.getRepeatDays())
+                .repeatMonthDays(daily.getRepeatMonthDays())
+                .challengeId(daily.getChallengeId())
+                .build();
+
+        return dailyDTO;
+    }
+
+    @Transactional
+    public void updateDaily(DailyDTO dailyDTO, String username) {
+        User user = userService.getUser(username);
+
+        Daily daily = dailyRepository.findById(dailyDTO.getDailyId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy "));
+
+        daily.setTitle(dailyDTO.getTitle());
+        daily.setDescription(dailyDTO.getDescription());
+        daily.setDifficulty(dailyDTO.getDifficulty());
+        daily.setRepeatFrequency(dailyDTO.getRepeatFrequency());
+        daily.setRepeatEvery(dailyDTO.getRepeatEvery());
+        daily.setRepeatDays(dailyDTO.getRepeatDays());
+        daily.setRepeatMonthDays(dailyDTO.getRepeatMonthDays());
+        daily.setChallengeId(dailyDTO.getChallengeId());
+        this.dailyRepository.save(daily);
+    }
 }

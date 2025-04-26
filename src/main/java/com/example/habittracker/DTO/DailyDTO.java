@@ -1,10 +1,7 @@
 package com.example.habittracker.DTO;
 
 import com.example.habittracker.Domain.Daily;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -14,9 +11,10 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class DailyDTO {
-    private int dailyId;
-    private int userId;
+    private Long dailyId;
+    private Long userId;
     private Long challengeId;
     private String title;
     private String description;

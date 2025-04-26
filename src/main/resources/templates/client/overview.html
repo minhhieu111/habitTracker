@@ -181,6 +181,7 @@
                             <div class="w-100 ">
                                 <h4 class="fw-bold mb-3">Chỉnh sửa</h4>
                                 <div class="mb-3" >
+                                    <input type="hidden" id="upHabitId" th:field="*{habitId}" />
                                     <label for="habitUpdateTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="habitUpdateTitle" th:field="*{title}">
                                     <div id="habitTitleUpdateError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
@@ -278,10 +279,10 @@
                     <div th:each="userDaily : ${userDailies}" class="checkbox-item">
                         <div class="daily-checkbox"></div>
                         <div class="task-content">
-                            <div class="task-detail">
+                            <button class="task-detail" th:data-daily-id="${userDaily.getDaily().getDailyId()}" onclick="openDailyUpdateModal(this.getAttribute('data-daily-id'))">
                                 <div class="fw-bold mb-1" th:text="${userDaily.getDaily().getTitle()}">Ngủ trước 10 giờ</div>
                                 <div class="task-description" th:text="${userDaily.getDaily().getDescription()}">Uống nước mỗi 1 giờ</div>
-                            </div>
+                            </button>
                             <span class="task-count d-flex justify-content-end" th:text="${userDaily.getStreak()}">11</span>
                         </div>
 
@@ -295,73 +296,15 @@
             </div>
         </div>
 
-<!--        <div class="modal fade" id="modalDailyCreate" tabindex="-1">-->
-<!--            <div class="modal-dialog modal-dialog-centered">-->
-<!--                <div class="modal-content">-->
-<!--                    <form id="dailyForm" th:action="@{/dailys/save}" method="post" th:object="${newDaily}">-->
-<!--                        <div class="modal-header text-bg-warning p-4">-->
-<!--                            <div class="w-100 ">-->
-<!--                                <h4 class="fw-bold mb-3">Tạo mới</h4>-->
-<!--                                <div class="mb-3" >-->
-<!--                                    <label for="habitTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>-->
-<!--                                    <input type="text" class="form-control" id="habitTitle" th:field="*{title}">-->
-<!--                                    <div id="habitTitleError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>-->
-<!--                                </div>-->
-<!--                                <div class="mb-3" >-->
-<!--                                    <label for="notes" class="form-label">Ghi chú</label>-->
-<!--                                    <textarea class="form-control" id="notes" th:field="*{description}" rows="3" placeholder="Thêm ghi chú"></textarea>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="modal-body p-4">-->
-<!--                            <div class="mb-3">-->
-<!--                                <label for="type" class="form-label">Loại</label>-->
-<!--                                <select class="form-control" id="type" th:field="*{type}">-->
-<!--                                    <option value="NEGATIVE">Tích cực</option>-->
-<!--                                    <option value="POSITIVE">Tiêu cực</option>-->
-<!--                                    <option value="BOTH">Cả 2</option>-->
-<!--                                </select>-->
-<!--                            </div>-->
-
-<!--                            <div class="mb-3">-->
-<!--                                <label for="difficulty" class="form-label">Độ khó</label>-->
-<!--                                <select class="form-control" name="difficulty" id="difficulty" th:field="*{difficulty}">-->
-<!--                                    <option value="EASY">Dễ</option>-->
-<!--                                    <option value="MEDIUM">Trung Bình</option>-->
-<!--                                    <option value="HARD">Khó</option>-->
-<!--                                </select>-->
-<!--                            </div>-->
-
-<!--                            <div class="mb-3">-->
-<!--                                <label for="target" class="form-label">Mục tiêu</label>-->
-<!--                                <input type="number" class="form-control" id="target" th:field="*{targetCount}">-->
-<!--                                <div id="targetError" class="text-danger mt-1" style="display: none;">Vui lòng chọn mục tiêu >1</div>-->
-<!--                            </div>-->
-
-<!--                            <div class="mb-3">-->
-<!--                                <label for="challenge"  class="form-label">Thử thách</label>-->
-<!--                                <select class="form-control"  id="challenge" th:field="*{challengeId}">-->
-<!--                                    <option th:value="${null}" selected>Không có</option>-->
-<!--                                    <option th:each="challenge : ${userChallenges}" th:value="${challenge.getChallenge().getChallengeId()}" th:text="${challenge.getChallenge().getTitle()}"></option>-->
-<!--                                </select>-->
-<!--                            </div>-->
-
-<!--                            <div class="modal-footer">-->
-<!--                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>-->
-<!--                                <button type="submit" class="btn btn-primary">Lưu</button>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </form>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
+        <!--Modal Daily-->
         <div class="modal fade" id="modalDailyCreate" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <form id="dailyForm" th:action="@{/dailies/create}" method="post" th:object="${newDaily}">
+                    <form id="dailyForm" th:action="@{dailies/create}" method="post" th:object="${newDaily}">
                         <div class="modal-header text-bg-warning p-4">
                             <div class="w-100">
-                                <h4 class="fw-bold mb-3">Tạo mới Daily</h4>
+                                <h4 id="DailyModalTitle" class="fw-bold mb-3">Tạo mới Daily</h4>
+                                <input type="hidden" id="dailyId" th:field="*{dailyId}" />
                                 <div class="mb-3">
                                     <label for="dailyTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="dailyTitle" th:field="*{title}" required>
@@ -387,7 +330,7 @@
                             <!-- Repeat Frequency -->
                             <div class="mb-3">
                                 <label for="repeatFrequency" class="form-label">Tần suất lặp lại</label>
-                                <select class="form-control" id="repeatFrequency" th:field="*{repeatFrequency}" onchange="toggleRepeatOptions()">
+                                <select class="form-control" id="repeatFrequency" th:field="*{repeatFrequency}">
                                     <option th:each="freq : ${newDaily.repeatFrequencyOptions}"
                                             th:value="${freq}"
                                             th:text="${freq}"></option>
@@ -408,7 +351,7 @@
                                 <label class="form-label">Lặp lại vào</label>
                                 <div style="width: 100%">
                                     <div th:each="day : ${newDaily.dayOfWeekOptions}" class="form-check form-check-inline" style="width: 20%">
-                                        <input class="form-check-input" type="checkbox" th:field="*{repeatDays}" th:value="${day}" th:id="'day-' + ${day}" />
+                                        <input class="form-check-input" type="checkbox" th:field="*{repeatDays}" th:value="${day}" th:id="'day-' + ${day}">
                                         <label class="form-check-label" th:for="'day-' + ${day}" th:text="${day}"></label>
                                     </div>
                                 </div>
@@ -435,15 +378,42 @@
                                 </select>
                             </div>
 
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                <button type="submit" class="btn btn-primary">Lưu</button>
+                            <div class="modal-footer d-flex justify-content-between">
+                                <div>
+                                    <button id="deleteDailyButton" style="display: none" type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                            data-bs-target="#deleteHabitModal">Xóa</button>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+        <!--Modal Delete Daily-->
+        <div class="modal fade" id="deleteDailyModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" >Xóa Thói quen hằng ngày</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn xóa thói quen này?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">Đóng</button>
+                        <a id="deleteDaily" class="btn btn-primary">Đồng ý</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Todos Column -->
         <div class="task-column">
             <div class="column-header">Việc cần làm</div>
@@ -614,16 +584,60 @@
         });
 
         // Daily
+        window.openDailyUpdateModal = function(dailyId) {
+            if (!dailyId) {
+                console.error('Không tìm thấy dailyId');
+                alert('Không thể tải dữ liệu Daily do thiếu dailyId.');
+                return;
+            }
 
-        window.toggleRepeatOptions = () => {
+            fetch(`/dailies/update/${dailyId}`)
+                .then(response => response.json())
+                .then(daily => {
+                    console.log('Dữ liệu Daily:', daily);
+                    document.getElementById('dailyId').value = dailyId || '';
+                    document.getElementById('dailyTitle').value = daily.title || '';
+                    document.getElementById('dailyDes').value = daily.description || '';
+                    document.getElementById('dailyDifficulty').value = daily.difficulty || '';
+                    document.getElementById('repeatFrequency').value = daily.repeatFrequency || 'DAILY';
+                    toggleRepeatOptions();
+                    document.getElementById('repeatEvery').value = daily.repeatEvery || 1;
+                    document.getElementById("deleteDailyButton").style.display='block'
+                    document.getElementById("deleteDaily").setAttribute("href","dailies/delete/"+dailyId);
+
+                    document.querySelectorAll('#repeatDaysSection input[type="checkbox"]').forEach(checkbox => {
+                        checkbox.checked = daily.repeatDays ? daily.repeatDays.includes(checkbox.value) : false;
+                    });
+
+                    document.querySelectorAll('#repeatMonthDaysSection input[type="checkbox"]').forEach(checkbox => {
+                        console.log(daily.repeatMonthDays)
+                        checkbox.checked = daily.repeatMonthDays ? daily.repeatMonthDays.includes(Number(checkbox.value)) : false;
+                    });
+
+                    document.getElementById('challenge').value = daily.challengeId || '';
+
+                    const form = document.getElementById('dailyForm');
+                    const modalTitle = document.getElementById('DailyModalTitle');
+                    form.action = '/dailies/update/'+dailyId;
+                    modalTitle.textContent = 'Chỉnh sửa';
+
+                    const modal = new bootstrap.Modal(document.getElementById('modalDailyCreate'));
+                    modal.show();
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu Daily:', error);
+                    alert('Không thể tải dữ liệu Daily. Vui lòng thử lại.');
+                });
+        };
+
+        function toggleRepeatOptions() {
             const repeatFrequency = document.getElementById('repeatFrequency').value;
             const repeatEverySection = document.getElementById('repeatEverySection');
             const repeatDaysSection = document.getElementById('repeatDaysSection');
             const repeatMonthDaysSection = document.getElementById('repeatMonthDaysSection');
             const repeatEveryUnit = document.getElementById('repeatEveryUnit');
 
-            // Ẩn tất cả section trước
-            repeatEverySection.style.display = 'none'
+            repeatEverySection.style.display = 'none';
             repeatDaysSection.style.display = 'none';
             repeatMonthDaysSection.style.display = 'none';
 
@@ -637,23 +651,7 @@
                 repeatEveryUnit.textContent = 'Months';
             }
         }
-
-        window.toggleMonthlyOptions = () =>{
-            const monthlyRepeatType = document.getElementById('monthlyRepeatType') ? document.getElementById('monthlyRepeatType').value : 'DAY_OF_MONTH';
-            const repeatMonthDaysSection = document.getElementById('repeatMonthDaysSection');
-            const dayOfWeekSection = document.getElementById('dayOfWeekSection');
-            const weekOfMonthSection = document.getElementById('weekOfMonthSection');
-
-            if (monthlyRepeatType === 'DAY_OF_MONTH') {
-                repeatMonthDaysSection.style.display = 'block';
-                dayOfWeekSection.style.display = 'none';
-                weekOfMonthSection.style.display = 'none';
-            } else if (monthlyRepeatType === 'DAY_OF_WEEK') {
-                repeatMonthDaysSection.style.display = 'none';
-                dayOfWeekSection.style.display = 'block';
-                weekOfMonthSection.style.display = 'block';
-            }
-        }
+        document.getElementById('repeatFrequency').addEventListener('change', toggleRepeatOptions);
 
         // Checkbox daily toggle
         document.querySelectorAll('.daily-checkbox').forEach(function (checkbox) {
