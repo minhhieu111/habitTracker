@@ -8,6 +8,7 @@ import com.example.habittracker.Domain.User;
 import com.example.habittracker.Domain.UserHabit;
 import com.example.habittracker.Service.HabitService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,12 +44,11 @@ public class HabitController {
 
     @GetMapping("/{habitId}")
     @ResponseBody
-    public HabitDTO UpdateHabit(HttpServletRequest request, @PathVariable Long habitId) {
+    public ResponseEntity<HabitDTO> UpdateHabit(HttpServletRequest request, @PathVariable Long habitId) {
         String token = tokenUtil.getTokenFromCookies(request);
         String userName = jwtUtil.getUserNameFromToken(token);
-
         HabitDTO updateHabit = this.habitService.getUpdateHabit(habitId,userName);
-        return updateHabit;
+        return ResponseEntity.ok().body(updateHabit);
     }
 
     @PostMapping("/update")

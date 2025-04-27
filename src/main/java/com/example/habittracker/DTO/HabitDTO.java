@@ -21,4 +21,7 @@ public class HabitDTO {
     private Long challengeId;
     private Long targetCount =0L;
     private Long userId;
+
+    private final Habit.Difficulty[] habitDifficultiesOption = Habit.Difficulty.values();
+    private final Habit.HabitType[] habitTypesOption = Habit.HabitType.values();
 }

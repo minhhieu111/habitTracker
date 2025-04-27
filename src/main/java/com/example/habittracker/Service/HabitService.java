@@ -38,6 +38,12 @@ public class HabitService {
     public void save(HabitDTO habitDTO, String username) {
         User user = this.userService.getUser(username);
 
+        if(habitDTO.getTitle().equals("")){
+            throw new RuntimeException("Tạo Thói quen thất Bại! Tiêu đề không được để trống");
+        }
+        if(habitDTO.getTargetCount() < 1 || habitDTO.getTargetCount() == null){
+            throw new RuntimeException("Tạo Thói quen thất Bại! Mục tiêu không được để trống và mục tiêu phải lớn hơn 1");
+        }
         Habit createHabit = new Habit();
         createHabit.setTitle(habitDTO.getTitle());
         createHabit.setDescription(habitDTO.getDescription());
@@ -73,6 +79,14 @@ public class HabitService {
     public void updateHabit(HabitDTO habitDTO, String username) {
         User user = this.userService.getUser(username);
         Habit habit = getHabit(habitDTO.getHabitId());
+
+        if(habitDTO.getTitle().equals("")){
+            throw new RuntimeException("Tạo Thói quen thất Bại! Tiêu đề không được để trống");
+        }
+        if(habitDTO.getTargetCount() < 1 || habitDTO.getTargetCount() == null){
+            throw new RuntimeException("Tạo Thói quen thất Bại! Mục tiêu không được để trống và mục tiêu phải lớn hơn 1");
+        }
+
         habit.setTitle(habitDTO.getTitle());
         habit.setDescription(habitDTO.getDescription());
         habit.setDifficulty(habitDTO.getDifficulty());

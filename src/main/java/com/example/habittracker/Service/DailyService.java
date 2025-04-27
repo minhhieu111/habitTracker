@@ -90,4 +90,17 @@ public class DailyService {
         daily.setChallengeId(dailyDTO.getChallengeId());
         this.dailyRepository.save(daily);
     }
+
+    @Transactional
+    public void deleteDaily(Long dailyId, String username) {
+        User user = userService.getUser(username);
+        Daily daily = this.dailyRepository.findById(dailyId).get();
+        UserDaily userDaily = this.userDailyRepository.findByUserAndDaily(user,daily);
+        if(daily == null && userDaily == null){
+            throw new RuntimeException("Có lỗi xảy ra khi xóa! Không tìm thấy thói quen để xóa");
+        }
+
+        this.dailyRepository.delete(daily);
+        this.userDailyRepository.delete(userDaily);
+    }
 }

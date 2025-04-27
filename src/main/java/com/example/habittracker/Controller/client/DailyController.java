@@ -53,7 +53,21 @@ public class DailyController {
         String username = this.jwtUtil.getUserNameFromToken(token);
         try{
             this.dailyService.updateDaily(dailyDTO, username);
-            redirectAttributes.addFlashAttribute("success", "Chỉnh sưa thành công!");
+            redirectAttributes.addFlashAttribute("success", "Chỉnh sửa thành công!");
+        }catch (RuntimeException e){
+            redirectAttributes.addFlashAttribute("failed", e.getMessage());
+            return "redirect:/overview";
+        }
+        return "redirect:/overview";
+    }
+
+    @GetMapping("delete/{dailyId}")
+    public String deleteDaily(HttpServletRequest request, @PathVariable Long dailyId,RedirectAttributes redirectAttributes) {
+        String token = this.tokenUtil.getTokenFromCookies(request);
+        String username = this.jwtUtil.getUserNameFromToken(token);
+        try{
+            this.dailyService.deleteDaily(dailyId , username);
+            redirectAttributes.addFlashAttribute("success", "Xoá thói quen hàng ngày thành công!");
         }catch (RuntimeException e){
             redirectAttributes.addFlashAttribute("failed", e.getMessage());
             return "redirect:/overview";
