@@ -1,6 +1,5 @@
 package com.example.habittracker.Service;
 
-import com.example.habittracker.Domain.Challenge;
 import com.example.habittracker.Domain.UserChallenge;
 import com.example.habittracker.Repository.ChallengeRepository;
 import org.springframework.stereotype.Service;

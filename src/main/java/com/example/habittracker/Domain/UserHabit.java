@@ -20,6 +20,9 @@ public class UserHabit {
     private Long targetCount;
     private String EmailMessage;
     private LocalDateTime timeSendEmail;
+    private Long negativeCount = 0L;
+    private Long positiveCount = 0L;
+    private boolean isCompleted = false;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
