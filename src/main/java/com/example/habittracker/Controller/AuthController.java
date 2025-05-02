@@ -4,7 +4,6 @@ import com.example.habittracker.DTO.Login;
 import com.example.habittracker.DTO.Register;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Service.AuthService;
-import com.example.habittracker.Service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
