@@ -302,6 +302,21 @@ body {
     background-color: #ffcc00;
 }
 
+.btn-plus-container{
+    display: flex;
+    align-items: center;
+    width: 60px;
+    height: 100%;
+    background-color: inherit;
+}
+.btn-minus-container{
+    display: flex;
+    align-items: center;
+    width: 60px;
+    height: 100%;
+    background-color: inherit;
+}
+
 .color-indicator {
     width: 5px;
     height: 50px;
@@ -360,7 +375,7 @@ body {
     overflow-y: hidden;
     text-decoration: none;
     color: white;
-    background-color: rgba(158, 158, 158, 0.29);
+    background-color: rgb(44 44 44 / 24%);
 }
 
 .task-count {
@@ -381,7 +396,6 @@ body {
 /*Daily item*/
 .checkbox-item {
     display: flex;
-    align-items: center;
     justify-content: space-between;
     background-color: #ffcc00;
     border-radius: 12px;
@@ -390,6 +404,15 @@ body {
     height: 75px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
     padding-left: 2px;
+}
+
+.daily-checkbox-contain{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 100%;
+    background-color: inherit;
 }
 
 .daily-checkbox {

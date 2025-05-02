@@ -3,7 +3,6 @@ package com.example.habittracker.DTO;
 import com.example.habittracker.Domain.Daily;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 

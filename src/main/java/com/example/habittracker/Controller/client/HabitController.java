@@ -3,15 +3,10 @@ package com.example.habittracker.Controller.client;
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.DTO.HabitDTO;
-import com.example.habittracker.Domain.Habit;
-import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserHabit;
 import com.example.habittracker.Service.HabitService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -77,5 +72,14 @@ public class HabitController {
             return "redirect:/overview";
         }
         return "redirect:/overview";
+    }
+
+    @GetMapping("/{habitId}/progress_count")
+    @ResponseBody
+    public ResponseEntity<HabitDTO> progressCount(HttpServletRequest request,@PathVariable Long habitId, @RequestParam String type) {
+        String token = tokenUtil.getTokenFromCookies(request);
+        String userName = jwtUtil.getUserNameFromToken(token);
+        HabitDTO habitProgress = this.habitService.updateHabitCount(habitId,userName,type);
+        return ResponseEntity.ok().body(habitProgress);
     }
 }

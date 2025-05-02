@@ -2,14 +2,16 @@ package com.example.habittracker.Service;
 
 import com.example.habittracker.DTO.HabitDTO;
 import com.example.habittracker.Domain.Habit;
+import com.example.habittracker.Domain.HabitHistory;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Domain.UserHabit;
+import com.example.habittracker.Repository.HabitHistoryRepository;
 import com.example.habittracker.Repository.HabitRepository;
 import com.example.habittracker.Repository.UserHabitRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -17,11 +19,13 @@ public class HabitService {
     private final HabitRepository habitRepository;
     private final UserService userService;
     private final UserHabitRepository userHabitRepository;
+    private final HabitHistoryRepository habitHistoryRepository;
 
-    public HabitService(HabitRepository habitRepository, UserService userService, UserHabitRepository userHabitRepository) {
+    public HabitService(HabitRepository habitRepository, UserService userService, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository) {
         this.habitRepository = habitRepository;
         this.userService = userService;
         this.userHabitRepository = userHabitRepository;
+        this.habitHistoryRepository = habitHistoryRepository;
     }
 
     @Transactional
@@ -104,7 +108,75 @@ public class HabitService {
         User user = this.userService.getUser(username);
         Habit habit = getHabit(habitId);
         UserHabit userHabit = this.userHabitRepository.findUserHabitByHabitAndUser(habit,user).orElseThrow(()->new RuntimeException("Lỗi xảy ra khi xóa thói quen!"));
+        List<HabitHistory> habitHistories = this.habitHistoryRepository.findAllByUserHabit(userHabit);
+        this.habitHistoryRepository.deleteAll(habitHistories);
         this.userHabitRepository.delete(userHabit);
         this.habitRepository.delete(habit);
+    }
+
+    @Transactional
+    public HabitDTO updateHabitCount(Long habitId, String username, String type){
+        User user = this.userService.getUser(username);
+        Habit habit = getHabit(habitId);
+        UserHabit userHabit = this.userHabitRepository.findUserHabitByHabitAndUser(habit,user).orElseThrow(()->new RuntimeException("Lỗi xảy ra khi xóa thói quen!"));
+
+        String actionType = type.toUpperCase();
+
+        if(actionType.equals("POSITIVE")){
+            userHabit.setPositiveCount(userHabit.getPositiveCount()+1);
+        }else if(actionType.equals("NEGATIVE")){
+            userHabit.setNegativeCount(userHabit.getNegativeCount()+1);
+        }else{
+            throw new RuntimeException("Lỗi xảy ra khi cập nhật!");
+        }
+
+        this.userHabitRepository.save(userHabit);
+        LocalDate today = LocalDate.now();
+
+        HabitHistory habitHistory = this.habitHistoryRepository.findByUserHabitAndDate(userHabit,today)
+                .map(habitHis->{
+                    habitHis.setPositiveCount(userHabit.getPositiveCount());
+                    habitHis.setNegativeCount(userHabit.getNegativeCount());
+                    return habitHis;
+                })
+                .orElse(new HabitHistory().builder()
+                        .userHabit(userHabit)
+                        .negativeCount(userHabit.getNegativeCount())
+                        .positiveCount(userHabit.getPositiveCount())
+                        .date(today)
+                        .build()
+        );
+
+        HabitDTO habitDTO = new HabitDTO();
+        habitDTO.setPositiveCount(userHabit.getPositiveCount());
+        habitDTO.setNegativeCount(userHabit.getNegativeCount());
+
+        if((habit.getType().name().equals("BOTH") && userHabit.getTargetCount() <= userHabit.getPositiveCount() - userHabit.getNegativeCount())
+        || (habit.getType().name().equals("NEGATIVE") && userHabit.getTargetCount() <= userHabit.getNegativeCount())
+        ||(habit.getType().name().equals("POSITIVE") && userHabit.getTargetCount() <= userHabit.getPositiveCount())){
+            userHabit.setCompleted(true);
+            habitHistory.setCompleted(true);
+            habitDTO.setCompleted(true);
+        }
+        else{
+            userHabit.setCompleted(false);
+            habitHistory.setCompleted(false);
+            habitDTO.setCompleted(false);
+        }
+        this.userHabitRepository.save(userHabit);
+        this.habitHistoryRepository.save(habitHistory);
+
+        return habitDTO;
+    }
+
+    @Transactional
+    public void resetHabit(){
+        List<UserHabit> userHabits = this.userHabitRepository.findAll();
+        for(UserHabit userHabit : userHabits){
+            userHabit.setNegativeCount(0L);
+            userHabit.setPositiveCount(0L);
+            userHabit.setCompleted(false);
+            this.userHabitRepository.save(userHabit);
+        }
     }
 }

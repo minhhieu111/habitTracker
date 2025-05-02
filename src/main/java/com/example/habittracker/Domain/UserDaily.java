@@ -2,7 +2,6 @@ package com.example.habittracker.Domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.scheduling.config.Task;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;

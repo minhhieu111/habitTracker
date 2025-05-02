@@ -4,7 +4,6 @@ import com.example.habittracker.DTO.DailyDTO;
 import com.example.habittracker.Domain.Daily;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Domain.UserDaily;
-import com.example.habittracker.Domain.UserHabit;
 import com.example.habittracker.Repository.DailyRepository;
 import com.example.habittracker.Repository.UserDailyRepository;
 import org.springframework.stereotype.Service;

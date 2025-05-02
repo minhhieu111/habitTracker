@@ -4,9 +4,10 @@ import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.DTO.DailyDTO;
 import com.example.habittracker.DTO.HabitDTO;
-import com.example.habittracker.Domain.*;
-import com.example.habittracker.Repository.DailyRepository;
-import com.example.habittracker.Repository.HabitRepository;
+import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.UserChallenge;
+import com.example.habittracker.Domain.UserDaily;
+import com.example.habittracker.Domain.UserHabit;
 import com.example.habittracker.Service.ChallengeService;
 import com.example.habittracker.Service.DailyService;
 import com.example.habittracker.Service.HabitService;
@@ -17,10 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/overview")

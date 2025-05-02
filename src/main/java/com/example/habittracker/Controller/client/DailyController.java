@@ -3,7 +3,6 @@ package com.example.habittracker.Controller.client;
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.DTO.DailyDTO;
-import com.example.habittracker.Domain.Daily;
 import com.example.habittracker.Service.DailyService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;

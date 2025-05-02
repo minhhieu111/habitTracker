@@ -86,26 +86,34 @@
             </button>
             <div class="tasks-contain">
                 <!-- Habit item -->
-                <div th:each="habit : ${userHabits}" class="task-item">
-                    <button class="action-button plus-button">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <div class="task-content">
+                <div th:each="habit : ${userHabits}"
+                     th:class="${habit.getHabit().getType().name() == 'POSITIVE'} ? 'task-item green-indicator':(${habit.getHabit().getType().name() == 'NEGATIVE'} ? 'task-item red-indicator':'task-item')">
+                    <div class="btn-plus-container" th:if="${habit.getHabit().getType().name()=='BOTH'|| habit.getHabit().getType().name() == 'POSITIVE'}">
+                        <button class="action-button plus-button"
+                                th:data-habit-id="${habit.getHabit().getHabitId()}"
+                                onclick="updateHabitCount('positive',this.getAttribute('data-habit-id'))">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <div th:id="habit-task-content-+${habit.getHabit().getHabitId()}" th:class="  ${habit.isCompleted()} ? 'task-content completed' : 'task-content'">
                         <button class="task-detail" th:data-habit-id="${habit.getHabit().getHabitId()}" onclick="openHabitUpdateModal(this.getAttribute('data-habit-id'))">
                             <div class="fw-bold mb-1" th:text="${habit.getHabit().getTitle()}">Uống nước</div>
                             <div class="task-description" th:text="${habit.getHabit().getDescription()}">Uống nước mỗi 1 giờ</div>
                         </button>
-                        <div class="task-count d-flex justify-content-end"><span>+11 | 2-</span></div>
+                        <div class="task-count d-flex justify-content-end"><span th:id="habit-+${habit.getHabit().getHabitId()}" th:text="'+'+${habit.positiveCount}+'|'+${habit.negativeCount}+'-'">+11 | 2-</span></div>
                     </div>
-                    <div class="task-actions">
+                    <div class="btn-minus-container" th:if="${habit.getHabit().getType().name()=='BOTH'|| habit.getHabit().getType().name() == 'NEGATIVE'}">
+                        <button class="action-button minus-button"
+                                th:data-habit-id="${habit.getHabit().getHabitId()}"
+                                onclick="updateHabitCount('negative',this.getAttribute('data-habit-id'))">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
 
-                    </div>
-                    <button class="action-button minus-button">
-                        <i class="fas fa-minus"></i>
-                    </button>
                 </div>
             </div>
-            <div class="column-footer">
+            <div class="column-footer" th:if="${userHabits.size()<4}">
                 Duy trì các thói quen tốt và cùng loại bỏ thói quen xấu
             </div>
         </div>
@@ -210,7 +218,10 @@
                 <div class="tasks-contain">
                     <!-- Daily task item -->
                     <div th:each="userDaily : ${userDailies}" class="checkbox-item">
-                        <div class="daily-checkbox"></div>
+                        <div class="daily-checkbox-contain">
+                            <div class="daily-checkbox"></div>
+                        </div>
+
                         <div class="task-content">
                             <button class="task-detail" th:data-daily-id="${userDaily.getDaily().getDailyId()}" onclick="openDailyUpdateModal(this.getAttribute('data-daily-id'))">
                                 <div class="fw-bold mb-1" th:text="${userDaily.getDaily().getTitle()}">Ngủ trước 10 giờ</div>
@@ -224,7 +235,7 @@
 
             </div>
 
-            <div class="column-footer">
+            <div class="column-footer" th:if="${userDailies.size()<4}">
                 Hãy cố gắng hoàn thành công việc đã đặt ra của ngày hôm nay
             </div>
         </div>
@@ -505,23 +516,32 @@
             }
         });
 
-        // Xử lý nút cộng
-        document.querySelectorAll('.plus-button').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                const countEl = this.nextElementSibling;
-                let count = parseInt(countEl.textContent.replace('+', '')) || 0;
-                countEl.textContent = '+' + (count + 1);
-            });
-        });
+        //Positive Negative count
+        window.updateHabitCount = (type,habitId)=>{
+            fetch(`/habits/${habitId}/progress_count?type=${type}`)
+                .then(response=>{
+                    if(response.url.includes("/login")){
+                        window.location.href="/login"
+                        return;
+                    }
+                    return response.json()
+                })
+                .then(data =>{
 
-        // Xử lý nút trừ
-        document.querySelectorAll('.minus-button').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                const countEl = this.previousElementSibling;
-                let count = parseInt(countEl.textContent.replace('+', '')) || 0;
-                countEl.textContent = '+' + (count - 1);
-            });
-        });
+                    taskHabit = document.querySelector(`#habit-${habitId}`)
+                    taskComplete = document.querySelector(`#habit-task-content-${habitId}`)
+                    taskHabit.textContent  = `+${data.positiveCount}|${data.negativeCount}-`
+                    if(data.completed){
+                        taskComplete.classList.add("completed");
+                    }else {
+                        taskComplete.classList.remove("completed");
+                    }
+                })
+                .catch(error=>{
+                    console.error("Lỗi:", error);
+                    alert("Cập nhật thất bại! Phiên đăng nhập hết hạn mời đăng nhập lại!");
+                })
+        }
 
         // Daily
         window.openDailyCreateModal= ()=>{

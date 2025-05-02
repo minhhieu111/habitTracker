@@ -1,11 +1,7 @@
 package com.example.habittracker.DTO;
 
 import com.example.habittracker.Domain.Habit;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,6 +17,9 @@ public class HabitDTO {
     private Long challengeId;
     private Long targetCount =0L;
     private Long userId;
+    private Long negativeCount;
+    private Long positiveCount;
+    private boolean isCompleted =false;
 
     private final Habit.Difficulty[] habitDifficultiesOption = Habit.Difficulty.values();
     private final Habit.HabitType[] habitTypesOption = Habit.HabitType.values();
