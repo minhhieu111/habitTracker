@@ -90,14 +90,13 @@
                      th:class="${habit.getHabit().getType().name() == 'POSITIVE'} ? 'task-item green-indicator':(${habit.getHabit().getType().name() == 'NEGATIVE'} ? 'task-item red-indicator':'task-item')">
                     <div class="btn-plus-container" th:if="${habit.getHabit().getType().name()=='BOTH'|| habit.getHabit().getType().name() == 'POSITIVE'}">
                         <button class="action-button plus-button"
-                                th:data-habit-id="${habit.getHabit().getHabitId()}"
-                                onclick="updateHabitCount('positive',this.getAttribute('data-habit-id'))">
+                                th:onclick="|updateHabitCount('positive',${habit.getHabit().getHabitId()})|">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
 
                     <div th:id="habit-task-content-+${habit.getHabit().getHabitId()}" th:class="  ${habit.isCompleted()} ? 'task-content completed' : 'task-content'">
-                        <button class="task-detail" th:data-habit-id="${habit.getHabit().getHabitId()}" onclick="openHabitUpdateModal(this.getAttribute('data-habit-id'))">
+                        <button class="task-detail" th:onclick="|openHabitUpdateModal(${habit.getHabit().getHabitId()})|">
                             <div class="fw-bold mb-1" th:text="${habit.getHabit().getTitle()}">Uống nước</div>
                             <div class="task-description" th:text="${habit.getHabit().getDescription()}">Uống nước mỗi 1 giờ</div>
                         </button>
@@ -105,8 +104,7 @@
                     </div>
                     <div class="btn-minus-container" th:if="${habit.getHabit().getType().name()=='BOTH'|| habit.getHabit().getType().name() == 'NEGATIVE'}">
                         <button class="action-button minus-button"
-                                th:data-habit-id="${habit.getHabit().getHabitId()}"
-                                onclick="updateHabitCount('negative',this.getAttribute('data-habit-id'))">
+                                th:onclick="|updateHabitCount('negative',${habit.getHabit().getHabitId()})|">
                             <i class="fas fa-minus"></i>
                         </button>
                     </div>
@@ -184,7 +182,7 @@
         </div>
 
 
-<!--    Modal Delete Habit-->
+        <!--Modal Delete Habit-->
         <div class="modal fade" id="deleteHabitModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -217,17 +215,26 @@
             <div class="tasks-contain">
                 <div class="tasks-contain">
                     <!-- Daily task item -->
-                    <div th:each="userDaily : ${userDailies}" class="checkbox-item">
+                    <div th:each="userDaily : ${userDailies}" th:class="${userDaily.isEnabled()}? 'checkbox-item':'checkbox-item checkbox-disable'">
                         <div class="daily-checkbox-contain">
-                            <div class="daily-checkbox"></div>
+                            <button class="daily-checkbox"
+                                    th:id="daily-checkbox-+${userDaily.getDaily().getDailyId()}"
+                                    th:onclick="|dailyCheckedTask(${userDaily.getDaily().getDailyId()})|"
+                                    th:disabled="${userDaily.isEnabled()}?false:true">
+                                <i th:if="${userDaily.isCompleted}" class="fas fa-check"></i>
+                            </button>
                         </div>
-
-                        <div class="task-content">
-                            <button class="task-detail" th:data-daily-id="${userDaily.getDaily().getDailyId()}" onclick="openDailyUpdateModal(this.getAttribute('data-daily-id'))">
+                        <div th:class="${userDaily.isCompleted}?'task-content completed':'task-content'" th:id="daily-task-+${userDaily.getDaily().getDailyId()}">
+                            <button class="task-detail" th:onclick="|openDailyUpdateModal(${userDaily.getDaily().getDailyId()})|">
                                 <div class="fw-bold mb-1" th:text="${userDaily.getDaily().getTitle()}">Ngủ trước 10 giờ</div>
                                 <div class="task-description" th:text="${userDaily.getDaily().getDescription()}">Uống nước mỗi 1 giờ</div>
                             </button>
-                            <span class="task-count d-flex justify-content-end" th:text="${userDaily.getStreak()}">11</span>
+                            <div class="w-100 d-flex justify-content-end">
+                                <i class="fa-solid fa-fire-flame-curved"></i>
+                                <span th:id="daily-streak-+${userDaily.getDaily().getDailyId()}" class="task-count"
+                                      th:text="${userDaily.getStreak()}">11</span>
+                            </div>
+
                         </div>
 
                     </div>
@@ -283,7 +290,7 @@
 
                             <!-- Repeat Every -->
                             <div class="mb-3" id="repeatEverySection" style="display: none">
-                                <label for="repeatEvery" class="form-label" >Lặp lại mỗi</label>
+                                <label for="repeatEvery" class="form-label" >Lặp lại sau mỗi</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" id="repeatEvery" th:field="*{repeatEvery}" min="1" />
                                     <span class="input-group-text" id="repeatEveryUnit">Days</span>
@@ -619,35 +626,66 @@
             const repeatMonthDaysSection = document.getElementById('repeatMonthDaysSection');
             const repeatEveryUnit = document.getElementById('repeatEveryUnit');
 
-            repeatEverySection.style.display = 'none';
+            repeatEverySection.style.display = 'block';
+            repeatEveryUnit.textContent = 'Ngày';
             repeatDaysSection.style.display = 'none';
             repeatMonthDaysSection.style.display = 'none';
 
             if (repeatFrequency === 'WEEKLY') {
                 repeatEverySection.style.display = 'block';
                 repeatDaysSection.style.display = 'block';
-                repeatEveryUnit.textContent = 'Weeks';
+                repeatEveryUnit.textContent = 'Tuần';
             } else if (repeatFrequency === 'MONTHLY') {
                 repeatEverySection.style.display = 'block';
                 repeatMonthDaysSection.style.display = 'block';
-                repeatEveryUnit.textContent = 'Months';
+                repeatEveryUnit.textContent = 'Tháng';
             }
+
         }
         document.getElementById('repeatFrequency').addEventListener('change', toggleRepeatOptions);
 
-        // Checkbox daily toggle
-        document.querySelectorAll('.daily-checkbox').forEach(function (checkbox) {
-            checkbox.addEventListener('click', function () {
-                const item = this.closest('.checkbox-item');
-                item.classList.toggle('completed');
 
-                if (item.classList.contains('completed')) {
-                    this.innerHTML = '<i class="fas fa-check"></i>';
-                } else {
-                    this.innerHTML = '';
-                }
-            });
-        });
+        //Daily checked task
+        window.dailyCheckedTask = (dailyId)=>{
+            const dailytask = document.querySelector(`#daily-task-${dailyId}`)
+            let url;
+            if(dailytask.classList.contains("completed")){
+                url = `/dailies/${dailyId}/task_checked?status=unchecked`;
+            }else{
+                url = `/dailies/${dailyId}/task_checked?status=checked`;
+            }
+            fetch(url)
+                .then(response =>{
+                    if(response.url.includes("/login")){
+                        window.location.href("/login");
+                        return;
+                    }
+                    return response.json()
+                })
+                .then(data=>{
+
+                    const dailystreak = document.querySelector(`#daily-streak-${dailyId}`)
+                    const dailycheckbox = document.querySelector(`#daily-checkbox-${dailyId}`)
+
+                    dailystreak.textContent = `${data.streak}`;
+
+                    if(data.completed){
+                        dailytask.classList.add('completed');
+                    }else{
+                        dailytask.classList.remove('completed');
+                    }
+
+                    if(dailytask.classList.contains("completed")){
+                        dailycheckbox.innerHTML = '<i class="fas fa-check"></i>';
+                    }else{
+                        dailycheckbox.innerHTML = '';
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi:",error)
+                    alert("Có lỗi xảy ra khi cập nhật! Phiên đăng nhập hết hạn, mời đăng nhập lại!")
+                })
+        }
 
         // Mở rộng nhật ký
         document.querySelectorAll('.journal-day').forEach(function (journal) {

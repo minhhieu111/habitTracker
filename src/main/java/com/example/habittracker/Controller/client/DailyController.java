@@ -73,4 +73,13 @@ public class DailyController {
         }
         return "redirect:/overview";
     }
+
+    @GetMapping("{dailyId}/task_checked")
+    @ResponseBody
+    public ResponseEntity<DailyDTO> updateTaskChecked(HttpServletRequest request, @PathVariable Long dailyId, @RequestParam("status") String status) {
+        String token = this.tokenUtil.getTokenFromCookies(request);
+        String username = this.jwtUtil.getUserNameFromToken(token);
+        DailyDTO dailyTaskUpdate = this.dailyService.dailyTaskUpdate(username, dailyId, status);
+        return ResponseEntity.ok().body(dailyTaskUpdate);
+    }
 }

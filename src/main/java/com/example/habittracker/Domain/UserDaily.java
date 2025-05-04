@@ -17,10 +17,12 @@ public class UserDaily {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userDailyId;
-    private Long streak;
+    private Long streak =0L;
     private String EmailMessage;
     private LocalDateTime timeSendEmail;
     private LocalTime executionTime;
+    private boolean isCompleted;
+    private boolean isEnabled;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")

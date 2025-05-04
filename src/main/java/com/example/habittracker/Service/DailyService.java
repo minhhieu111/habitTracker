@@ -1,14 +1,15 @@
 package com.example.habittracker.Service;
 
 import com.example.habittracker.DTO.DailyDTO;
-import com.example.habittracker.Domain.Daily;
-import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserDaily;
+import com.example.habittracker.Domain.*;
+import com.example.habittracker.Repository.DailyHistoryRepository;
 import com.example.habittracker.Repository.DailyRepository;
 import com.example.habittracker.Repository.UserDailyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -16,14 +17,23 @@ public class DailyService {
     private final DailyRepository dailyRepository;
     private final UserService userService;
     private final UserDailyRepository userDailyRepository;
-    public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository) {
+    private final DailyHistoryRepository dailyHistoryRepository;
+    public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository, DailyHistoryRepository dailyHistoryRepository) {
         this.dailyRepository = dailyRepository;
         this.userService = userService;
         this.userDailyRepository = userDailyRepository;
+        this.dailyHistoryRepository = dailyHistoryRepository;
     }
 
     public List<UserDaily> getUserDaily(User user){
-        return this.dailyRepository.findUserDailiesByUserId(user.getUserId()).get();
+        List<UserDaily>userDailies = this.dailyRepository.findUserDailiesByUserId(user.getUserId()).get();
+        LocalDate today = LocalDate.now();
+
+        for(UserDaily userDaily : userDailies){
+            userDaily.setEnabled(enableToday(userDaily.getDaily(), today));
+            this.userDailyRepository.save(userDaily);
+        }
+        return userDailies;
     }
 
     @Transactional
@@ -40,6 +50,7 @@ public class DailyService {
                 .repeatDays(dailyDTO.getRepeatDays())
                 .repeatMonthDays(dailyDTO.getRepeatMonthDays())
                 .challengeId(dailyDTO.getChallengeId())
+                .createAt(LocalDate.now())
                 .build();
         daily = dailyRepository.save(daily);
 
@@ -101,5 +112,115 @@ public class DailyService {
 
         this.dailyRepository.delete(daily);
         this.userDailyRepository.delete(userDaily);
+    }
+
+
+    private boolean enableToday(Daily daily, LocalDate today) {
+
+        long daysSinceCreation = ChronoUnit.DAYS.between(daily.getCreateAt(), today);
+        switch (daily.getRepeatFrequency()) {
+            case DAILY:
+                return daysSinceCreation % daily.getRepeatEvery() == 0;
+            case WEEKLY:
+                long weeksSinceCreation = daysSinceCreation / 7;
+                if (weeksSinceCreation % daily.getRepeatEvery() != 0) {
+                    return false;
+                }
+                Daily.DayOfWeek todayDayOfWeek = Daily.DayOfWeek.valueOf(today.getDayOfWeek().toString());
+                return daily.getRepeatDays().contains(todayDayOfWeek);
+            case MONTHLY:
+                long monthsSinceCreation = ChronoUnit.MONTHS.between(daily.getCreateAt().withDayOfMonth(1), today.withDayOfMonth(1));
+                if (monthsSinceCreation % daily.getRepeatEvery() != 0) {
+                    return false;
+                }
+                return daily.getRepeatMonthDays().contains(today.getDayOfMonth());
+            default:
+                return false;
+        }
+    }
+
+    @Transactional
+    public DailyDTO dailyTaskUpdate(String username, Long dailyId, String status) {
+        Daily daily = this.dailyRepository.findById(dailyId).get();
+        User user = this.userService.getUser(username);
+        UserDaily userDaily = this.userDailyRepository.findByUserAndDaily(user,daily);
+        DailyDTO dailyDTO = new DailyDTO();
+        LocalDate today = LocalDate.now();
+
+        DailyHistory dailyHistory = this.dailyHistoryRepository.findDailyHistory(userDaily,today).orElseGet(()->
+                new DailyHistory().builder()
+                        .userDaily(userDaily)
+                        .date(today)
+                        .streak(userDaily.getStreak())
+                        .isCompleted(false)
+                        .build()
+        );
+
+        if(status.equals("checked")){
+            userDaily.setCompleted(true);
+            dailyHistory.setCompleted(true);
+            userDaily.setStreak(userDaily.getStreak() + 1);
+        } else if (status.equals("unchecked")) {
+            userDaily.setCompleted(false);
+            dailyHistory.setCompleted(false);
+            userDaily.setStreak(userDaily.getStreak() - 1);
+        }
+
+        this.userDailyRepository.save(userDaily);
+        dailyHistory.setStreak(userDaily.getStreak());
+        this.dailyHistoryRepository.save(dailyHistory);
+
+//        streakCalculator(userDaily,today);
+
+        dailyDTO.setStreak(userDaily.getStreak());
+        dailyDTO.setCompleted(userDaily.isCompleted());
+
+        return dailyDTO;
+    }
+
+    @Transactional
+    public void streakCalculator(UserDaily userDaily,LocalDate today){
+        DailyHistory newDailyHistory = this.dailyHistoryRepository.findDailyHistory(userDaily,today).get();
+
+        if(newDailyHistory.isCompleted()){
+            userDaily.setStreak(userDaily.getStreak() + 1);
+        }else{
+            userDaily.setStreak(userDaily.getStreak() - 1);
+        }
+        this.userDailyRepository.save(userDaily);
+        newDailyHistory.setStreak(userDaily.getStreak());
+        this.dailyHistoryRepository.save(newDailyHistory);
+    }
+
+    public void resetDaily(){
+        List<UserDaily> userDailies = this.userDailyRepository.findAll();
+        LocalDate today = LocalDate.now();
+        for(UserDaily userDaily : userDailies){
+            DailyHistory lastDailyHistory = this.dailyHistoryRepository.findTopByUserDailyOrderByDateDesc(userDaily).orElse(null);
+            DailyHistory dailyHistory = this.dailyHistoryRepository.findDailyHistory(userDaily,today).orElse(null);
+            if(dailyHistory != null && lastDailyHistory != null){
+                if(lastDailyHistory.isCompleted() && dailyHistory.isCompleted()){
+                    userDaily.setStreak(userDaily.getStreak() + 1);
+                } else if (lastDailyHistory.isCompleted() && !dailyHistory.isCompleted()) {
+                    userDaily.setStreak(0L);
+                }else if(!lastDailyHistory.isCompleted() && dailyHistory.isCompleted()){
+                    userDaily.setStreak(1L);
+                }else if(!lastDailyHistory.isCompleted() && !dailyHistory.isCompleted()){
+                    userDaily.setStreak(0L);
+                }
+                userDaily.setCompleted(false);
+
+                this.userDailyRepository.save(userDaily);
+            }else if(dailyHistory != null){
+                if(dailyHistory.isCompleted()){
+                    userDaily.setStreak(userDaily.getStreak() + 1);
+                }else{
+                    userDaily.setStreak(0L);
+                }
+                userDaily.setCompleted(false);
+
+                this.userDailyRepository.save(userDaily);
+            }
+        }
     }
 }
