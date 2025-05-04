@@ -3,6 +3,7 @@ package com.example.habittracker.Domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +24,7 @@ public class Daily {
     private Difficulty difficulty;
     @Enumerated(EnumType.STRING)
     private RepeatFrequency repeatFrequency;
-    private LocalDateTime createAt = LocalDateTime.now();
+    private LocalDate createAt = LocalDate.now();
     private Integer repeatEvery;
     private Long challengeId;
 

@@ -379,7 +379,7 @@ body {
 }
 
 .task-count {
-    width: 100%;
+    margin-left: 5px;
     font-weight: bold;
     font-size: small;
 }
@@ -406,6 +406,10 @@ body {
     padding-left: 2px;
 }
 
+.checkbox-disable{
+    background-color: #787878;
+}
+
 .daily-checkbox-contain{
     display: flex;
     justify-content: center;
@@ -424,6 +428,7 @@ body {
     justify-content: center;
     cursor: pointer;
     color: #393939;
+    border:none;
     background-color: rgba(255, 255, 255, 0.5);
 }
 

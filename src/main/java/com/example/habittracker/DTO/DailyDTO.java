@@ -22,6 +22,8 @@ public class DailyDTO {
     private Integer repeatEvery;
     private Set<Daily.DayOfWeek> repeatDays = new HashSet<>();
     private Set<Integer> repeatMonthDays = new HashSet<>();
+    private Long streak;
+    private boolean isCompleted;
 
     private final Daily.Difficulty[] difficultyOptions = Daily.Difficulty.values();
     private final Daily.RepeatFrequency[] repeatFrequencyOptions = Daily.RepeatFrequency.values();

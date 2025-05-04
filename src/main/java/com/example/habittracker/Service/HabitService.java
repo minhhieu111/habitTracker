@@ -139,7 +139,7 @@ public class HabitService {
                     habitHis.setNegativeCount(userHabit.getNegativeCount());
                     return habitHis;
                 })
-                .orElse(new HabitHistory().builder()
+                .orElseGet(()->new HabitHistory().builder()
                         .userHabit(userHabit)
                         .negativeCount(userHabit.getNegativeCount())
                         .positiveCount(userHabit.getPositiveCount())
