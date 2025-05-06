@@ -192,35 +192,53 @@ public class DailyService {
         this.dailyHistoryRepository.save(newDailyHistory);
     }
 
+    @Transactional
     public void resetDaily(){
         List<UserDaily> userDailies = this.userDailyRepository.findAll();
         LocalDate today = LocalDate.now();
         for(UserDaily userDaily : userDailies){
-            DailyHistory lastDailyHistory = this.dailyHistoryRepository.findTopByUserDailyOrderByDateDesc(userDaily).orElse(null);
-            DailyHistory dailyHistory = this.dailyHistoryRepository.findDailyHistory(userDaily,today).orElse(null);
-            if(dailyHistory != null && lastDailyHistory != null){
-                if(lastDailyHistory.isCompleted() && dailyHistory.isCompleted()){
-                    userDaily.setStreak(userDaily.getStreak() + 1);
-                } else if (lastDailyHistory.isCompleted() && !dailyHistory.isCompleted()) {
-                    userDaily.setStreak(0L);
-                }else if(!lastDailyHistory.isCompleted() && dailyHistory.isCompleted()){
-                    userDaily.setStreak(1L);
-                }else if(!lastDailyHistory.isCompleted() && !dailyHistory.isCompleted()){
-                    userDaily.setStreak(0L);
+            if(enableToday(userDaily.getDaily(),today)){
+                DailyHistory lastDailyHistory = findLastEnableHistory(userDaily,today);
+                DailyHistory dailyHistory = this.dailyHistoryRepository.findDailyHistory(userDaily,today).orElseGet(()->
+                        new DailyHistory().builder()
+                                .userDaily(userDaily)
+                                .date(today)
+                                .streak(0L)
+                                .isCompleted(false)
+                                .build()
+                );
+                if(dailyHistory != null && lastDailyHistory != null){
+                    if(lastDailyHistory.isCompleted() && dailyHistory.isCompleted()){
+                        userDaily.setStreak(userDaily.getStreak());
+                    } else if (lastDailyHistory.isCompleted() && !dailyHistory.isCompleted()) {
+                        userDaily.setStreak(0L);
+                    }else if(!lastDailyHistory.isCompleted() && dailyHistory.isCompleted()){
+                        userDaily.setStreak(1L);
+                    }else if(!lastDailyHistory.isCompleted() && !dailyHistory.isCompleted()){
+                        userDaily.setStreak(0L);
+                    }
+                }else if(dailyHistory != null){
+                    if(dailyHistory.isCompleted()){
+                        userDaily.setStreak(userDaily.getStreak());
+                    }else{
+                        userDaily.setStreak(0L);
+                    }
                 }
                 userDaily.setCompleted(false);
 
                 this.userDailyRepository.save(userDaily);
-            }else if(dailyHistory != null){
-                if(dailyHistory.isCompleted()){
-                    userDaily.setStreak(userDaily.getStreak() + 1);
-                }else{
-                    userDaily.setStreak(0L);
-                }
-                userDaily.setCompleted(false);
-
-                this.userDailyRepository.save(userDaily);
+                this.dailyHistoryRepository.save(dailyHistory);
             }
         }
+    }
+
+    public DailyHistory findLastEnableHistory(UserDaily userDaily, LocalDate today){
+        List<DailyHistory> dailyHistories = this.dailyHistoryRepository.findAllByUserDailyOrderByDateDesc(userDaily);
+        for(DailyHistory dailyHistory : dailyHistories){
+            if(dailyHistory.getDate().isBefore(today) && enableToday(userDaily.getDaily(),dailyHistory.getDate())){
+                return dailyHistory;
+            }
+        }
+        return null;
     }
 }

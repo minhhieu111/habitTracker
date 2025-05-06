@@ -18,11 +18,13 @@ public class SchedulerConfig {
         this.dailyService = dailyService;
     }
 
-    @Scheduled(cron ="59 59 23 * * *")
+//    @Scheduled(cron ="59 59 23 * * *")
+@Scheduled(cron = "0 * * * * *")
     public void ResetHabitCount(){
         this.habitService.resetHabit();
     }
 
-    @Scheduled(cron = "59 59 23 * * *")
+   @Scheduled(cron = "59 59 23 * * *")
+
     public void ResetDaily(){this.dailyService.resetDaily();}
 }

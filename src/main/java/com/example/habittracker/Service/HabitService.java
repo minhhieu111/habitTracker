@@ -172,7 +172,23 @@ public class HabitService {
     @Transactional
     public void resetHabit(){
         List<UserHabit> userHabits = this.userHabitRepository.findAll();
+        LocalDate today = LocalDate.now();
         for(UserHabit userHabit : userHabits){
+            HabitHistory habitHistory = this.habitHistoryRepository.findByUserHabitAndDate(userHabit,today)
+                    .map(habitHis->{
+                        habitHis.setPositiveCount(userHabit.getPositiveCount());
+                        habitHis.setNegativeCount(userHabit.getNegativeCount());
+                        return habitHis;
+                    })
+                    .orElseGet(()->new HabitHistory().builder()
+                            .userHabit(userHabit)
+                            .negativeCount(userHabit.getNegativeCount())
+                            .positiveCount(userHabit.getPositiveCount())
+                            .date(today)
+                            .build()
+                    );
+            habitHistoryRepository.save(habitHistory);
+
             userHabit.setNegativeCount(0L);
             userHabit.setPositiveCount(0L);
             userHabit.setCompleted(false);
