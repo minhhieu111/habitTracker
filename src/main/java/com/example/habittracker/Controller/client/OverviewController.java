@@ -4,14 +4,9 @@ import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.DTO.DailyDTO;
 import com.example.habittracker.DTO.HabitDTO;
-import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserChallenge;
-import com.example.habittracker.Domain.UserDaily;
-import com.example.habittracker.Domain.UserHabit;
-import com.example.habittracker.Service.ChallengeService;
-import com.example.habittracker.Service.DailyService;
-import com.example.habittracker.Service.HabitService;
-import com.example.habittracker.Service.UserService;
+import com.example.habittracker.DTO.TodoDTO;
+import com.example.habittracker.Domain.*;
+import com.example.habittracker.Service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,14 +24,16 @@ public class OverviewController {
     private final HabitService habitService;
     private final DailyService dailyService;
     private final ChallengeService challengeService;
+    private final TodoService todoService;
 
-    public OverviewController(JwtUtil jwtUtil, TokenUtil tokenUtil, UserService userService, HabitService habitService, DailyService dailyService, ChallengeService challengeService) {
+    public OverviewController(JwtUtil jwtUtil, TokenUtil tokenUtil, UserService userService, HabitService habitService, DailyService dailyService, ChallengeService challengeService, TodoService todoService) {
         this.jwtUtil = jwtUtil;
         this.tokenUtil = tokenUtil;
         this.userService = userService;
         this.habitService = habitService;
         this.dailyService = dailyService;
         this.challengeService = challengeService;
+        this.todoService = todoService;
     }
 
     @GetMapping("")
@@ -76,6 +73,12 @@ public class OverviewController {
         List<UserDaily> userdaily = this.dailyService.getUserDaily(user);
         model.addAttribute("userDailies",userdaily);
         model.addAttribute("updateDaily",new DailyDTO());
+
+        //Todos
+        model.addAttribute("newTodo", new TodoDTO());
+        List<Todo> activeTodos = this.todoService.getActiveTodos(user);
+        model.addAttribute("activeTodos", activeTodos);
+        model.addAttribute("updateTodos", new TodoDTO());
 
         return "client/overview";
     }

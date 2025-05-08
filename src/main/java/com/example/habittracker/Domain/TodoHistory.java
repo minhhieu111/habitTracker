@@ -3,6 +3,7 @@ package com.example.habittracker.Domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 public class TodoHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long HistoryTodoId;
-    private LocalDateTime date;
+    private Long todoHistoryId;
+    private LocalDate date;
     private boolean isCompleted;
     private Long expEarned;
 
