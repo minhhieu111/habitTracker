@@ -386,16 +386,16 @@
                                 <div class="task-description" th:text="${todo.description}">Dọn nhà</div>
                             </button>
                         </div>
-                        <div class="todo-progress" th:if="${!todo.todoSubtasks.isEmpty()}">
+                        <div class="todo-progress" th:if="${!todo.todoSubTasks.isEmpty()}">
                             <i class="fas fa-tasks"></i>
-                            <span class="ms-2" th:text="${todo.todoSubtasks.stream().filter(subtask -> subtask.isCompleted()).count()} + '/' + ${todo.todoSubtasks.size()}">0/4</span>
+                            <span class="ms-2" th:text="'0' + '/' + ${todo.todoSubTasks.size()}">0/4</span>
                             <button class="todo-dropdown-toggle" th:attr="data-bs-target='#subtasksList-' + ${todo.todoId}" data-bs-toggle="collapse" aria-expanded="false">
                                 <i class="fas fa-chevron-down"></i>
                             </button>
                         </div>
                         <div th:id="'subtasksList-' + ${todo.todoId}" class="collapse">
                             <div class="todo-subtasks mt-2">
-                                <div class="todo-subtask" th:each="subtask : ${todo.todoSubtasks}">
+                                <div class="todo-subtask" th:each="subtask : ${todo.todoSubTasks}">
                                     <input type="checkbox" th:id="'subtask-' + ${subtask.todoSubtaskId}" th:checked="${subtask.isCompleted}" th:onclick="|updateSubtaskCompletion(${todo.todoId}, ${subtask.todoSubtaskId})|">
                                     <label th:for="'subtask-' + ${subtask.todoSubtaskId}" th:text="${subtask.title}">123</label>
                                 </div>
@@ -430,7 +430,7 @@
                             <div class="mb-3">
                                 <label for="todoDifficulty" class="form-label">Độ khó</label>
                                 <select class="form-control" id="todoDifficulty" th:field="*{difficulty}">
-                                    <option th:each="difficult : ${newTodo.todoDifficultiesOption}" th:value="${difficult}" th:text="${difficult}">Dễ</option>
+                                    <option th:each="difficult : ${newTodo.todoDifficultOption}" th:value="${difficult}" th:text="${difficult}">Dễ</option>
                                 </select>
                             </div>
 
@@ -443,7 +443,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Checklist</label>
                                 <div id="subtasksContainer">
-                                    <!-- Subtasks sẽ được thêm động -->
+
                                 </div>
                                 <button type="button" class="btn btn-outline-primary mt-2" onclick="addSubtaskField()">Thêm Subtask</button>
                             </div>
@@ -790,8 +790,8 @@
                     // Load subtasks
                     const subtasksContainer = document.getElementById("subtasksContainer");
                     subtasksContainer.innerHTML = '';
-                    if (todo.todoSubtasks) {
-                        todo.todoSubtasks.forEach(subtask => {
+                    if (todo.todoSubTasks) {
+                        todo.todoSubTasks.forEach(subtask => {
                             addSubtaskField(subtask.title, subtask.todoSubtaskId);
                         });
                     }
@@ -845,46 +845,6 @@
                 });
         };
 
-
-
-
-        $('.daily-item .task-checkbox, .todo-item .task-checkbox').on('click', function() {
-            const id = $(this).data('id');
-            const item = $(this).closest('.daily-item, .todo-item');
-            const isDaily = item.hasClass('daily-item');
-            const isCompleted = item.hasClass('completed');
-
-            // Call API to toggle completion
-            fetch(`/api/${isDaily ? 'daily' : 'todo'}/${id}/toggle`)
-                .then(response => response.text())
-                .then(data => {
-                    if (data === 'success') {
-                        if (isCompleted) {
-                            item.removeClass('completed');
-                            $(this).html('');
-                        } else {
-                            item.addClass('completed');
-                            $(this).html('<i class="fas fa-check"></i>');
-                        }
-                    }
-                });
-        });
-        // Initialize tooltips
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-
-        // Handle todo subtask checkboxes
-        $('.todo-subtask input[type="checkbox"]').on('change', function() {
-            updateTodoProgress();
-        });
-
-        function updateTodoProgress() {
-            const totalSubtasks = $('.todo-subtask input[type="checkbox"]').length;
-            const completedSubtasks = $('.todo-subtask input[type="checkbox"]:checked').length;
-            $('.todo-progress span').text(`${completedSubtasks}/${totalSubtasks}`);
-        }
 
         // Handle todo dropdown toggle
         $('.todo-dropdown-toggle').on('click', function() {

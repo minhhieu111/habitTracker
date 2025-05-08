@@ -14,8 +14,8 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
     @Query("SELECT th from Todo th WHERE th.user = :user")
     Todo findByUser(@Param("user") User user);
 
-    @Query("SELECT th FROM TodoHistory th WHERE th.todo = :todo AND th.isCompleted = false")
-    List<Todo> findByTodoAndIsCompletedFalse(@Param("todo")Todo todo);
+    @Query("SELECT th FROM Todo th WHERE th.user = :user AND th.isCompleted = false")
+    List<Todo> findByUserAndIsCompletedFalse(@Param("user") User user);
 
 
 }

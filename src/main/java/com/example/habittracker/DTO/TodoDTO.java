@@ -21,5 +21,5 @@ public class TodoDTO {
     private List<String> subtasks;
     private List<Long> subtaskIds;
 
-    private final Todo.Difficulty[] todoDifficult = Todo.Difficulty.values();
+    private final Todo.Difficulty[] todoDifficultOption = Todo.Difficulty.values();
 }
