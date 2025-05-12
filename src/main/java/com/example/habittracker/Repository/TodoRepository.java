@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TodoRepository extends JpaRepository<Todo, Long> {
@@ -17,5 +18,6 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
     @Query("SELECT th FROM Todo th WHERE th.user = :user AND th.isCompleted = false")
     List<Todo> findByUserAndIsCompletedFalse(@Param("user") User user);
 
-
+    @Query("SELECT t FROM Todo t WHERE t.user = :user and t.TodoId = :todoId")
+    Optional<Todo> findByUserAndTodoId(@Param("user") User user, @Param("todoId")Long todoId);
 }

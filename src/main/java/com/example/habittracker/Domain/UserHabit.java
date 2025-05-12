@@ -34,4 +34,8 @@ public class UserHabit {
 
     @OneToMany(mappedBy = "userHabit")
     private List<HabitHistory> habitHistories;
+
+    @ManyToOne()
+    @JoinColumn(name = "diary_id")
+    private Diary diary;
 }
