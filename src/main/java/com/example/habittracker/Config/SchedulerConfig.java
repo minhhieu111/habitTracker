@@ -24,7 +24,7 @@ public class SchedulerConfig {
         this.habitService.resetHabit();
     }
 
-   @Scheduled(cron = "59 59 23 * * *")
+   @Scheduled(cron = "0 * * * * *")
 
     public void ResetDaily(){this.dailyService.resetDaily();}
 }

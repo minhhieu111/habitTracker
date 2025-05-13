@@ -1,14 +1,14 @@
 package com.example.habittracker.Domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TodoSubtask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
