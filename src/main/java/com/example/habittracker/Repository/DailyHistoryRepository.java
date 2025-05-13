@@ -23,4 +23,7 @@ public interface DailyHistoryRepository extends JpaRepository<DailyHistory, Long
     @Query("SELECT dh FROM DailyHistory dh WHERE dh.userDaily = :userDaily ORDER BY dh.date DESC ")
     List<DailyHistory> findAllByUserDailyOrderByDateDesc(@Param("userDaily") UserDaily userDaily);
 
+    @Query("SELECT dh FROM DailyHistory dh WHERE dh.userDaily = :userDaily")
+    List<DailyHistory> findAllByUserDaily(@Param("userDaily") UserDaily userDaily);
+
 }

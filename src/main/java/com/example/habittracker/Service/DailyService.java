@@ -109,7 +109,9 @@ public class DailyService {
         if(daily == null && userDaily == null){
             throw new RuntimeException("Có lỗi xảy ra khi xóa! Không tìm thấy thói quen để xóa");
         }
+        List<DailyHistory> dailyHistories = this.dailyHistoryRepository.findAllByUserDaily(userDaily);
 
+        this.dailyHistoryRepository.deleteAll(dailyHistories);
         this.dailyRepository.delete(daily);
         this.userDailyRepository.delete(userDaily);
     }

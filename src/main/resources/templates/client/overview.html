@@ -197,7 +197,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary"
                                 data-bs-dismiss="modal">Đóng</button>
-                        <a id="deleteHabit" class="btn btn-primary">Đồng ý</a>
+                        <a id="deleteHabit" class="btn btn-danger">Xóa</a>
                     </div>
                 </div>
             </div>
@@ -359,7 +359,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary"
                                 data-bs-dismiss="modal">Đóng</button>
-                        <a id="deleteDaily" class="btn btn-primary">Đồng ý</a>
+                        <a id="deleteDaily" class="btn btn-danger">Xóa</a>
                     </div>
                 </div>
             </div>
@@ -368,55 +368,112 @@
         <!-- Todos Column -->
         <div class="task-column">
             <div class="column-header">Việc cần làm</div>
-
-            <button class="add-task-button">
+            <button class="add-task-button" onclick="openTodoCreateModal()">
                 <i class="fas fa-plus"></i> Thêm công việc
             </button>
-
-            <!-- Dropdown for categories -->
-            <div class="dropdown mb-3">
-                <button class="btn btn-light dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown">
-                    Làm việc nhà
-                </button>
-                <ul class="dropdown-menu w-100">
-                    <li><a class="dropdown-item" href="#">Tất cả</a></li>
-                    <li><a class="dropdown-item" href="#">Chưa hoàn thành</a></li>
-                    <li><a class="dropdown-item" href="#">Đã hoàn thành</a></li>
-                </ul>
-            </div>
-
-            <!-- Todo task item - completed -->
-            <div class="checkbox-item completed">
-                <div class="task-checkbox green-checkbox">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div class="task-content">
-                    <div class="task-name">Dọn phòng</div>
-                </div>
-            </div>
-
-            <!-- Todo task item -->
-            <div class="checkbox-item">
-                <div class="task-checkbox green-checkbox">
-                    <!-- Empty for unchecked -->
-                </div>
-                <div class="task-content">
-                    <div class="task-name">Quét, lau nhà</div>
-                </div>
-            </div>
-
-            <!-- Todo task item -->
-            <div class="checkbox-item">
-                <div class="task-checkbox red-checkbox">
-                    <!-- Empty for unchecked -->
-                </div>
-                <div class="task-content">
-                    <div class="task-name">Giặt quần, áo</div>
+            <div class="tasks-contain">
+                <!-- Todo item -->
+                <div th:each="todo : ${activeTodos}" class="todo-card">
+                    <div class="todo-color-bar yellow">
+                        <button class="todo-checkbox" th:onclick="|updateTodoCompletion(${todo.todoId})|">
+                            <i class="fas fa-check" th:class="${todo.isCompleted} ? 'visible' : 'invisible'"></i>
+                        </button>
+                    </div>
+                    <div class="task-content" style="height: auto;">
+                        <div class="todo-card-header">
+                            <button class="task-detail" th:onclick="|openTodoUpdateModal(${todo.todoId})|">
+                                <div class="fw-bold mb-1" th:text="${todo.title}">Dọn nhà</div>
+                                <div class="task-description" th:text="${todo.description}">Dọn nhà</div>
+                            </button>
+                        </div>
+                        <div class="todo-progress" th:if="${!todo.todoSubTasks.isEmpty()}">
+                            <i class="fas fa-tasks"></i>
+                            <span class="ms-2" th:text="${todo.todoSubTasks.size()}">4</span>
+                            <button class="todo-dropdown-toggle" th:attr="data-bs-target='#subtasksList-' + ${todo.todoId}" data-bs-toggle="collapse" aria-expanded="false">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div th:id="'subtasksList-' + ${todo.todoId}" class="collapse">
+                            <div class="todo-subtasks mt-2">
+                                <div class="todo-subtask" th:each="subtask : ${todo.todoSubTasks}">
+                                    <input type="checkbox" th:id="'subtask-' + ${subtask.todoSubtaskId}" th:checked="${subtask.isCompleted}" th:onclick="|updateSubtaskCompletion(${todo.todoId}, ${subtask.todoSubtaskId})|">
+                                    <label th:for="'subtask-' + ${subtask.todoSubtaskId}" th:text="${subtask.title}">123</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="column-footer">
-                Đi chợ <i class="fas fa-chevron-right"></i>
+        <!-- Modal Todo -->
+        <div class="modal fade" id="modalTodo" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="todoForm" th:action="@{/todos/save}" method="post" th:object="${newTodo}">
+                        <div class="modal-header text-bg-warning p-4">
+                            <div class="w-100">
+                                <h4 id="todoContent" class="fw-bold mb-3">Tạo mới</h4>
+                                <input type="text" id="todoId" style="display: none" th:field="*{todoId}">
+                                <div class="mb-3">
+                                    <label for="todoTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="todoTitle" th:field="*{title}">
+                                    <div id="todoTitleError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="todoDescription" class="form-label">Ghi chú</label>
+                                    <textarea class="form-control" id="todoDescription" th:field="*{description}" rows="3" placeholder="Thêm ghi chú"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label for="todoDifficulty" class="form-label">Độ khó</label>
+                                <select class="form-control" id="todoDifficulty" th:field="*{difficulty}">
+                                    <option th:each="difficult : ${newTodo.todoDifficultOption}" th:value="${difficult}" th:text="${difficult}">Dễ</option>
+                                </select>
+                            </div>
+
+                            <!-- Subtasks -->
+                            <div class="mb-3">
+                                <label class="form-label">Checklist</label>
+                                <div id="subtasksContainer">
+                                    
+                                </div>
+                                <button type="button" class="btn btn-outline-primary mt-2" onclick="addSubtaskField()">Thêm Subtask</button>
+                            </div>
+
+                            <div class="modal-footer d-flex justify-content-between">
+                                <div>
+                                    <button id="deleteTodoButton" style="display: none" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTodoModal">Xóa</button>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteTodoModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Xác nhận xóa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn xóa công việc này?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <a id="deleteTodo" class="btn btn-danger" href="#">Xóa</a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -447,6 +504,7 @@
 </div>
 
 <!-- Bootstrap JS and other scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function (){
 
@@ -578,8 +636,8 @@
         window.openDailyUpdateModal = function(dailyId) {
             fetch(`/dailies/update/${dailyId}`)
                 .then(response =>{
-                    if (response.url.includes('/login')) {
-                        window.location.href = '/login';
+                    if (response.url.includes("/login")) {
+                        window.location.href = "/login";
                         return;
                     }
                     return response.json()})
@@ -686,6 +744,126 @@
                     alert("Có lỗi xảy ra khi cập nhật! Phiên đăng nhập hết hạn, mời đăng nhập lại!")
                 })
         }
+// todo
+        // Open create todo modal
+        window.openTodoCreateModal = () => {
+            document.getElementById("todoId").value = '';
+            document.getElementById("todoTitle").value = '';
+            document.getElementById("todoDescription").value = '';
+            document.getElementById("todoDifficulty").value = 'EASY';
+            document.getElementById("subtasksContainer").innerHTML = '';
+
+            document.getElementById("deleteTodoButton").style.display = 'none';
+
+            const form = document.getElementById('todoForm');
+            const modalTitle = document.getElementById('todoContent');
+            form.action = '/todos/save';
+            modalTitle.textContent = 'Tạo mới';
+
+            const modalTodo = new bootstrap.Modal(document.getElementById("modalTodo"));
+            modalTodo.show();
+        };
+
+// Open update todo modal
+        window.openTodoUpdateModal = (todoId) => {
+            fetch(`/todos/${todoId}`)
+                .then(response => {
+                    if (response.url.includes('/login')) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(todo => {
+                    console.log(todoId)
+                    document.getElementById("todoId").value = todoId;
+                    document.getElementById("todoTitle").value = todo.title;
+                    document.getElementById("todoDescription").value = todo.description;
+                    document.getElementById("todoDifficulty").value = todo.difficulty;
+
+                    // Load subtasks
+                    const subtasksContainer = document.getElementById("subtasksContainer");
+                    subtasksContainer.innerHTML = '';
+                    if (todo.todoSubtasks) {
+                        todo.todoSubtasks.forEach(subtask => {
+                            addSubtaskField(subtask.title, subtask.todoSubtaskId);
+                        });
+                    }
+
+                    document.getElementById("deleteTodoButton").style.display = 'block';
+                    document.getElementById("deleteTodo").setAttribute("href", `/todos/delete/${todoId}`);
+
+                    const form = document.getElementById('todoForm');
+                    const modalTitle = document.getElementById('todoContent');
+                    form.action = '/todos/'+ todoId;
+                    modalTitle.textContent = 'Chỉnh sửa';
+
+                    const modalTodo = new bootstrap.Modal(document.getElementById("modalTodo"));
+                    modalTodo.show();
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu Todo:', error);
+                    alert('Không thể lấy dữ liệu Todo. Do phiên đăng nhập hết hạn! Mời đăng nhập lại');
+                });
+        };
+
+        // Add subtask
+        window.addSubtaskField = (title = '', subtaskId = '') => {
+            const container = document.getElementById("subtasksContainer");
+            const subtaskDiv = document.createElement("div");
+            subtaskDiv.className = "subtask-field mb-2 d-flex align-items-center";
+            subtaskDiv.innerHTML = `<input type="text" class="form-control me-2" name="subtasks" value="${title}" placeholder="Nhập subtask">
+                                    <input type="hidden" name="subtaskIds" value="${subtaskId}">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Xóa</button>`;
+            container.appendChild(subtaskDiv);
+        };
+
+// // Update subtask completion
+//         window.updateSubtaskCompletion = (todoId, subtaskId) => {
+//             fetch(`/todos/${todoId}/subtasks/${subtaskId}/completion`, { method: 'POST' })
+//                 .then(response => response.json())
+//                 .then(data => {
+//                     fetch(`/todos/${todoId}/completion`, { method: 'POST' }); // Cập nhật trạng thái todo
+//                     location.reload(); // Tải lại trang để cập nhật giao diện
+//                 });
+//         };
+//
+// // Update todo completion
+//         window.updateTodoCompletion = (todoId) => {
+//             fetch(`/todos/${todoId}/completion`, { method: 'POST' })
+//                 .then(response => response.json())
+//                 .then(data => {
+//                     location.reload(); // Tải lại trang để cập nhật giao diện
+//                 });
+//         };
+
+
+        // Handle todo dropdown toggle
+        document.querySelectorAll('.todo-dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function () {
+                const icon = this.querySelector('i');
+                if (this.getAttribute('aria-expanded') === 'true') {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                } else {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                }
+            });
+        });
+
+        // Make the entire todo card header clickable to toggle subtasks
+        // document.querySelectorAll('.todo-card-header').forEach(header => {
+        //     header.addEventListener('click', function (e) {
+        //         // Don't trigger if clicking on the menu button
+        //         if (!e.target.closest('.todo-menu-button')) {
+        //             const dropdownToggle = this.querySelector('.todo-dropdown-toggle');
+        //             if (dropdownToggle) {
+        //                 dropdownToggle.click();
+        //             }
+        //         }
+        //     });
+        // });
 
         // Mở rộng nhật ký
         document.querySelectorAll('.journal-day').forEach(function (journal) {

@@ -47,7 +47,7 @@ public class HabitController {
     }
 
     @PostMapping("/update")
-    public String updateHabit(HttpServletRequest request,@ModelAttribute("updateHabit") HabitDTO habitDTO, RedirectAttributes redirectAttributes) {
+    public String updateHabit(HttpServletRequest request,@ModelAttribute("newHabit") HabitDTO habitDTO, RedirectAttributes redirectAttributes) {
         try{
             String token = tokenUtil.getTokenFromCookies(request);
             String userName = jwtUtil.getUserNameFromToken(token);

@@ -3,6 +3,7 @@ package com.example.habittracker.Domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,10 +21,11 @@ public class Todo {
     private String description;
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
-    private LocalDateTime execution_date;
+    private LocalDate execution_date;
     private String EmailMessage;
     private LocalDateTime timeSendEmail;
-    private LocalDateTime created_at = LocalDateTime.now();
+    private LocalDate created_at = LocalDate.now();
+    private boolean isCompleted;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")
@@ -35,7 +37,15 @@ public class Todo {
     @OneToMany(mappedBy = "todo")
     private List<TodoHistory> todoHistories;
 
+    @ManyToOne()
+    @JoinColumn(name = "diary_id")
+    private Diary diary;
+
     public enum Difficulty {
         EASY, MEDIUM, HARD
+    }
+
+    public boolean isAllSubtasksCompleted() {
+        return todoSubTasks.stream().allMatch(TodoSubtask::isCompleted);
     }
 }

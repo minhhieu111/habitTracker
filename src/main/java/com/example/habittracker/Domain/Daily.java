@@ -42,6 +42,7 @@ public class Daily {
     @OneToMany(mappedBy = "daily")
     private List<UserDaily> userDailies;
 
+
     public enum Difficulty {
         EASY, MEDIUM, HARD
     }

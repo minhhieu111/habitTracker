@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,4 +24,13 @@ public class Diary {
     @ManyToOne()
     @JoinColumn(name="user_id")
     private User user;
+
+    @OneToMany(mappedBy = "diary")
+    List<UserHabit> userHabitList;
+
+    @OneToMany(mappedBy = "diary")
+    List<UserDaily> userDailyList;
+
+    @OneToMany(mappedBy = "diary")
+    List<Todo> todoList;
 }
