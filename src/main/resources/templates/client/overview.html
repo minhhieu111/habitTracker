@@ -197,7 +197,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary"
                                 data-bs-dismiss="modal">Đóng</button>
-                        <a id="deleteHabit" class="btn btn-primary">Đồng ý</a>
+                        <a id="deleteHabit" class="btn btn-danger">Xóa</a>
                     </div>
                 </div>
             </div>
@@ -359,7 +359,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary"
                                 data-bs-dismiss="modal">Đóng</button>
-                        <a id="deleteDaily" class="btn btn-primary">Đồng ý</a>
+                        <a id="deleteDaily" class="btn btn-danger">Xóa</a>
                     </div>
                 </div>
             </div>
@@ -388,7 +388,7 @@
                         </div>
                         <div class="todo-progress" th:if="${!todo.todoSubTasks.isEmpty()}">
                             <i class="fas fa-tasks"></i>
-                            <span class="ms-2" th:text="'0' + '/' + ${todo.todoSubTasks.size()}">0/4</span>
+                            <span class="ms-2" th:text="${todo.todoSubTasks.size()}">4</span>
                             <button class="todo-dropdown-toggle" th:attr="data-bs-target='#subtasksList-' + ${todo.todoId}" data-bs-toggle="collapse" aria-expanded="false">
                                 <i class="fas fa-chevron-down"></i>
                             </button>
@@ -434,16 +434,11 @@
                                 </select>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="todoExecutionDate" class="form-label">Ngày thực hiện</label>
-                                <input type="date" class="form-control" id="todoExecutionDate" th:field="*{executionDate}">
-                            </div>
-
                             <!-- Subtasks -->
                             <div class="mb-3">
                                 <label class="form-label">Checklist</label>
                                 <div id="subtasksContainer">
-
+                                    
                                 </div>
                                 <button type="button" class="btn btn-outline-primary mt-2" onclick="addSubtaskField()">Thêm Subtask</button>
                             </div>
@@ -465,7 +460,7 @@
 
         <!-- Delete Confirmation Modal -->
         <div class="modal fade" id="deleteTodoModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Xác nhận xóa</h5>
@@ -756,7 +751,6 @@
             document.getElementById("todoTitle").value = '';
             document.getElementById("todoDescription").value = '';
             document.getElementById("todoDifficulty").value = 'EASY';
-            document.getElementById("todoExecutionDate").value = '';
             document.getElementById("subtasksContainer").innerHTML = '';
 
             document.getElementById("deleteTodoButton").style.display = 'none';
@@ -781,17 +775,17 @@
                     return response.json();
                 })
                 .then(todo => {
+                    console.log(todoId)
                     document.getElementById("todoId").value = todoId;
                     document.getElementById("todoTitle").value = todo.title;
                     document.getElementById("todoDescription").value = todo.description;
                     document.getElementById("todoDifficulty").value = todo.difficulty;
-                    document.getElementById("todoExecutionDate").value = todo.executionDate ? todo.executionDate : '';
 
                     // Load subtasks
                     const subtasksContainer = document.getElementById("subtasksContainer");
                     subtasksContainer.innerHTML = '';
-                    if (todo.todoSubTasks) {
-                        todo.todoSubTasks.forEach(subtask => {
+                    if (todo.todoSubtasks) {
+                        todo.todoSubtasks.forEach(subtask => {
                             addSubtaskField(subtask.title, subtask.todoSubtaskId);
                         });
                     }
@@ -801,7 +795,7 @@
 
                     const form = document.getElementById('todoForm');
                     const modalTitle = document.getElementById('todoContent');
-                    form.action = '/todos/update';
+                    form.action = '/todos/'+ todoId;
                     modalTitle.textContent = 'Chỉnh sửa';
 
                     const modalTodo = new bootstrap.Modal(document.getElementById("modalTodo"));
@@ -813,57 +807,63 @@
                 });
         };
 
-// Add subtask field dynamically
+        // Add subtask
         window.addSubtaskField = (title = '', subtaskId = '') => {
             const container = document.getElementById("subtasksContainer");
             const subtaskDiv = document.createElement("div");
             subtaskDiv.className = "subtask-field mb-2 d-flex align-items-center";
-            subtaskDiv.innerHTML = `
-        <input type="text" class="form-control me-2" name="subtasks" value="${title}" placeholder="Nhập subtask">
-        <input type="hidden" name="subtaskIds" value="${subtaskId}">
-        <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Xóa</button>
-    `;
+            subtaskDiv.innerHTML = `<input type="text" class="form-control me-2" name="subtasks" value="${title}" placeholder="Nhập subtask">
+                                    <input type="hidden" name="subtaskIds" value="${subtaskId}">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Xóa</button>`;
             container.appendChild(subtaskDiv);
         };
 
-// Update subtask completion
-        window.updateSubtaskCompletion = (todoId, subtaskId) => {
-            fetch(`/todos/${todoId}/subtasks/${subtaskId}/completion`, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    fetch(`/todos/${todoId}/completion`, { method: 'POST' }); // Cập nhật trạng thái todo
-                    location.reload(); // Tải lại trang để cập nhật giao diện
-                });
-        };
-
-// Update todo completion
-        window.updateTodoCompletion = (todoId) => {
-            fetch(`/todos/${todoId}/completion`, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    location.reload(); // Tải lại trang để cập nhật giao diện
-                });
-        };
+// // Update subtask completion
+//         window.updateSubtaskCompletion = (todoId, subtaskId) => {
+//             fetch(`/todos/${todoId}/subtasks/${subtaskId}/completion`, { method: 'POST' })
+//                 .then(response => response.json())
+//                 .then(data => {
+//                     fetch(`/todos/${todoId}/completion`, { method: 'POST' }); // Cập nhật trạng thái todo
+//                     location.reload(); // Tải lại trang để cập nhật giao diện
+//                 });
+//         };
+//
+// // Update todo completion
+//         window.updateTodoCompletion = (todoId) => {
+//             fetch(`/todos/${todoId}/completion`, { method: 'POST' })
+//                 .then(response => response.json())
+//                 .then(data => {
+//                     location.reload(); // Tải lại trang để cập nhật giao diện
+//                 });
+//         };
 
 
         // Handle todo dropdown toggle
-        $('.todo-dropdown-toggle').on('click', function() {
-            const icon = $(this).find('i');
-            if ($(this).attr('aria-expanded') === 'true') {
-                icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
-            } else {
-                icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
-            }
+        document.querySelectorAll('.todo-dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function () {
+                const icon = this.querySelector('i');
+                if (this.getAttribute('aria-expanded') === 'true') {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                } else {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                }
+            });
         });
 
         // Make the entire todo card header clickable to toggle subtasks
-        $('.todo-card-header').on('click', function(e) {
-            // Don't trigger if clicking on the menu button
-            if (!$(e.target).closest('.todo-menu-button').length) {
-                const dropdownToggle = $(this).find('.todo-dropdown-toggle');
-                dropdownToggle.click();
-            }
-        });
+        // document.querySelectorAll('.todo-card-header').forEach(header => {
+        //     header.addEventListener('click', function (e) {
+        //         // Don't trigger if clicking on the menu button
+        //         if (!e.target.closest('.todo-menu-button')) {
+        //             const dropdownToggle = this.querySelector('.todo-dropdown-toggle');
+        //             if (dropdownToggle) {
+        //                 dropdownToggle.click();
+        //             }
+        //         }
+        //     });
+        // });
 
         // Mở rộng nhật ký
         document.querySelectorAll('.journal-day').forEach(function (journal) {

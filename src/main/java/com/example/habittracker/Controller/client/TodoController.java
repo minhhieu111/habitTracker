@@ -7,10 +7,11 @@ import com.example.habittracker.Domain.User;
 import com.example.habittracker.Service.TodoService;
 import com.example.habittracker.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -36,6 +37,50 @@ public class TodoController {
             User user = this.userService.getUser(username);
             this.todoService.saveTodo(todoDTO, user);
             redirectAttributes.addFlashAttribute("success", "Thêm mới thành công!");
+        }catch(RuntimeException e){
+            redirectAttributes.addFlashAttribute("fail", e.getMessage());
+            return "redirect:/overview";
+        }
+
+        return "redirect:/overview";
+    }
+
+    @GetMapping("/{todoId}")
+    @ResponseBody
+    public ResponseEntity<TodoDTO> getUpdateTodo(HttpServletRequest request, @PathVariable("todoId")Long id){
+        String token = this.tokenUtil.getTokenFromCookies(request);
+        String username =  this.jwtUtil.getUserNameFromToken(token);
+        User user = this.userService.getUser(username);
+        TodoDTO todoDTO = this.todoService.getUpdateTodo(user, id);
+
+        return ResponseEntity.ok().body(todoDTO);
+    }
+
+    @PostMapping("/{todoId}")
+    public String updateTodo(HttpServletRequest request,@PathVariable("todoId") Long todoId,@ModelAttribute("newTodo")TodoDTO todoDTO,RedirectAttributes redirectAttributes){
+        try{
+            String token = this.tokenUtil.getTokenFromCookies(request);
+            String username =  this.jwtUtil.getUserNameFromToken(token);
+            User user = this.userService.getUser(username);
+
+            this.todoService.updateTodo(todoDTO, user, todoId);
+            redirectAttributes.addFlashAttribute("success","Sửa việc cần làm thành công!");
+        }catch(RuntimeException e){
+            redirectAttributes.addFlashAttribute("fail", e.getMessage());
+            return "redirect:/overview";
+        }
+        return "redirect:/overview";
+    }
+
+    @GetMapping("/delete/{todoId}")
+    public String deleteTodo(HttpServletRequest request, @PathVariable("todoId")Long todoId,RedirectAttributes redirectAttributes){
+        try{
+            String token = this.tokenUtil.getTokenFromCookies(request);
+            String username =  this.jwtUtil.getUserNameFromToken(token);
+            User user = this.userService.getUser(username);
+
+            this.todoService.deleteTodo(user,todoId);
+            redirectAttributes.addFlashAttribute("success","Xóa việc cần làm thành công!");
         }catch(RuntimeException e){
             redirectAttributes.addFlashAttribute("fail", e.getMessage());
             return "redirect:/overview";

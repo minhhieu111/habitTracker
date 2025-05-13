@@ -1,6 +1,7 @@
 package com.example.habittracker.DTO;
 
 import com.example.habittracker.Domain.Todo;
+import com.example.habittracker.Domain.TodoSubtask;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ public class TodoDTO {
     private LocalDate executionDate;
     private List<String> subtasks;
     private List<Long> subtaskIds;
+    private List<TodoSubtaskDTO> todoSubtasks;
 
     private final Todo.Difficulty[] todoDifficultOption = Todo.Difficulty.values();
 }

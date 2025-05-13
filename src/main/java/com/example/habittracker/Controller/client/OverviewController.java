@@ -66,19 +66,16 @@ public class OverviewController {
         model.addAttribute("newHabit",new HabitDTO());
         List<UserHabit> userhabit = this.habitService.getUserHabits(user);
         model.addAttribute("userHabits",userhabit);
-        model.addAttribute("updateHabit",new HabitDTO());
 
         // Dailies
         model.addAttribute("newDaily",new DailyDTO());
         List<UserDaily> userdaily = this.dailyService.getUserDaily(user);
         model.addAttribute("userDailies",userdaily);
-        model.addAttribute("updateDaily",new DailyDTO());
 
         //Todos
         model.addAttribute("newTodo", new TodoDTO());
         List<Todo> activeTodos = this.todoService.getActiveTodos(user);
         model.addAttribute("activeTodos", activeTodos);
-        model.addAttribute("updateTodos", new TodoDTO());
 
         return "client/overview";
     }
