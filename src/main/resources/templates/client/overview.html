@@ -379,7 +379,7 @@
                             <i class="fas fa-check" th:class="${todo.isCompleted} ? 'visible' : 'invisible'"></i>
                         </button>
                     </div>
-                    <div class="task-content">
+                    <div class="task-content" style="height: auto;">
                         <div class="todo-card-header">
                             <button class="task-detail" th:onclick="|openTodoUpdateModal(${todo.todoId})|">
                                 <div class="fw-bold mb-1" th:text="${todo.title}">Dọn nhà</div>
