@@ -375,11 +375,13 @@
                 <!-- Todo item -->
                 <div th:each="todo : ${activeTodos}" class="todo-card">
                     <div class="todo-color-bar yellow">
-                        <button class="todo-checkbox" th:onclick="|updateTodoCompletion(${todo.todoId})|">
-                            <i class="fas fa-check" th:class="${todo.isCompleted} ? 'visible' : 'invisible'"></i>
+                        <button class="todo-checkbox"
+                                th:id="todo-checkbox-+${todo.todoId}"
+                                th:onclick="|updateTodotaskCompletion(${todo.todoId},null)|">
+                            <i class="fas fa-check" th:if="${todo.isCompleted}"></i>
                         </button>
                     </div>
-                    <div class="task-content" style="height: auto;">
+                    <div style="height: auto;" th:class="${todo.isCompleted}?'task-content completed':'task-content'" th:id="todo-task-+${todo.todoId}">
                         <div class="todo-card-header">
                             <button class="task-detail" th:onclick="|openTodoUpdateModal(${todo.todoId})|">
                                 <div class="fw-bold mb-1" th:text="${todo.title}">Dọn nhà</div>
@@ -396,7 +398,7 @@
                         <div th:id="'subtasksList-' + ${todo.todoId}" class="collapse">
                             <div class="todo-subtasks mt-2">
                                 <div class="todo-subtask" th:each="subtask : ${todo.todoSubTasks}">
-                                    <input type="checkbox" th:id="'subtask-' + ${subtask.todoSubtaskId}" th:checked="${subtask.isCompleted}" th:onclick="|updateSubtaskCompletion(${todo.todoId}, ${subtask.todoSubtaskId})|">
+                                    <input type="checkbox" th:id="'subtask-' + ${subtask.todoSubtaskId}" th:checked="${subtask.isCompleted}" th:onclick="|updateTodotaskCompletion(${todo.todoId}, ${subtask.todoSubtaskId})|">
                                     <label th:for="'subtask-' + ${subtask.todoSubtaskId}" th:text="${subtask.title}">123</label>
                                 </div>
                             </div>
@@ -818,6 +820,43 @@
             container.appendChild(subtaskDiv);
         };
 
+        window.updateTodotaskCompletion = (todoId,subTaskId)=>{
+            let url;
+            if(subTaskId != null){
+                url = `/todos/${todoId}/subtasks/${subTaskId}/completion`;
+            }else{
+                url = `/todos/${todoId}/completion`;
+            }
+            fetch(url)
+                .then(response =>{
+                    if(response.url.includes("/login")){
+                        window.location.href("/login");
+                        return;
+                    }
+                    return response.json()
+                })
+                .then(data=>{
+                    const todotask = document.querySelector(`#todo-task-${todoId}`)
+                    const dailycheckbox = document.querySelector(`#todo-checkbox-${todoId}`)
+
+
+                    if(data.completed){
+                        todotask.classList.add('completed');
+                    }else{
+                        todotask.classList.remove('completed');
+                    }
+
+                    if(todotask.classList.contains("completed")){
+                        dailycheckbox.innerHTML = '<i class="fas fa-check"></i>';
+                    }else{
+                        dailycheckbox.innerHTML = '';
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi:",error)
+                    alert("Có lỗi xảy ra khi cập nhật! Phiên đăng nhập hết hạn, mời đăng nhập lại!")
+                })
+        }
 // // Update subtask completion
 //         window.updateSubtaskCompletion = (todoId, subtaskId) => {
 //             fetch(`/todos/${todoId}/subtasks/${subtaskId}/completion`, { method: 'POST' })

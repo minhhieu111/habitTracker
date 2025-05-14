@@ -115,7 +115,7 @@ public class TodoService {
     }
 
     @Transactional
-    public TodoDTO updateTodoCompletion(User user,Long todoId,String status) {
+    public TodoDTO updateTodoCompletion(User user,Long todoId,boolean isDirectClick) {
         Todo todo = this.todoRepository.findByUserAndTodoId(user, todoId).orElseThrow(()->new RuntimeException("Không tìm thấy việc cần làm!"));
         TodoDTO todoDTO = new TodoDTO();
         LocalDate today = LocalDate.now();
@@ -127,15 +127,23 @@ public class TodoService {
                         .build()
         );
 
-        boolean allCompleted = todo.isAllSubtasksCompleted();
-        boolean completed = todo.isCompleted();
-        if(allCompleted || !completed){
+        if (isDirectClick) {
+            boolean newCompletedState = !todo.isCompleted();
+            todo.setCompleted(newCompletedState);
+            todoHistory.setCompleted(newCompletedState);
+
+            if (newCompletedState) {
+                for (TodoSubtask subtask : todo.getTodoSubTasks()) {
+                    subtask.setCompleted(true);
+                    this.todoSubTaskRepository.save(subtask);
+                }
+            }
+        } else {
+            boolean allCompleted = todo.isAllSubtasksCompleted();
             todo.setCompleted(allCompleted);
-            todoHistory.setCompleted(true);
-        }else{
-            todo.setCompleted(false);
-            todoHistory.setCompleted(false);
+            todoHistory.setCompleted(allCompleted);
         }
+        todoHistoryRepository.save(todoHistory);
         todoRepository.save(todo);
 
         todoDTO.setCompleted(todo.isCompleted());
@@ -143,11 +151,11 @@ public class TodoService {
     }
 
     @Transactional
-    public void updateSubtaskCompletion(Long todoId, Long subtaskId) {
-        TodoSubtask subtask = todoSubtaskRepository.findById(subtaskId)
-                .orElseThrow(() -> new RuntimeException("Subtask not found"));
-        subtask.setIsCompleted(!subtask.isCompleted());
-        todoSubtaskRepository.save(subtask);
-        updateTodoCompletion(todoId);
+    public TodoDTO updateSubtaskCompletion(User user,Long todoId, Long subtaskId) {
+        TodoSubtask subtask = this.todoSubTaskRepository.findById(subtaskId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy subTask"));
+        subtask.setCompleted(!subtask.isCompleted());
+        this.todoSubTaskRepository.save(subtask);
+        return updateTodoCompletion(user,todoId,false);
     }
 }

@@ -91,19 +91,23 @@ public class TodoController {
         return "redirect:/overview";
     }
 
-    @PostMapping("/{todoId}/completion")
+    @GetMapping("/{todoId}/completion")
     @ResponseBody
     public ResponseEntity<TodoDTO> updateTodoCompletion(HttpServletRequest request,@PathVariable Long todoId) {
         String token = this.tokenUtil.getTokenFromCookies(request);
         String username =  this.jwtUtil.getUserNameFromToken(token);
         User user = this.userService.getUser(username);
-        TodoDTO todoDTO = todoService.updateTodoCompletion(user,todoId);
+        TodoDTO todoDTO = todoService.updateTodoCompletion(user,todoId,true);
         return ResponseEntity.ok().body(todoDTO);
     }
 
-    @PostMapping("/{todoId}/subtasks/{subtaskId}/completion")
+    @GetMapping("/{todoId}/subtasks/{subtaskId}/completion")
     @ResponseBody
-    public void updateSubtaskCompletion(@PathVariable Long todoId, @PathVariable Long subtaskId) {
-        todoService.updateSubtaskCompletion(todoId, subtaskId);
+    public ResponseEntity<TodoDTO> updateSubtaskCompletion(HttpServletRequest request,@PathVariable Long todoId, @PathVariable Long subtaskId) {
+        String token = this.tokenUtil.getTokenFromCookies(request);
+        String username =  this.jwtUtil.getUserNameFromToken(token);
+        User user = this.userService.getUser(username);
+        TodoDTO todoDTO = todoService.updateSubtaskCompletion(user,todoId, subtaskId);
+        return ResponseEntity.ok().body(todoDTO);
     }
 }
