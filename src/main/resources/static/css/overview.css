@@ -340,6 +340,7 @@ body {
     width: 84%;
     background-color: var(--light-bg);
     padding: 5px 10px 5px 20px;
+    height: 100%;
 }
 
 .task-detail{
