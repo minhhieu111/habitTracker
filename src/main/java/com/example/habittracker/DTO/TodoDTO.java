@@ -22,6 +22,7 @@ public class TodoDTO {
     private List<String> subtasks;
     private List<Long> subtaskIds;
     private List<TodoSubtaskDTO> todoSubtasks;
+    private boolean isCompleted;
 
     private final Todo.Difficulty[] todoDifficultOption = Todo.Difficulty.values();
 }

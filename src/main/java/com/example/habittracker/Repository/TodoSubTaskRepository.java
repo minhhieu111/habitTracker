@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TodoSubTaskRepository extends JpaRepository<TodoSubtask,Long> {
+
 }

@@ -25,7 +25,7 @@ public class Todo {
     private String EmailMessage;
     private LocalDateTime timeSendEmail;
     private LocalDate created_at = LocalDate.now();
-    private boolean isCompleted;
+    private boolean isCompleted = false;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")
