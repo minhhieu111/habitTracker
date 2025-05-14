@@ -14,6 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.swing.text.html.parser.Entity;
+
 @Controller
 @RequestMapping("/todos")
 public class TodoController {
@@ -87,5 +89,25 @@ public class TodoController {
         }
 
         return "redirect:/overview";
+    }
+
+    @GetMapping("/{todoId}/completion")
+    @ResponseBody
+    public ResponseEntity<TodoDTO> updateTodoCompletion(HttpServletRequest request,@PathVariable Long todoId) {
+        String token = this.tokenUtil.getTokenFromCookies(request);
+        String username =  this.jwtUtil.getUserNameFromToken(token);
+        User user = this.userService.getUser(username);
+        TodoDTO todoDTO = todoService.updateTodoCompletion(user,todoId,true);
+        return ResponseEntity.ok().body(todoDTO);
+    }
+
+    @GetMapping("/{todoId}/subtasks/{subtaskId}/completion")
+    @ResponseBody
+    public ResponseEntity<TodoDTO> updateSubtaskCompletion(HttpServletRequest request,@PathVariable Long todoId, @PathVariable Long subtaskId) {
+        String token = this.tokenUtil.getTokenFromCookies(request);
+        String username =  this.jwtUtil.getUserNameFromToken(token);
+        User user = this.userService.getUser(username);
+        TodoDTO todoDTO = todoService.updateSubtaskCompletion(user,todoId, subtaskId);
+        return ResponseEntity.ok().body(todoDTO);
     }
 }
