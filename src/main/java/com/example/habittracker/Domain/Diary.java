@@ -1,5 +1,6 @@
 package com.example.habittracker.Domain;
 
+import com.example.habittracker.DTO.CompletedTasksConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,4 +34,7 @@ public class Diary {
 
     @OneToMany(mappedBy = "diary")
     List<Todo> todoList;
+
+    @Convert(converter = CompletedTasksConverter.class)
+    private List<Long> completedTaskIds;
 }

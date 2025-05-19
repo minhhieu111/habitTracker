@@ -25,8 +25,7 @@ public class DailyController {
 
     @PostMapping("/create")
     public String createDaily(HttpServletRequest request, @ModelAttribute("newDaily")DailyDTO dailyDTO, RedirectAttributes redirectAttributes) {
-        String token = this.tokenUtil.getTokenFromCookies(request);
-        String username = this.jwtUtil.getUserNameFromToken(token);
+        String username = getUserNameFromRequest(request);
         try{
             this.dailyService.createDaily(dailyDTO, username);
             redirectAttributes.addFlashAttribute("success", "Tạo thói quen hằng ngày thành công!");
@@ -40,16 +39,14 @@ public class DailyController {
     @GetMapping("update/{dailyId}")
     @ResponseBody
     public ResponseEntity<DailyDTO> updateDaily(HttpServletRequest request, @PathVariable Long dailyId) {
-        String token = this.tokenUtil.getTokenFromCookies(request);
-        String username = this.jwtUtil.getUserNameFromToken(token);
+        String username = getUserNameFromRequest(request);
         DailyDTO dailyUpdate = this.dailyService.getUpdateDaily(dailyId, username);
         return ResponseEntity.ok().body(dailyUpdate);
     }
 
     @PostMapping("update/{dailyId}")
     public String updateDaily(HttpServletRequest request, @PathVariable Long dailyId, @ModelAttribute("newDaily")DailyDTO dailyDTO, RedirectAttributes redirectAttributes) {
-        String token = this.tokenUtil.getTokenFromCookies(request);
-        String username = this.jwtUtil.getUserNameFromToken(token);
+        String username = getUserNameFromRequest(request);
         try{
             this.dailyService.updateDaily(dailyDTO, username);
             redirectAttributes.addFlashAttribute("success", "Chỉnh sửa thành công!");
@@ -62,8 +59,7 @@ public class DailyController {
 
     @GetMapping("delete/{dailyId}")
     public String deleteDaily(HttpServletRequest request, @PathVariable Long dailyId,RedirectAttributes redirectAttributes) {
-        String token = this.tokenUtil.getTokenFromCookies(request);
-        String username = this.jwtUtil.getUserNameFromToken(token);
+        String username = getUserNameFromRequest(request);
         try{
             this.dailyService.deleteDaily(dailyId , username);
             redirectAttributes.addFlashAttribute("success", "Xoá thói quen hàng ngày thành công!");
@@ -77,9 +73,13 @@ public class DailyController {
     @GetMapping("{dailyId}/task_checked")
     @ResponseBody
     public ResponseEntity<DailyDTO> updateTaskChecked(HttpServletRequest request, @PathVariable Long dailyId, @RequestParam("status") String status) {
-        String token = this.tokenUtil.getTokenFromCookies(request);
-        String username = this.jwtUtil.getUserNameFromToken(token);
+        String username = getUserNameFromRequest(request);
         DailyDTO dailyTaskUpdate = this.dailyService.dailyTaskUpdate(username, dailyId, status);
         return ResponseEntity.ok().body(dailyTaskUpdate);
+    }
+
+    private String getUserNameFromRequest(HttpServletRequest request) {
+        String token = tokenUtil.getTokenFromCookies(request);
+        return jwtUtil.getUserNameFromToken(token);
     }
 }
