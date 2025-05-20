@@ -487,18 +487,9 @@
             </button>
             <div class="tasks-contain">
                 <div th:each="diary : ${diaries}" class="journal-day" >
-                    <div th:onclick="|openDiaryUpdateModal(${diary.diaryId})|">
-                        <span th:text="'Ngày ' + ${#temporals.format(diary.date, 'd')}"></span>
-                    </div>
-
-<!--                    <img th:if="${diary.imageUrl != null}" th:src="${diary.imageUrl}" class="img-fluid mt-1" style="max-width: 200px;">-->
-                    <div class="mt-2">
-                        <strong>Task đã hoàn thành:</strong>
-                        <ul>
-<!--                            <li th:each="task : ${diary.completedTaskIds}" th:text="${task}"></li>-->
-                        </ul>
-                        <button class="btn btn-primary btn-sm" th:onclick="|updateDiaryTasks(${diary.diaryId})|">Cập nhật Task</button>
-                    </div>
+                    <button class="diary-task" th:onclick="|openDiaryUpdateModal(${diary.diaryId})|">
+                        <span th:text="'Ngày ' + ${#temporals.format(diary.date, 'd-MM-YYYY')}"></span>
+                    </button>
                 </div>
             </div>
             <div class="column-footer">
@@ -523,17 +514,28 @@
                                 <div class="mb-3">
                                     <label for="diaryImage" class="form-label">Tải ảnh lên</label>
                                     <input type="file" class="form-control" id="diaryImage" name="image" accept="image/*">
+                                    <div class="d-flex justify-content-center w-100">
+                                        <img id="diaryImagePreview" class="img-fluid mt-1" style="max-width: 300px; display: none;" />
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
                         <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <strong>Task đã hoàn thành:</strong>
+                                <ul id="completedTasksList">
+                                    <!-- Danh sách task sẽ được thêm động -->
+                                </ul>
+                                <button type="button" id="updateTasksButton" class="btn btn-primary btn-sm" onclick="updateDiaryTasks()">Cập nhật Task</button>
+                            </div>
                             <div class="modal-footer d-flex justify-content-between">
                                 <div>
                                     <button id="deleteDiaryButton" style="display: none" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteDiaryModal">Xóa</button>
                                 </div>
-                                <div>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                <div class="d-flex">
+                                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" id="saveDiaryButton" class="btn btn-primary">Lưu</button>
                                 </div>
                             </div>
                         </div>
@@ -935,13 +937,21 @@
             document.getElementById("diaryId").value = '';
             document.getElementById("diaryContentInput").value = '';
             document.getElementById("diaryImage").value = '';
+            document.getElementById("diaryImagePreview").style.display = 'none';
+            document.getElementById("diaryImagePreview").src = '';
+            document.getElementById("completedTasksList").innerHTML = '';
 
             document.getElementById("deleteDiaryButton").style.display = 'none';
+            document.getElementById("updateTasksButton").style.display = 'block';
+            document.getElementById("saveDiaryButton").style.display = 'block';
 
             const form = document.getElementById('diaryForm');
             const modalTitle = document.getElementById('diaryContent');
             form.action = '/diaries/save';
             modalTitle.textContent = 'Tạo mới';
+
+            // Load completed tasks for today
+            fetchCompletedTasks();
 
             const modalDiary = new bootstrap.Modal(document.getElementById("modalDiary"));
             modalDiary.show();
@@ -960,9 +970,28 @@
                 .then(diary => {
                     document.getElementById("diaryId").value = diaryId;
                     document.getElementById("diaryContentInput").value = diary.content;
-                    document.getElementById("diaryImage").value = ''; // Reset file input
+                    document.getElementById("diaryImage").value = '';
+                    if (diary.imageUrl) {
+                        document.getElementById("diaryImagePreview").style.display = 'block';
+                        document.getElementById("diaryImagePreview").src = diary.imageUrl;
+                    } else {
+                        document.getElementById("diaryImagePreview").style.display = 'none';
+                    }
+
+                    // Load completed tasks
+                    const completedTasksList = document.getElementById("completedTasksList");
+                    completedTasksList.innerHTML = '';
+                    if (diary.completedTasks) {
+                        diary.completedTasks.forEach(task => {
+                            const li = document.createElement("li");
+                            li.textContent = task.title;
+                            completedTasksList.appendChild(li);
+                        });
+                    }
 
                     document.getElementById("deleteDiaryButton").style.display = 'block';
+                    document.getElementById("updateTasksButton").style.display = 'block';
+                    document.getElementById("saveDiaryButton").style.display = 'block';
                     document.getElementById("deleteDiary").setAttribute("href", `/diaries/delete/${diaryId}`);
 
                     const form = document.getElementById('diaryForm');
@@ -979,20 +1008,39 @@
                 });
         };
 
-        // Open delete diary modal
-        window.openDiaryDeleteModal = (diaryId) => {
-            document.getElementById("deleteDiary").setAttribute("href", `/diaries/delete/${diaryId}`);
-            const modalDelete = new bootstrap.Modal(document.getElementById("deleteDiaryModal"));
-            modalDelete.show();
+        // Fetch completed tasks for today
+        window.fetchCompletedTasks = () => {
+            fetch('/diaries/completed-tasks')
+                .then(response => response.json())
+                .then(tasks => {
+                    const completedTasksList = document.getElementById("completedTasksList");
+                    completedTasksList.innerHTML = '';
+                    tasks.forEach(task => {
+                        const li = document.createElement("li");
+                        li.textContent = task.title;
+                        completedTasksList.appendChild(li);
+                    });
+                });
         };
 
         // Update completed tasks for diary
-        window.updateDiaryTasks = (diaryId) => {
-            fetch(`/diaries/${diaryId}/update-tasks`, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    location.reload();
-                });
+        window.updateDiaryTasks = () => {
+            const diaryId = document.getElementById("diaryId").value;
+            if (diaryId) {
+                fetch(`/diaries/${diaryId}/update-tasks`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        const completedTasksList = document.getElementById("completedTasksList");
+                        completedTasksList.innerHTML = '';
+                        data.completedTasks.forEach(task => {
+                            const li = document.createElement("li");
+                            li.textContent = task.title;
+                            completedTasksList.appendChild(li);
+                        });
+                    });
+            } else {
+                fetchCompletedTasks();
+            }
         };
     });
 

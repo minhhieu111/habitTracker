@@ -17,9 +17,6 @@ public class DiaryDTO {
     private String content;
     private MultipartFile image;
     private String imageUrl;
-    private List<Long> completedTaskIds;
+    private List<TaskDTO> completedTasks;
 
-//        public static List<Difficulty> getDifficultiesOption() {
-//            return Arrays.asList(Difficulty.values());
-//        }
 }

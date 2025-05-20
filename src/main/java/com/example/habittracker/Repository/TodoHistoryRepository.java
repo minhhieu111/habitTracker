@@ -17,6 +17,6 @@ public interface TodoHistoryRepository extends JpaRepository<TodoHistory,Long> {
     @Query("SELECT th FROM TodoHistory th WHERE th.todo = :todoId AND th.date = :today")
     Optional<TodoHistory> findByDateAndTodoId(@Param("todoId")Todo todo, @Param("today")LocalDate today);
 
-    @Query("SELECT th.todo.TodoId FROM TodoHistory th WHERE th.todo.user = :user AND th.isCompleted = true AND DATE(th.date) <= :date")
+    @Query("SELECT th.todo.TodoId FROM TodoHistory th WHERE th.todo.user = :user AND th.isCompleted = true AND DATE(th.date) = :date")
     List<Long> findCompletedTodoIdsByUserAndDate(@Param("user")User user, @Param("date")LocalDate date);
 }

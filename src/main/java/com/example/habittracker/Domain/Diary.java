@@ -26,15 +26,13 @@ public class Diary {
     @JoinColumn(name="user_id")
     private User user;
 
-    @OneToMany(mappedBy = "diary")
+    @OneToMany(mappedBy = "diary" ,cascade = CascadeType.ALL, orphanRemoval = true)
     List<UserHabit> userHabitList;
 
-    @OneToMany(mappedBy = "diary")
+    @OneToMany(mappedBy = "diary" ,cascade = CascadeType.ALL, orphanRemoval = true)
     List<UserDaily> userDailyList;
 
-    @OneToMany(mappedBy = "diary")
+    @OneToMany(mappedBy = "diary" ,cascade = CascadeType.ALL, orphanRemoval = true)
     List<Todo> todoList;
 
-    @Convert(converter = CompletedTasksConverter.class)
-    private List<Long> completedTaskIds;
 }

@@ -3,6 +3,7 @@ package com.example.habittracker.Controller.client;
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.DTO.DiaryDTO;
+import com.example.habittracker.DTO.TaskDTO;
 import com.example.habittracker.Domain.Diary;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Service.DiaryService;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -37,29 +39,54 @@ public class DiaryController {
     }
 
     @PostMapping("/save")
-    public String saveDiary(@ModelAttribute("newDiary") DiaryDTO diaryDTO, HttpServletRequest request, @RequestParam("image") MultipartFile image) {
-         User user = getUserFromRequest(request);
-        diaryService.saveDiary(diaryDTO, image, user);
+    public String saveDiary(@ModelAttribute("newDiary") DiaryDTO diaryDTO, HttpServletRequest request, @RequestParam("image") MultipartFile image, RedirectAttributes redirectAttributes) {
+        User user = getUserFromRequest(request);
+        try{
+            diaryService.saveDiary(diaryDTO, image, user);
+            redirectAttributes.addFlashAttribute("success", "Tạo nhật ký thành công!");
+        }catch (Exception e){
+            redirectAttributes.addFlashAttribute("failed", "Tạo nhật ký thất bại!");
+            return "redirect:/overview";
+        }
         return "redirect:/overview";
     }
 
     @PostMapping("/update")
-    public String updateDiary(@ModelAttribute("newDiary") DiaryDTO diaryDTO, @RequestParam(value = "image", required = false) MultipartFile image) {
-        diaryService.updateDiary(diaryDTO, image);
+    public String updateDiary(@ModelAttribute("newDiary") DiaryDTO diaryDTO, @RequestParam(value = "image", required = false) MultipartFile image, RedirectAttributes redirectAttributes) {
+        try{
+            diaryService.updateDiary(diaryDTO, image);
+            redirectAttributes.addFlashAttribute("success", "Cập nhật nhật ký thành công!");
+        }catch (Exception e){
+            redirectAttributes.addFlashAttribute("failed", "Cập nhật nhật ký thất bại!");
+            return "redirect:/overview";
+        }
         return "redirect:/overview";
     }
 
-    @PostMapping("/{diaryId}/delete")
-    public String deleteDiary(@PathVariable Long diaryId) {
-        diaryService.deleteDiary(diaryId);
+    @GetMapping("/delete/{diaryId}")
+    public String deleteDiary(@PathVariable Long diaryId, RedirectAttributes redirectAttributes) {
+        try{
+            diaryService.deleteDiary(diaryId);
+            redirectAttributes.addFlashAttribute("success", "Xóa nhật ký thành công!");
+        }catch (Exception e){
+            redirectAttributes.addFlashAttribute("failed", "Xóa nhật ký thất bại!");
+            return "redirect:/overview";
+        }
         return "redirect:/overview";
+    }
+
+    @GetMapping("/completed-tasks")
+    @ResponseBody
+    public List<TaskDTO> getCompletedTasks(HttpServletRequest request) {
+        User user = getUserFromRequest(request);
+        return diaryService.getCompletedTasks(user);
     }
 
     @PostMapping("/{diaryId}/update-tasks")
     @ResponseBody
-    public void updateDiaryTasks(@PathVariable Long diaryId, HttpServletRequest request) {
+    public DiaryDTO updateDiaryTasks(@PathVariable Long diaryId, HttpServletRequest request) {
         User user = getUserFromRequest(request);
-        diaryService.updateDiaryTasks(diaryId, user);
+        return diaryService.updateDiaryTasks(diaryId, user);
     }
 
     private User getUserFromRequest(HttpServletRequest request) {
