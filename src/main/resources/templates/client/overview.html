@@ -482,24 +482,84 @@
         <!-- Journal Column -->
         <div class="task-column">
             <div class="column-header">Viết Nhật Ký</div>
-
-            <div class="journal-day">
-                <span>Ngày 1</span>
-                <i class="fas fa-chevron-down"></i>
+            <button class="add-task-button" onclick="openDiaryCreateModal()">
+                <i class="fas fa-plus"></i> Thêm Nhật Ký
+            </button>
+            <div class="tasks-contain">
+                <div th:each="diary : ${diaries}" class="journal-day" >
+                    <button class="diary-task" th:onclick="|openDiaryUpdateModal(${diary.diaryId})|">
+                        <span th:text="'Ngày ' + ${#temporals.format(diary.date, 'd-MM-YYYY')}"></span>
+                    </button>
+                </div>
             </div>
-
-            <div class="journal-day">
-                <span>Ngày 2</span>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-
-            <div class="journal-day">
-                <span>Ngày 3</span>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-
             <div class="column-footer">
                 Hãy ghi lại những thay đổi của bạn hôm nay
+            </div>
+        </div>
+
+        <!-- Modal Diary -->
+        <div class="modal fade" id="modalDiary" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="diaryForm" th:action="@{/diaries/save}" method="post" th:object="${newDiary}" enctype="multipart/form-data">
+                        <div class="modal-header text-bg-warning p-4">
+                            <div class="w-100">
+                                <h4 id="diaryContent" class="fw-bold mb-3">Tạo mới</h4>
+                                <input type="text" id="diaryId" style="display: none" th:field="*{diaryId}">
+                                <div class="mb-3">
+                                    <label for="diaryContentInput" class="form-label">Nội dung <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="diaryContentInput" th:field="*{content}" rows="3" placeholder="Viết nhật ký của bạn"></textarea>
+                                    <div id="diaryContentError" class="text-danger mt-1" style="display: none;">Vui lòng nhập nội dung.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="diaryImage" class="form-label">Tải ảnh lên</label>
+                                    <input type="file" class="form-control" id="diaryImage" name="image" accept="image/*">
+                                    <div class="d-flex justify-content-center w-100">
+                                        <img id="diaryImagePreview" class="img-fluid mt-1" style="max-width: 300px; display: none;" />
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <strong>Task đã hoàn thành:</strong>
+                                <ul id="completedTasksList">
+                                    <!-- Danh sách task sẽ được thêm động -->
+                                </ul>
+                                <button type="button" id="updateTasksButton" class="btn btn-primary btn-sm" onclick="updateDiaryTasks()">Cập nhật Task</button>
+                            </div>
+                            <div class="modal-footer d-flex justify-content-between">
+                                <div>
+                                    <button id="deleteDiaryButton" style="display: none" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteDiaryModal">Xóa</button>
+                                </div>
+                                <div class="d-flex">
+                                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" id="saveDiaryButton" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteDiaryModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Xác nhận xóa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn xóa nhật ký này?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <a id="deleteDiary" class="btn btn-danger" href="#">Xóa</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -746,7 +806,7 @@
                     alert("Có lỗi xảy ra khi cập nhật! Phiên đăng nhập hết hạn, mời đăng nhập lại!")
                 })
         }
-// todo
+        // todo
         // Open create todo modal
         window.openTodoCreateModal = () => {
             document.getElementById("todoId").value = '';
@@ -766,7 +826,7 @@
             modalTodo.show();
         };
 
-// Open update todo modal
+        // Open update todo modal
         window.openTodoUpdateModal = (todoId) => {
             fetch(`/todos/${todoId}`)
                 .then(response => {
@@ -857,25 +917,6 @@
                     alert("Có lỗi xảy ra khi cập nhật! Phiên đăng nhập hết hạn, mời đăng nhập lại!")
                 })
         }
-// // Update subtask completion
-//         window.updateSubtaskCompletion = (todoId, subtaskId) => {
-//             fetch(`/todos/${todoId}/subtasks/${subtaskId}/completion`, { method: 'POST' })
-//                 .then(response => response.json())
-//                 .then(data => {
-//                     fetch(`/todos/${todoId}/completion`, { method: 'POST' }); // Cập nhật trạng thái todo
-//                     location.reload(); // Tải lại trang để cập nhật giao diện
-//                 });
-//         };
-//
-// // Update todo completion
-//         window.updateTodoCompletion = (todoId) => {
-//             fetch(`/todos/${todoId}/completion`, { method: 'POST' })
-//                 .then(response => response.json())
-//                 .then(data => {
-//                     location.reload(); // Tải lại trang để cập nhật giao diện
-//                 });
-//         };
-
 
         // Handle todo dropdown toggle
         document.querySelectorAll('.todo-dropdown-toggle').forEach(toggle => {
@@ -891,33 +932,116 @@
             });
         });
 
-        // Make the entire todo card header clickable to toggle subtasks
-        // document.querySelectorAll('.todo-card-header').forEach(header => {
-        //     header.addEventListener('click', function (e) {
-        //         // Don't trigger if clicking on the menu button
-        //         if (!e.target.closest('.todo-menu-button')) {
-        //             const dropdownToggle = this.querySelector('.todo-dropdown-toggle');
-        //             if (dropdownToggle) {
-        //                 dropdownToggle.click();
-        //             }
-        //         }
-        //     });
-        // });
+        // Open create diary modal
+        window.openDiaryCreateModal = () => {
+            document.getElementById("diaryId").value = '';
+            document.getElementById("diaryContentInput").value = '';
+            document.getElementById("diaryImage").value = '';
+            document.getElementById("diaryImagePreview").style.display = 'none';
+            document.getElementById("diaryImagePreview").src = '';
+            document.getElementById("completedTasksList").innerHTML = '';
 
-        // Mở rộng nhật ký
-        document.querySelectorAll('.journal-day').forEach(function (journal) {
-            journal.addEventListener('click', function () {
-                this.classList.toggle('expanded');
-                const icon = this.querySelector('i');
-                if (this.classList.contains('expanded')) {
-                    icon.classList.remove('fa-chevron-down');
-                    icon.classList.add('fa-chevron-up');
-                } else {
-                    icon.classList.remove('fa-chevron-up');
-                    icon.classList.add('fa-chevron-down');
-                }
-            });
-        });
+            document.getElementById("deleteDiaryButton").style.display = 'none';
+            document.getElementById("updateTasksButton").style.display = 'block';
+            document.getElementById("saveDiaryButton").style.display = 'block';
+
+            const form = document.getElementById('diaryForm');
+            const modalTitle = document.getElementById('diaryContent');
+            form.action = '/diaries/save';
+            modalTitle.textContent = 'Tạo mới';
+
+            // Load completed tasks for today
+            fetchCompletedTasks();
+
+            const modalDiary = new bootstrap.Modal(document.getElementById("modalDiary"));
+            modalDiary.show();
+        };
+
+        // Open update diary modal
+        window.openDiaryUpdateModal = (diaryId) => {
+            fetch(`/diaries/${diaryId}`)
+                .then(response => {
+                    if (response.url.includes('/login')) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(diary => {
+                    document.getElementById("diaryId").value = diaryId;
+                    document.getElementById("diaryContentInput").value = diary.content;
+                    document.getElementById("diaryImage").value = '';
+                    if (diary.imageUrl) {
+                        document.getElementById("diaryImagePreview").style.display = 'block';
+                        document.getElementById("diaryImagePreview").src = diary.imageUrl;
+                    } else {
+                        document.getElementById("diaryImagePreview").style.display = 'none';
+                    }
+
+                    // Load completed tasks
+                    const completedTasksList = document.getElementById("completedTasksList");
+                    completedTasksList.innerHTML = '';
+                    if (diary.completedTasks) {
+                        diary.completedTasks.forEach(task => {
+                            const li = document.createElement("li");
+                            li.textContent = task.title;
+                            completedTasksList.appendChild(li);
+                        });
+                    }
+
+                    document.getElementById("deleteDiaryButton").style.display = 'block';
+                    document.getElementById("updateTasksButton").style.display = 'block';
+                    document.getElementById("saveDiaryButton").style.display = 'block';
+                    document.getElementById("deleteDiary").setAttribute("href", `/diaries/delete/${diaryId}`);
+
+                    const form = document.getElementById('diaryForm');
+                    const modalTitle = document.getElementById('diaryContent');
+                    form.action = '/diaries/update';
+                    modalTitle.textContent = 'Chỉnh sửa';
+
+                    const modalDiary = new bootstrap.Modal(document.getElementById("modalDiary"));
+                    modalDiary.show();
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu nhật ký:', error);
+                    alert('Không thể lấy dữ liệu nhật ký. Do phiên đăng nhập hết hạn! Mời đăng nhập lại');
+                });
+        };
+
+        // Fetch completed tasks for today
+        window.fetchCompletedTasks = () => {
+            fetch('/diaries/completed-tasks')
+                .then(response => response.json())
+                .then(tasks => {
+                    const completedTasksList = document.getElementById("completedTasksList");
+                    completedTasksList.innerHTML = '';
+                    tasks.forEach(task => {
+                        const li = document.createElement("li");
+                        li.textContent = task.title;
+                        completedTasksList.appendChild(li);
+                    });
+                });
+        };
+
+        // Update completed tasks for diary
+        window.updateDiaryTasks = () => {
+            const diaryId = document.getElementById("diaryId").value;
+            if (diaryId) {
+                fetch(`/diaries/${diaryId}/update-tasks`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        const completedTasksList = document.getElementById("completedTasksList");
+                        completedTasksList.innerHTML = '';
+                        data.completedTasks.forEach(task => {
+                            const li = document.createElement("li");
+                            li.textContent = task.title;
+                            completedTasksList.appendChild(li);
+                        });
+                    });
+            } else {
+                fetchCompletedTasks();
+            }
+        };
     });
 
 </script>

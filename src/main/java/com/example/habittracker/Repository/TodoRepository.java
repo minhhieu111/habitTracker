@@ -1,9 +1,11 @@
 package com.example.habittracker.Repository;
 
+import com.example.habittracker.Domain.Diary;
 import com.example.habittracker.Domain.Todo;
 import com.example.habittracker.Domain.TodoHistory;
 import com.example.habittracker.Domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -21,5 +23,4 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
 
     @Query("SELECT t FROM Todo t WHERE t.user = :user and t.TodoId = :todoId")
     Optional<Todo> findByUserAndTodoId(@Param("user") User user, @Param("todoId")Long todoId);
-
 }

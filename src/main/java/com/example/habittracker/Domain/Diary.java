@@ -1,5 +1,6 @@
 package com.example.habittracker.Domain;
 
+import com.example.habittracker.DTO.CompletedTasksConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,12 +26,28 @@ public class Diary {
     @JoinColumn(name="user_id")
     private User user;
 
-    @OneToMany(mappedBy = "diary")
-    List<UserHabit> userHabitList;
+    @ManyToMany
+    @JoinTable(
+            name = "diary_user_habit",
+            joinColumns = @JoinColumn(name = "diary_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_habit_id")
+    )
+    private List<UserHabit> userHabitList;
 
-    @OneToMany(mappedBy = "diary")
-    List<UserDaily> userDailyList;
+    @ManyToMany
+    @JoinTable(
+            name = "diary_user_daily",
+            joinColumns = @JoinColumn(name = "diary_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_daily_id")
+    )
+    private List<UserDaily> userDailyList;
 
-    @OneToMany(mappedBy = "diary")
-    List<Todo> todoList;
+    @ManyToMany
+    @JoinTable(
+            name = "diary_todo",
+            joinColumns = @JoinColumn(name = "diary_id"),
+            inverseJoinColumns = @JoinColumn(name = "todo_id")
+    )
+    private List<Todo> todoList;
+
 }
