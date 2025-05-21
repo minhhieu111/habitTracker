@@ -20,6 +20,6 @@ public interface HabitHistoryRepository extends JpaRepository<HabitHistory, Long
     @Query("SELECT hs FROM HabitHistory hs WHERE hs.userHabit = :userHabit")
     List<HabitHistory> findAllByUserHabit(@Param("userHabit") UserHabit userHabit);
 
-    @Query("SELECT hh.userHabit.habit.habitId FROM HabitHistory hh WHERE hh.userHabit.user = :user AND hh.isCompleted = true AND DATE(hh.date) = :date")
+    @Query("SELECT hh.userHabit.userHabitId FROM HabitHistory hh WHERE hh.userHabit.user = :user AND hh.isCompleted = true AND DATE(hh.date) = :date")
     List<Long> findCompletedHabitIdsByUserAndDate(@Param("user") User user, @Param("date")LocalDate date);
 }

@@ -37,10 +37,6 @@ public class Todo {
     @OneToMany(mappedBy = "todo")
     private List<TodoHistory> todoHistories;
 
-    @ManyToOne()
-    @JoinColumn(name = "diary_id")
-    private Diary diary;
-
     public enum Difficulty {
         EASY, MEDIUM, HARD
     }

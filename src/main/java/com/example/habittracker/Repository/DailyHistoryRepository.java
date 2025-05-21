@@ -27,6 +27,6 @@ public interface DailyHistoryRepository extends JpaRepository<DailyHistory, Long
     @Query("SELECT dh FROM DailyHistory dh WHERE dh.userDaily = :userDaily")
     List<DailyHistory> findAllByUserDaily(@Param("userDaily") UserDaily userDaily);
 
-    @Query("SELECT dh.userDaily.daily.DailyId FROM DailyHistory dh WHERE dh.userDaily.user = :user AND dh.isCompleted = true AND DATE(dh.date) = :date")
+    @Query("SELECT dh.userDaily.userDailyId FROM DailyHistory dh WHERE dh.userDaily.user = :user AND dh.isCompleted = true AND DATE(dh.date) = :date")
     List<Long> findCompletedDailyIdsByUserAndDate(@Param("user")User user, @Param("date")LocalDate date);
 }
