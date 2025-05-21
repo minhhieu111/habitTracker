@@ -1,6 +1,7 @@
 package com.example.habittracker.Repository;
 
 import com.example.habittracker.Domain.HabitHistory;
+import com.example.habittracker.Domain.User;
 import com.example.habittracker.Domain.UserHabit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +19,7 @@ public interface HabitHistoryRepository extends JpaRepository<HabitHistory, Long
 
     @Query("SELECT hs FROM HabitHistory hs WHERE hs.userHabit = :userHabit")
     List<HabitHistory> findAllByUserHabit(@Param("userHabit") UserHabit userHabit);
+
+    @Query("SELECT hh.userHabit.userHabitId FROM HabitHistory hh WHERE hh.userHabit.user = :user AND hh.isCompleted = true AND DATE(hh.date) = :date")
+    List<Long> findCompletedHabitIdsByUserAndDate(@Param("user") User user, @Param("date")LocalDate date);
 }

@@ -64,17 +64,18 @@ public class TodoService {
                 .todoSubTasks(new ArrayList<>())
                 .build();
 
-        // Thêm subtasks
-        for (int i = 0; i < todoDTO.getSubtasks().size(); i++) {
-            String subtaskTitle = todoDTO.getSubtasks().get(i);
-            if (subtaskTitle != null && !subtaskTitle.trim().isEmpty()) {
-                TodoSubtask subtask = TodoSubtask.builder()
-                        .title(subtaskTitle)
-                        .isCompleted(false)
-                        .todo(todo)
-                        .build();
-                this.todoSubTaskRepository.save(subtask);
-                todo.getTodoSubTasks().add(subtask);
+        if(todoDTO.getSubtasks() != null){
+            for (int i = 0; i < todoDTO.getSubtasks().size(); i++) {
+                String subtaskTitle = todoDTO.getSubtasks().get(i);
+                if (subtaskTitle != null && !subtaskTitle.trim().isEmpty()) {
+                    TodoSubtask subtask = TodoSubtask.builder()
+                            .title(subtaskTitle)
+                            .isCompleted(false)
+                            .todo(todo)
+                            .build();
+                    this.todoSubTaskRepository.save(subtask);
+                    todo.getTodoSubTasks().add(subtask);
+                }
             }
         }
         this.todoRepository.save(todo);
@@ -88,21 +89,22 @@ public class TodoService {
         todo.setDescription(todoDTO.getDescription());
         todo.setDifficulty(todoDTO.getDifficulty());
 
-        this.todoSubTaskRepository.deleteAll();
-        for (int i = 0; i < todoDTO.getSubtasks().size(); i++) {
-            String subtaskTitle = todoDTO.getSubtasks().get(i);
-            if (subtaskTitle != null && !subtaskTitle.trim().isEmpty()) {
-                TodoSubtask subtask = TodoSubtask.builder()
-                        .title(subtaskTitle)
-                        .isCompleted(false)
-                        .todo(todo)
-                        .build();
+        this.todoSubTaskRepository.deleteAllByTodo(todo);
+        if(todoDTO.getSubtasks() != null && !todoDTO.getSubtasks().isEmpty()){
+            for (int i = 0; i < todoDTO.getSubtasks().size(); i++) {
+                String subtaskTitle = todoDTO.getSubtasks().get(i);
+                if (subtaskTitle != null && !subtaskTitle.trim().isEmpty()) {
+                    TodoSubtask subtask = TodoSubtask.builder()
+                            .title(subtaskTitle)
+                            .isCompleted(false)
+                            .todo(todo)
+                            .build();
 
-                this.todoSubTaskRepository.save(subtask);
-                todo.getTodoSubTasks().add(subtask);
+                    this.todoSubTaskRepository.save(subtask);
+                    todo.getTodoSubTasks().add(subtask);
+                }
             }
         }
-
         todoRepository.save(todo);
     }
 

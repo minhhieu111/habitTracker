@@ -3,6 +3,7 @@ package com.example.habittracker.Controller.client;
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.DTO.DailyDTO;
+import com.example.habittracker.DTO.DiaryDTO;
 import com.example.habittracker.DTO.HabitDTO;
 import com.example.habittracker.DTO.TodoDTO;
 import com.example.habittracker.Domain.*;
@@ -25,8 +26,9 @@ public class OverviewController {
     private final DailyService dailyService;
     private final ChallengeService challengeService;
     private final TodoService todoService;
+    private final DiaryService diaryService;
 
-    public OverviewController(JwtUtil jwtUtil, TokenUtil tokenUtil, UserService userService, HabitService habitService, DailyService dailyService, ChallengeService challengeService, TodoService todoService) {
+    public OverviewController(JwtUtil jwtUtil, TokenUtil tokenUtil, UserService userService, HabitService habitService, DailyService dailyService, ChallengeService challengeService, TodoService todoService, DiaryService diaryService) {
         this.jwtUtil = jwtUtil;
         this.tokenUtil = tokenUtil;
         this.userService = userService;
@@ -34,6 +36,7 @@ public class OverviewController {
         this.dailyService = dailyService;
         this.challengeService = challengeService;
         this.todoService = todoService;
+        this.diaryService = diaryService;
     }
 
     @GetMapping("")
@@ -76,6 +79,12 @@ public class OverviewController {
         model.addAttribute("newTodo", new TodoDTO());
         List<Todo> activeTodos = this.todoService.getActiveTodos(user);
         model.addAttribute("activeTodos", activeTodos);
+
+        //Diary
+        model.addAttribute("newDiary", new DiaryDTO());
+        List<Diary> diaries = diaryService.getDiariesByUser(user);
+        model.addAttribute("diaries", diaries);
+
 
         return "client/overview";
     }

@@ -33,10 +33,8 @@ public class TodoController {
 
     @PostMapping("/save")
     public String saveTodo(@ModelAttribute("newTodo") TodoDTO todoDTO, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        String token = this.tokenUtil.getTokenFromCookies(request);
-        String username =  this.jwtUtil.getUserNameFromToken(token);
         try{
-            User user = this.userService.getUser(username);
+            User user = getUserFromRequest(request);
             this.todoService.saveTodo(todoDTO, user);
             redirectAttributes.addFlashAttribute("success", "Thêm mới thành công!");
         }catch(RuntimeException e){
@@ -50,9 +48,7 @@ public class TodoController {
     @GetMapping("/{todoId}")
     @ResponseBody
     public ResponseEntity<TodoDTO> getUpdateTodo(HttpServletRequest request, @PathVariable("todoId")Long id){
-        String token = this.tokenUtil.getTokenFromCookies(request);
-        String username =  this.jwtUtil.getUserNameFromToken(token);
-        User user = this.userService.getUser(username);
+        User user = getUserFromRequest(request);
         TodoDTO todoDTO = this.todoService.getUpdateTodo(user, id);
 
         return ResponseEntity.ok().body(todoDTO);
@@ -61,9 +57,7 @@ public class TodoController {
     @PostMapping("/{todoId}")
     public String updateTodo(HttpServletRequest request,@PathVariable("todoId") Long todoId,@ModelAttribute("newTodo")TodoDTO todoDTO,RedirectAttributes redirectAttributes){
         try{
-            String token = this.tokenUtil.getTokenFromCookies(request);
-            String username =  this.jwtUtil.getUserNameFromToken(token);
-            User user = this.userService.getUser(username);
+            User user = getUserFromRequest(request);
 
             this.todoService.updateTodo(todoDTO, user, todoId);
             redirectAttributes.addFlashAttribute("success","Sửa việc cần làm thành công!");
@@ -77,9 +71,7 @@ public class TodoController {
     @GetMapping("/delete/{todoId}")
     public String deleteTodo(HttpServletRequest request, @PathVariable("todoId")Long todoId,RedirectAttributes redirectAttributes){
         try{
-            String token = this.tokenUtil.getTokenFromCookies(request);
-            String username =  this.jwtUtil.getUserNameFromToken(token);
-            User user = this.userService.getUser(username);
+            User user = getUserFromRequest(request);
 
             this.todoService.deleteTodo(user,todoId);
             redirectAttributes.addFlashAttribute("success","Xóa việc cần làm thành công!");
@@ -94,9 +86,7 @@ public class TodoController {
     @GetMapping("/{todoId}/completion")
     @ResponseBody
     public ResponseEntity<TodoDTO> updateTodoCompletion(HttpServletRequest request,@PathVariable Long todoId) {
-        String token = this.tokenUtil.getTokenFromCookies(request);
-        String username =  this.jwtUtil.getUserNameFromToken(token);
-        User user = this.userService.getUser(username);
+        User user = getUserFromRequest(request);
         TodoDTO todoDTO = todoService.updateTodoCompletion(user,todoId,true);
         return ResponseEntity.ok().body(todoDTO);
     }
@@ -104,10 +94,14 @@ public class TodoController {
     @GetMapping("/{todoId}/subtasks/{subtaskId}/completion")
     @ResponseBody
     public ResponseEntity<TodoDTO> updateSubtaskCompletion(HttpServletRequest request,@PathVariable Long todoId, @PathVariable Long subtaskId) {
-        String token = this.tokenUtil.getTokenFromCookies(request);
-        String username =  this.jwtUtil.getUserNameFromToken(token);
-        User user = this.userService.getUser(username);
+        User user = getUserFromRequest(request);
         TodoDTO todoDTO = todoService.updateSubtaskCompletion(user,todoId, subtaskId);
         return ResponseEntity.ok().body(todoDTO);
+    }
+
+    private User getUserFromRequest(HttpServletRequest request) {
+        String token = tokenUtil.getTokenFromCookies(request);
+        String username =  this.jwtUtil.getUserNameFromToken(token);
+        return this.userService.getUser(username);
     }
 }
