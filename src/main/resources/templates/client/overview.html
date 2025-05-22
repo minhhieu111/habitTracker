@@ -998,6 +998,11 @@
                     const modalTitle = document.getElementById('diaryContent');
                     form.action = '/diaries/update';
                     modalTitle.textContent = 'Chỉnh sửa';
+console.log(diary)
+                    if(diary.today != diary.date){
+                        document.getElementById("updateTasksButton").style.display = 'none';
+                    }
+
 
                     const modalDiary = new bootstrap.Modal(document.getElementById("modalDiary"));
                     modalDiary.show();
