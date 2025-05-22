@@ -68,7 +68,7 @@ public class HomeController {
         return "client/home";
     }
 
-    @GetMapping("/api/calendar/{date}")
+    @GetMapping("/calendar/{date}")
     @ResponseBody
     public String getCalendarData(@PathVariable String date) {
         // Giả lập dữ liệu cho API
