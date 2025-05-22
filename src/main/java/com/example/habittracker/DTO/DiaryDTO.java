@@ -18,5 +18,5 @@ public class DiaryDTO {
     private MultipartFile image;
     private String imageUrl;
     private List<TaskDTO> completedTasks;
-
+    private LocalDate today;
 }

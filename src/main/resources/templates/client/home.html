@@ -250,6 +250,123 @@
                 </div>
             </div>
 
+            //modal calendar
+            <div class="modal fade" id="calendarDayModal" tabindex="-1" aria-labelledby="calendarDayModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <!-- Modal Header with Date Navigation -->
+                        <div class="modal-header text-center p-0" style="background-color: #2ecc71; color: white;">
+                            <button type="button" class="btn text-white" id="prevDayBtn">
+                                <i class="fas fa-circle-arrow-left fa-lg"></i>
+                            </button>
+                            <h5 class="modal-title flex-grow-1 py-3" id="calendarDayModalLabel">6/3/2025</h5>
+                            <button type="button" class="btn text-white" id="nextDayBtn">
+                                <i class="fas fa-circle-arrow-right fa-lg"></i>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                            <!-- Daily Habits Section -->
+                            <div class="mb-4">
+                                <h6 class="mb-2">Thói quen hàng ngày:</h6>
+                                <div class="bg-light p-3 rounded">
+                                    <div class="daily-habit-item mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dailyHabit1">
+                                            <label class="form-check-label" for="dailyHabit1">
+                                                <i class="fas fa-times text-danger me-2"></i>
+                                                Ngủ trước 10 giờ
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="daily-habit-item mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dailyHabit2">
+                                            <label class="form-check-label" for="dailyHabit2">
+                                                <i class="fas fa-times text-danger me-2"></i>
+                                                Tập thể dục
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="daily-habit-item">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="dailyHabit3" checked>
+                                            <label class="form-check-label" for="dailyHabit3">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Học Tiếng Anh
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Todo Tasks Section -->
+                            <div class="mb-4">
+                                <h6 class="mb-2">Việc cần làm:</h6>
+                                <div class="bg-light p-3 rounded">
+                                    <div class="todo-item mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="todo1">
+                                            <label class="form-check-label" for="todo1">
+                                                <i class="fas fa-times text-danger me-2"></i>
+                                                Quét, lau nhà
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="todo-item mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="todo2">
+                                            <label class="form-check-label" for="todo2">
+                                                <i class="fas fa-times text-danger me-2"></i>
+                                                Giặt quần áo
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="todo-item">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="todo3" checked>
+                                            <label class="form-check-label" for="todo3">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                Dọn phòng
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Habits with Scores Section -->
+                            <div class="mb-4">
+                                <h6 class="mb-2">Thói Quen:</h6>
+                                <div class="bg-light p-3 rounded">
+                                    <div class="habit-score-item d-flex justify-content-between align-items-center mb-2">
+                                        <span>Quét, lau nhà</span>
+                                        <span class="badge text-white" style="background-color: #f39c12;">+3</span>
+                                    </div>
+                                    <div class="habit-score-item d-flex justify-content-between align-items-center mb-2">
+                                        <span>Giặt quần áo</span>
+                                        <span class="badge text-white" style="background-color: #2ecc71;">+5</span>
+                                    </div>
+                                    <div class="habit-score-item d-flex justify-content-between align-items-center">
+                                        <span>Dọn phòng</span>
+                                        <span class="badge text-white" style="background-color: #e74c3c;">-2</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Journal Section -->
+                            <div>
+                                <h6 class="mb-2">Nhật Ký:</h6>
+                                <select class="form-select bg-light">
+                                    <option selected>Ngày 1</option>
+                                    <option>Ngày 2</option>
+                                    <option>Ngày 3</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -400,7 +517,7 @@
             selectedDateElement = element;
 
             // Fetch day info
-            fetch(`/api/calendar/${date}`)
+            fetch(`/calendar/${date}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("Lỗi mạng hoặc API không phản hồi");
@@ -415,12 +532,6 @@
                 });
         }
     });
-
-
-
 </script>
 </body>
 </html>
-
-
-

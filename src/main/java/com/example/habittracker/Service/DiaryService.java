@@ -76,6 +76,7 @@ public class DiaryService {
                 .content(diary.getContent())
                 .imageUrl(diary.getImageUrl())
                 .completedTasks(completedTasks)
+                .today(LocalDate.now())
                 .build();
     }
 
