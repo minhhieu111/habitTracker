@@ -479,7 +479,7 @@
             </div>
         </div>
 
-        <!-- Journal Column -->
+        <!-- Diary Column -->
         <div class="task-column">
             <div class="column-header">Viết Nhật Ký</div>
             <button class="add-task-button" onclick="openDiaryCreateModal()">
@@ -492,7 +492,7 @@
                     </button>
                 </div>
             </div>
-            <div class="column-footer">
+            <div th:if="${(diaries.size() >= 6 ? false : true)}" class="column-footer">
                 Hãy ghi lại những thay đổi của bạn hôm nay
             </div>
         </div>
@@ -515,7 +515,7 @@
                                     <label for="diaryImage" class="form-label">Tải ảnh lên</label>
                                     <input type="file" class="form-control" id="diaryImage" name="image" accept="image/*">
                                     <div class="d-flex justify-content-center w-100">
-                                        <img id="diaryImagePreview" class="img-fluid mt-1" style="max-width: 300px; display: none;" />
+                                        <img id="diaryImagePreview" class="img-fluid mt-1" style="max-width: 300px; max-height: 400px; display: none;" />
                                     </div>
 
                                 </div>
@@ -998,7 +998,7 @@
                     const modalTitle = document.getElementById('diaryContent');
                     form.action = '/diaries/update';
                     modalTitle.textContent = 'Chỉnh sửa';
-console.log(diary)
+
                     if(diary.today != diary.date){
                         document.getElementById("updateTasksButton").style.display = 'none';
                     }

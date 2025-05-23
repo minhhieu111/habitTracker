@@ -22,4 +22,7 @@ public interface HabitHistoryRepository extends JpaRepository<HabitHistory, Long
 
     @Query("SELECT hh.userHabit.userHabitId FROM HabitHistory hh WHERE hh.userHabit.user = :user AND hh.isCompleted = true AND DATE(hh.date) = :date")
     List<Long> findCompletedHabitIdsByUserAndDate(@Param("user") User user, @Param("date")LocalDate date);
+
+    @Query("SELECT hh FROM HabitHistory hh WHERE hh.userHabit.user = :user AND hh.isCompleted = true AND DATE(hh.date) = :date")
+    List<HabitHistory> findCompletedHabitHisByUserAndDate(@Param("user") User user, @Param("date")LocalDate date);
 }
