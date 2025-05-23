@@ -164,6 +164,7 @@ select {
     border: 1px solid #ddd;
     background-color: #fff;
     border-radius: 10px;
+    text-align: center;
 }
 
 /* Habit cards */
@@ -328,4 +329,19 @@ select {
 .coin-icon {
     width: 20px;
     height: 20px;
+}
+
+/*calendar-content*/
+.tasks-contain{
+    max-height: calc(2 * 62px);
+    overflow-y: auto;
+}
+
+.tasks-contain::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tasks-contain::-webkit-scrollbar-thumb {
+    background-color: #d3d3d3;
+    border-radius: 4px;
 }

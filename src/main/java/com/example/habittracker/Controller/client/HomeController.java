@@ -2,12 +2,15 @@ package com.example.habittracker.Controller.client;
 
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
+import com.example.habittracker.DTO.CalendarDTO;
 import com.example.habittracker.Domain.Reward;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Domain.UserChallenge;
+import com.example.habittracker.Service.CalendarService;
 import com.example.habittracker.Service.ChallengeService;
 import com.example.habittracker.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -26,20 +28,19 @@ public class HomeController {
     private final TokenUtil tokenUtil;
     private final JwtUtil jwtUtil;
     private final ChallengeService challengeService;
+    private final CalendarService calendarService;
 
-    public HomeController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService) {
+    public HomeController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, CalendarService calendarService) {
         this.userService = userService;
         this.tokenUtil = tokenUtil;
-
         this.jwtUtil = jwtUtil;
         this.challengeService = challengeService;
+        this.calendarService = calendarService;
     }
 
     @GetMapping("/home")
     public String home(Model model, HttpServletRequest request) {
-        String token = tokenUtil.getTokenFromCookies(request);
-        String userName = jwtUtil.getUserNameFromToken(token);
-        User user = this.userService.getUser(userName);
+        User user = getUserFromRequest(request);
 
         model.addAttribute("user", user);
 
@@ -70,14 +71,16 @@ public class HomeController {
 
     @GetMapping("/calendar/{date}")
     @ResponseBody
-    public String getCalendarData(@PathVariable String date) {
-        // Giả lập dữ liệu cho API
-        try {
-            LocalDate selectedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            return "Thông tin cho ngày " + selectedDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) +
-                    ": Bạn có 10 thói quen cần hoàn thành.";
-        } catch (Exception e) {
-            return "Lỗi: Định dạng ngày không hợp lệ.";
-        }
+    public ResponseEntity<CalendarDTO> getCalendarData(@PathVariable String date, HttpServletRequest request) {
+        User user = getUserFromRequest(request);
+        CalendarDTO calenderResponse = this.calendarService.calendarResponse(user, date);
+
+        return ResponseEntity.ok(calenderResponse);
+    }
+
+    private User getUserFromRequest(HttpServletRequest request) {
+        String token = tokenUtil.getTokenFromCookies(request);
+        String username =  this.jwtUtil.getUserNameFromToken(token);
+        return this.userService.getUser(username);
     }
 }
