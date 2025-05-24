@@ -19,18 +19,12 @@ public class Habit {
     private String title;
     private String description;
     @Enumerated(EnumType.STRING)
-    private Difficulty difficulty;
-    @Enumerated(EnumType.STRING)
     private HabitType type;
     private LocalDateTime createAt = LocalDateTime.now();
     private Long challengeId;
 
     @OneToMany(mappedBy = "habit")
     private List<UserHabit> userHabits;
-
-    public enum Difficulty {
-        EASY, MEDIUM, HARD
-    }
 
     public enum HabitType {
         POSITIVE, NEGATIVE, BOTH
