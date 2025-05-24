@@ -27,27 +27,21 @@ public class Diary {
     private User user;
 
     @ManyToMany
-    @JoinTable(
-            name = "diary_user_habit",
+    @JoinTable(name = "diary_user_habit",
             joinColumns = @JoinColumn(name = "diary_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_habit_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "user_habit_id"))
     private List<UserHabit> userHabitList;
 
     @ManyToMany
-    @JoinTable(
-            name = "diary_user_daily",
+    @JoinTable(name = "diary_user_daily",
             joinColumns = @JoinColumn(name = "diary_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_daily_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "user_daily_id"))
     private List<UserDaily> userDailyList;
 
     @ManyToMany
-    @JoinTable(
-            name = "diary_todo",
+    @JoinTable(name = "diary_todo",
             joinColumns = @JoinColumn(name = "diary_id"),
-            inverseJoinColumns = @JoinColumn(name = "todo_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "todo_id"))
     private List<Todo> todoList;
 
 }

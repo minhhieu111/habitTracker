@@ -49,11 +49,8 @@ public class User {
     List<Reward> rewards;
 
 
-    @ManyToMany
-    @JoinTable(name = "user_achievement",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "achievement_id")})
-    List<Achievement> achievements;
+    @OneToMany(mappedBy = "user")
+    List<UserAchievement> userAchievements;
 
 
     @OneToMany(mappedBy = "user")

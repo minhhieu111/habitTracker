@@ -19,6 +19,6 @@ public class Achievement {
     private String description;
     private Long requiredLevel;
 
-    @ManyToMany(mappedBy = "achievements")
-    private List<User> users;
+    @OneToMany(mappedBy = "achievement")
+    List<UserAchievement> userAchievements;
 }
