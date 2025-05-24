@@ -18,7 +18,7 @@ public class UserHabit {
     private Long userHabitId;
     private Long currentCount;
     private Long targetCount;
-    private String EmailMessage;
+    private String emailMessage;
     private LocalDateTime timeSendEmail;
     private Long negativeCount = 0L;
     private Long positiveCount = 0L;
@@ -34,4 +34,11 @@ public class UserHabit {
 
     @OneToMany(mappedBy = "userHabit")
     private List<HabitHistory> habitHistories;
+
+    @Enumerated(EnumType.STRING)
+    private Difficulty difficulty;
+
+    public enum Difficulty {
+        EASY, MEDIUM, HARD
+    }
 }

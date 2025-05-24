@@ -52,7 +52,6 @@ public class HabitService {
         createHabit.setTitle(habitDTO.getTitle());
         createHabit.setDescription(habitDTO.getDescription());
         createHabit.setType(habitDTO.getType());
-        createHabit.setDifficulty(habitDTO.getDifficulty());
         this.habitRepository.save(createHabit);
 
         UserHabit userHabit = new UserHabit();
@@ -60,6 +59,7 @@ public class HabitService {
         userHabit.setHabit(createHabit);
         userHabit.setTargetCount(habitDTO.getTargetCount());
         userHabit.setCurrentCount(0L);
+        userHabit.setDifficulty(habitDTO.getDifficulty()); // Thay đổi: Gán difficulty từ HabitDTO vào UserHabit
         this.userHabitRepository.save(userHabit);
     }
 
@@ -72,7 +72,7 @@ public class HabitService {
                 .title(userHabit.getHabit().getTitle())
                 .description(userHabit.getHabit().getDescription())
                 .type(userHabit.getHabit().getType())
-                .difficulty(userHabit.getHabit().getDifficulty())
+                .difficulty(userHabit.getDifficulty())
                 .targetCount(userHabit.getTargetCount())
                 .challengeId(userHabit.getHabit().getChallengeId())
                 .build();
@@ -93,13 +93,13 @@ public class HabitService {
 
         habit.setTitle(habitDTO.getTitle());
         habit.setDescription(habitDTO.getDescription());
-        habit.setDifficulty(habitDTO.getDifficulty());
         habit.setType(habitDTO.getType());
         habit.setChallengeId(habitDTO.getChallengeId());
 
         this.habitRepository.save(habit);
         UserHabit userHabit = this.userHabitRepository.findUserHabitByHabitAndUser(habit,user).orElseThrow(()->new RuntimeException("Lỗi khi lưu dữ liệu chỉnh sửa!"));
         userHabit.setTargetCount(habitDTO.getTargetCount());
+        userHabit.setDifficulty(habitDTO.getDifficulty()); // Thay đổi: Cập nhật difficulty trong UserHabit
         this.userHabitRepository.save(userHabit);
     }
 
