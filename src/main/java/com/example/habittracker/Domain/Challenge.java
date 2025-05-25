@@ -16,11 +16,17 @@ public class Challenge {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long challengeId;
     private String title;
+    private String description;
     private Long day;
     @Enumerated(EnumType.STRING)
     private Visibility isPublic;
     private Long participantCount;
 
+    @OneToMany(mappedBy = "challenge")
+    private List<Habit> habits;
+
+    @OneToMany(mappedBy = "challenge")
+    private List<Daily> dailies;
 
     @OneToMany(mappedBy = "challenge")
     List<UserChallenge> userChallenges;

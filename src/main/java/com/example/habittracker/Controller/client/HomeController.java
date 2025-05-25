@@ -57,13 +57,6 @@ public class HomeController {
         model.addAttribute("today", today);
         model.addAttribute("months", new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
 
-        // User data
-        model.addAttribute("username", "Người mới bắt đầu");
-        model.addAttribute("level", 10);
-        model.addAttribute("experience", 120);
-        model.addAttribute("maxExperience", 200);
-        model.addAttribute("challengeDay", 24);
-
         model.addAttribute("newReward", new Reward());
         model.addAttribute("updateReward", new Reward());
         return "client/home";

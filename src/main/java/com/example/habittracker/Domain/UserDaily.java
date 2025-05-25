@@ -25,6 +25,13 @@ public class UserDaily {
     private LocalTime executionTime;
     private boolean isCompleted;
     private boolean isEnabled;
+    private Integer repeatEvery;
+
+    @Enumerated(EnumType.STRING)
+    private Daily.RepeatFrequency repeatFrequency;
+
+    @Enumerated(EnumType.STRING)
+    private Daily.Difficulty difficulty;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")
@@ -48,21 +55,6 @@ public class UserDaily {
     @Column(name = "day_of_month")
     private Set<Integer> repeatMonthDays = new HashSet<>();
 
-    private Integer repeatEvery;
-
-    @Enumerated(EnumType.STRING)
-    private RepeatFrequency repeatFrequency;
-
-    @Enumerated(EnumType.STRING)
-    private Difficulty difficulty;
-
-    public enum Difficulty {
-        EASY, MEDIUM, HARD
-    }
-
-    public enum RepeatFrequency {
-        DAILY, WEEKLY, MONTHLY
-    }
 
     public enum DayOfWeek {
         SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
