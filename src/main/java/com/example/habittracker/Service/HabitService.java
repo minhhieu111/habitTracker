@@ -1,10 +1,8 @@
 package com.example.habittracker.Service;
 
 import com.example.habittracker.DTO.HabitDTO;
-import com.example.habittracker.Domain.Habit;
-import com.example.habittracker.Domain.HabitHistory;
-import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserHabit;
+import com.example.habittracker.Domain.*;
+import com.example.habittracker.Repository.ChallengeRepository;
 import com.example.habittracker.Repository.HabitHistoryRepository;
 import com.example.habittracker.Repository.HabitRepository;
 import com.example.habittracker.Repository.UserHabitRepository;
@@ -20,12 +18,14 @@ public class HabitService {
     private final UserService userService;
     private final UserHabitRepository userHabitRepository;
     private final HabitHistoryRepository habitHistoryRepository;
+    private final ChallengeRepository challengeRepository;
 
-    public HabitService(HabitRepository habitRepository, UserService userService, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository) {
+    public HabitService(HabitRepository habitRepository, UserService userService, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, ChallengeRepository challengeRepository) {
         this.habitRepository = habitRepository;
         this.userService = userService;
         this.userHabitRepository = userHabitRepository;
         this.habitHistoryRepository = habitHistoryRepository;
+        this.challengeRepository = challengeRepository;
     }
 
     @Transactional
@@ -48,18 +48,24 @@ public class HabitService {
         if(habitDTO.getTargetCount() < 1 || habitDTO.getTargetCount() == null){
             throw new RuntimeException("Tạo Thói quen thất Bại! Mục tiêu không được để trống và mục tiêu phải lớn hơn 1");
         }
-        Habit createHabit = new Habit();
-        createHabit.setTitle(habitDTO.getTitle());
-        createHabit.setDescription(habitDTO.getDescription());
-        createHabit.setType(habitDTO.getType());
+        Challenge challenge = this.challengeRepository.findById(habitDTO.getChallengeId()).get();
+
+        Habit createHabit = Habit.builder()
+                .title(habitDTO.getTitle())
+                .description(habitDTO.getDescription())
+                .type(habitDTO.getType())
+                .difficulty(habitDTO.getDifficulty())
+                .targetCount(habitDTO.getTargetCount())
+                .challenge(challenge)
+                .build();
         this.habitRepository.save(createHabit);
 
         UserHabit userHabit = new UserHabit();
         userHabit.setUser(user);
         userHabit.setHabit(createHabit);
-        userHabit.setTargetCount(habitDTO.getTargetCount());
+        userHabit.setTargetCount(createHabit.getTargetCount());
         userHabit.setCurrentCount(0L);
-        userHabit.setDifficulty(habitDTO.getDifficulty()); // Thay đổi: Gán difficulty từ HabitDTO vào UserHabit
+        userHabit.setDifficulty(createHabit.getDifficulty());
         this.userHabitRepository.save(userHabit);
     }
 
@@ -69,12 +75,12 @@ public class HabitService {
         Habit habit = this.habitRepository.findById(habitId).orElseThrow(()->new RuntimeException("Lỗi khi chỉnh sửa thói quen!"));
         UserHabit userHabit = this.userHabitRepository.findUserHabitByHabitAndUser(habit,user).orElseThrow(()->new RuntimeException("Lỗi lấy dữ liệu chỉnh sửa!"));
         HabitDTO habitDTO = new HabitDTO().builder()
-                .title(userHabit.getHabit().getTitle())
-                .description(userHabit.getHabit().getDescription())
-                .type(userHabit.getHabit().getType())
+                .title(habit.getTitle())
+                .description(habit.getDescription())
+                .type(habit.getType())
                 .difficulty(userHabit.getDifficulty())
                 .targetCount(userHabit.getTargetCount())
-                .challengeId(userHabit.getHabit().getChallengeId())
+                .challengeId(habit.getChallenge() != null ? habit.getChallenge().getChallengeId() : null)
                 .build();
         return habitDTO;
     }
@@ -90,16 +96,16 @@ public class HabitService {
         if(habitDTO.getTargetCount() < 1 || habitDTO.getTargetCount() == null){
             throw new RuntimeException("Tạo Thói quen thất Bại! Mục tiêu không được để trống và mục tiêu phải lớn hơn 1");
         }
+        Challenge challenge = this.challengeRepository.findById(habitDTO.getChallengeId()).get();
 
         habit.setTitle(habitDTO.getTitle());
         habit.setDescription(habitDTO.getDescription());
         habit.setType(habitDTO.getType());
-        habit.setChallengeId(habitDTO.getChallengeId());
-
+        habit.setChallenge(challenge);
         this.habitRepository.save(habit);
         UserHabit userHabit = this.userHabitRepository.findUserHabitByHabitAndUser(habit,user).orElseThrow(()->new RuntimeException("Lỗi khi lưu dữ liệu chỉnh sửa!"));
         userHabit.setTargetCount(habitDTO.getTargetCount());
-        userHabit.setDifficulty(habitDTO.getDifficulty()); // Thay đổi: Cập nhật difficulty trong UserHabit
+        userHabit.setDifficulty(habitDTO.getDifficulty());
         this.userHabitRepository.save(userHabit);
     }
 

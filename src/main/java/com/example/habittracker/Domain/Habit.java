@@ -21,12 +21,22 @@ public class Habit {
     @Enumerated(EnumType.STRING)
     private HabitType type;
     private LocalDateTime createAt = LocalDateTime.now();
-    private Long challengeId;
+    @Enumerated(EnumType.STRING)
+    private Difficulty difficulty;
+    private Long targetCount;
+
+    @ManyToOne
+    @JoinColumn(name = "challenge_id")
+    private Challenge challenge;
 
     @OneToMany(mappedBy = "habit")
     private List<UserHabit> userHabits;
 
     public enum HabitType {
         POSITIVE, NEGATIVE, BOTH
+    }
+
+    public enum Difficulty {
+        EASY, MEDIUM, HARD
     }
 }

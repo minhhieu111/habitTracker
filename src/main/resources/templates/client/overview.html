@@ -192,7 +192,7 @@
                                 aria-label="Đóng"></button>
                     </div>
                     <div class="modal-body">
-                        Bạn có chắc chắn muốn xóa thói quen này?
+                        Bạn có chắc chắn muốn xóa thói quen này? Lịch sử về thói quen cũng sẽ bị xóa!
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary"
@@ -258,7 +258,7 @@
                                 <input type="hidden" id="dailyId" th:field="*{dailyId}" />
                                 <div class="mb-3">
                                     <label for="dailyTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="dailyTitle" th:field="*{title}" required>
+                                    <input type="text" class="form-control" id="dailyTitle" th:field="*{title}">
                                     <div id="dailyTitleError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
                                 </div>
                                 <div class="mb-3">
@@ -290,11 +290,12 @@
 
                             <!-- Repeat Every -->
                             <div class="mb-3" id="repeatEverySection" style="display: none">
-                                <label for="repeatEvery" class="form-label" >Lặp lại sau mỗi</label>
+                                <label for="repeatEvery" class="form-label">Lặp lại sau mỗi</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" id="repeatEvery" th:field="*{repeatEvery}" min="1" />
                                     <span class="input-group-text" id="repeatEveryUnit">Days</span>
                                 </div>
+                                <div id="repeatEveryError" class="text-danger mt-1" style="display: none;">Vui lòng nhập giá trị lớn hơn 0.</div>
                             </div>
 
                             <!-- Repeat Days (Weekly) -->
@@ -306,6 +307,7 @@
                                         <label class="form-check-label" th:for="'day-' + ${day}" th:text="${day}"></label>
                                     </div>
                                 </div>
+                                <div id="repeatDaysError" class="text-danger mt-1" style="display: none;">Vui lòng chọn ít nhất 1 ngày.</div>
                             </div>
 
                             <!-- Repeat Month Days (Monthly) -->
@@ -317,6 +319,7 @@
                                         <label class="form-check-label" th:for="'month-day-' + ${day}" th:text="${day}"></label>
                                     </div>
                                 </div>
+                                <div id="repeatMonthDaysError" class="text-danger mt-1" style="display: none;">Vui lòng chọn ít nhất 1 ngày trong tháng.</div>
                             </div>
 
                             <div class="mb-3">
@@ -354,7 +357,7 @@
                                 aria-label="Đóng"></button>
                     </div>
                     <div class="modal-body">
-                        Bạn có chắc chắn muốn xóa thói quen này?
+                        Bạn có chắc chắn muốn xóa thói quen này? Lịch sử về thói quen hàng ngày cũng sẽ bị xóa!
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary"
@@ -739,6 +742,7 @@
                 });
         };
 
+
         function toggleRepeatOptions() {
             const repeatFrequency = document.getElementById('repeatFrequency').value;
             const repeatEverySection = document.getElementById('repeatEverySection');
@@ -764,6 +768,61 @@
         }
         document.getElementById('repeatFrequency').addEventListener('change', toggleRepeatOptions);
 
+        // Validate form Daily
+        const dailyForm = document.getElementById("dailyForm");
+        const dailyTitleInput = document.getElementById("dailyTitle");
+        const dailyTitleError = document.getElementById("dailyTitleError");
+        const repeatEveryInput = document.getElementById("repeatEvery");
+        const repeatEveryError = document.getElementById("repeatEveryError");
+        const repeatDaysError = document.getElementById("repeatDaysError");
+        const repeatMonthDaysError = document.getElementById("repeatMonthDaysError");
+
+        dailyForm.addEventListener("submit", (e) => {
+            let valid = true;
+
+            if (dailyTitleInput.value.trim() === "") {
+                dailyTitleError.style.display = "block";
+                valid = false;
+            } else {
+                dailyTitleError.style.display = "none";
+            }
+
+            if (repeatEveryInput.value < 1 || repeatEveryInput.value === "") {
+                repeatEveryError.style.display = "block";
+                valid = false;
+            } else {
+                repeatEveryError.style.display = "none";
+            }
+
+            const frequency = document.getElementById('repeatFrequency').value;
+            if (frequency === "WEEKLY") {
+                const repeatDays = document.querySelectorAll('#repeatDaysSection input[type="checkbox"]:checked');
+                if (repeatDays.length === 0) {
+                    repeatDaysError.style.display = "block";
+                    valid = false;
+                } else {
+                    repeatDaysError.style.display = "none";
+                }
+            } else {
+                repeatDaysError.style.display = "none";
+            }
+
+            if (frequency === "MONTHLY") {
+                const repeatMonthDays = document.querySelectorAll('#repeatMonthDaysSection input[type="checkbox"]:checked');
+                if (repeatMonthDays.length === 0) {
+                    repeatMonthDaysError.style.display = "block";
+                    valid = false;
+                } else {
+                    repeatMonthDaysError.style.display = "none";
+                }
+            } else {
+                repeatMonthDaysError.style.display = "none";
+            }
+
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
 
         //Daily checked task
         window.dailyCheckedTask = (dailyId)=>{
@@ -806,8 +865,7 @@
                     alert("Có lỗi xảy ra khi cập nhật! Phiên đăng nhập hết hạn, mời đăng nhập lại!")
                 })
         }
-        // todo
-        // Open create todo modal
+        // Todo
         window.openTodoCreateModal = () => {
             document.getElementById("todoId").value = '';
             document.getElementById("todoTitle").value = '';
@@ -826,7 +884,6 @@
             modalTodo.show();
         };
 
-        // Open update todo modal
         window.openTodoUpdateModal = (todoId) => {
             fetch(`/todos/${todoId}`)
                 .then(response => {
@@ -869,7 +926,24 @@
                 });
         };
 
-        // Add subtask
+        //validate Todo
+        const todoForm = document.getElementById("todoForm");
+        const todoTitleInput = document.getElementById("todoTitle");
+        const todoTitleInputError = document.getElementById("todoTitleError");
+
+        todoForm.addEventListener("submit",(e) => {
+            let valid = true;
+
+            if(todoTitleInput.value === ""){
+                todoTitleInputError.style.display = "block";
+                valid = false;
+            }
+
+            if(!valid){
+                e.preventDefault()
+            }
+        })
+
         window.addSubtaskField = (title = '', subtaskId = '') => {
             const container = document.getElementById("subtasksContainer");
             const subtaskDiv = document.createElement("div");
@@ -918,7 +992,6 @@
                 })
         }
 
-        // Handle todo dropdown toggle
         document.querySelectorAll('.todo-dropdown-toggle').forEach(toggle => {
             toggle.addEventListener('click', function () {
                 const icon = this.querySelector('i');
@@ -932,6 +1005,7 @@
             });
         });
 
+        //Diary
         // Open create diary modal
         window.openDiaryCreateModal = () => {
             document.getElementById("diaryId").value = '';
@@ -1012,6 +1086,24 @@
                     alert('Không thể lấy dữ liệu nhật ký. Do phiên đăng nhập hết hạn! Mời đăng nhập lại');
                 });
         };
+
+        //validate Diary
+        const diaryForm = document.getElementById("diaryForm");
+        const diaryTitleInput = document.getElementById("diaryContentInput");
+        const diaryTitleInputError = document.getElementById("diaryContentError");
+
+        diaryForm.addEventListener("submit",(e) => {
+            let valid = true;
+
+            if(diaryTitleInput.value === ""){
+                diaryTitleInputError.style.display = "block";
+                valid = false;
+            }
+
+            if(!valid){
+                e.preventDefault()
+            }
+        })
 
         // Fetch completed tasks for today
         window.fetchCompletedTasks = () => {

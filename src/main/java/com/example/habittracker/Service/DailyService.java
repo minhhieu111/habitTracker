@@ -2,6 +2,7 @@ package com.example.habittracker.Service;
 
 import com.example.habittracker.DTO.DailyDTO;
 import com.example.habittracker.Domain.*;
+import com.example.habittracker.Repository.ChallengeRepository;
 import com.example.habittracker.Repository.DailyHistoryRepository;
 import com.example.habittracker.Repository.DailyRepository;
 import com.example.habittracker.Repository.UserDailyRepository;
@@ -18,11 +19,13 @@ public class DailyService {
     private final UserService userService;
     private final UserDailyRepository userDailyRepository;
     private final DailyHistoryRepository dailyHistoryRepository;
-    public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository, DailyHistoryRepository dailyHistoryRepository) {
+    private final ChallengeRepository challengeRepository;
+    public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository, DailyHistoryRepository dailyHistoryRepository, ChallengeRepository challengeRepository) {
         this.dailyRepository = dailyRepository;
         this.userService = userService;
         this.userDailyRepository = userDailyRepository;
         this.dailyHistoryRepository = dailyHistoryRepository;
+        this.challengeRepository = challengeRepository;
     }
 
     public List<UserDaily> getUserDaily(User user){
@@ -39,12 +42,16 @@ public class DailyService {
     @Transactional
     public void createDaily(DailyDTO dailyDTO, String username) {
         User creator = userService.getUser(username);
+        Challenge challenge = challengeRepository.findById(dailyDTO.getChallengeId()).get();
 
         Daily daily = Daily.builder()
                 .title(dailyDTO.getTitle())
                 .description(dailyDTO.getDescription())
+                .difficulty(dailyDTO.getDifficulty())
+                .repeatFrequency(dailyDTO.getRepeatFrequency())
+                .repeatEvery(dailyDTO.getRepeatEvery())
+                .challenge(challenge)
                 .createAt(LocalDate.now())
-                .challengeId(dailyDTO.getChallengeId())
                 .build();
         daily = dailyRepository.save(daily);
 
@@ -53,11 +60,11 @@ public class DailyService {
                 .daily(daily)
                 .streak(0L)
                 .executionTime(null)
+                .difficulty(daily.getDifficulty())
+                .repeatFrequency(daily.getRepeatFrequency())
+                .repeatEvery(daily.getRepeatEvery())
                 .repeatDays(dailyDTO.getRepeatDays())
                 .repeatMonthDays(dailyDTO.getRepeatMonthDays())
-                .repeatEvery(dailyDTO.getRepeatEvery())
-                .repeatFrequency(dailyDTO.getRepeatFrequency())
-                .difficulty(dailyDTO.getDifficulty())
                 .build();
         userDailyRepository.save(userDaily);
     }
@@ -80,7 +87,7 @@ public class DailyService {
                 .repeatEvery(userDaily.getRepeatEvery())
                 .repeatDays(userDaily.getRepeatDays())
                 .repeatMonthDays(userDaily.getRepeatMonthDays())
-                .challengeId(daily.getChallengeId())
+                .challengeId(daily.getChallenge() != null? daily.getChallenge().getChallengeId() : null)
                 .build();
     }
 
@@ -92,19 +99,19 @@ public class DailyService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy"));
         UserDaily userDaily = userDailyRepository.findByUserAndDaily(user, daily)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy UserDaily"));
+        Challenge challenge = challengeRepository.findById(dailyDTO.getChallengeId()).get();
 
         daily.setTitle(dailyDTO.getTitle());
         daily.setDescription(dailyDTO.getDescription());
-        daily.setChallengeId(dailyDTO.getChallengeId());
+        daily.setChallenge(challenge);
+        this.dailyRepository.save(daily);
 
+        userDaily.setDifficulty(dailyDTO.getDifficulty());
+        userDaily.setRepeatFrequency(dailyDTO.getRepeatFrequency());
+        userDaily.setRepeatEvery(dailyDTO.getRepeatEvery());
         userDaily.setRepeatDays(dailyDTO.getRepeatDays());
         userDaily.setRepeatMonthDays(dailyDTO.getRepeatMonthDays());
-        userDaily.setRepeatEvery(dailyDTO.getRepeatEvery());
-        userDaily.setRepeatFrequency(dailyDTO.getRepeatFrequency());
-        userDaily.setDifficulty(dailyDTO.getDifficulty());
-
-        dailyRepository.save(daily);
-        userDailyRepository.save(userDaily);
+        this.userDailyRepository.save(userDaily);
     }
 
     @Transactional

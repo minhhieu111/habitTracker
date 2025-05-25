@@ -36,9 +36,5 @@ public class UserHabit {
     private List<HabitHistory> habitHistories;
 
     @Enumerated(EnumType.STRING)
-    private Difficulty difficulty;
-
-    public enum Difficulty {
-        EASY, MEDIUM, HARD
-    }
+    private Habit.Difficulty difficulty;
 }
