@@ -30,7 +30,7 @@
     <!-- Content Area -->
     <div class="content-area">
         <!-- Add Challenge Button -->
-        <button class="btn add-challenge-btn">
+        <button class="btn add-challenge-btn" onclick="openCreateChallengeModal()">
             <i class="fas fa-plus"></i> Thêm thử thách
         </button>
 
@@ -66,19 +66,189 @@
             </div>
         </div>
     </div>
-</div>
 
+    <!--Challenge Modal -->
+    <div class="modal fade" id="ChallengeModal" tabindex="-1" aria-labelledby="ChallengeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header text-center p-0" style="background-color: #f7b924; color: #000;">
+                    <h5 class="modal-title w-100 py-3 mb-0 fw-bold" id="ChallengeModalLabel"></h5>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <form id="ChallengeForm" class="p-4">
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label for="challengeTitle" class="form-label fw-bold">Tiêu đề</label>
+                            <input type="text" class="form-control bg-light border-0" id="challengeTitle" style="height: 45px; box-shadow: 0px 4px 5px 0px #dfdfdf">
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="challengeDescription" class="form-label fw-bold">Mô tả</label>
+                            <textarea class="form-control bg-light border-0" id="challengeDescription" rows="3" style="; box-shadow: 0px 4px 5px 0px #dfdfdf;"></textarea>
+                        </div>
+
+                        <div class="p-5">
+                            <!-- End Date -->
+                            <div class="mb-3">
+                                <label for="challengeEndDate" class="form-label fw-bold">Ngày kết thúc</label>
+                                <input type="date" class="form-control bg-light border-0" id="challengeEndDate" style="height: 45px;; box-shadow: 0px 4px 5px 0px #dfdfdf;">
+                            </div>
+
+                            <!-- Duration -->
+                            <div class="mb-4">
+                                <div class="col-md-12">
+                                    <label for="challengeDuration" class="form-label fw-bold">Số ngày thực hiện thử thách</label>
+                                    <div class="input-group" style="; box-shadow: 0px 4px 5px 0px #dfdfdf;">
+                                        <input type="number" class="form-control bg-light border-0" id="challengeDuration" disabled="true" style="height: 45px;">
+                                        <span class="btn btn-secondary disabled" style="height: 45px; line-height: 33px;">Ngày</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Daily Tasks Section -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Thói quen hàng ngày</label>
+                                <div class="bg-light p-3 rounded">
+                                    <button type="button" class="btn btn-light border mb-3 w-100 text-start" id="addDailyTaskBtn">
+                                        <i class="fas fa-plus me-2"></i>Thêm công việc
+                                    </button>
+
+                                    <div id="dailyTasksList">
+                                        <div class="daily-task-item mb-2">
+                                            <div class="bg-white p-2 rounded d-flex justify-content-between align-items-center" style="box-shadow: 0px 4px 5px 0px #dfdfdf;">
+                                                <span>Thiền</span>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDailyTask(this)">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Habits Section -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Thói quen</label>
+                                <div class="bg-light p-3 rounded">
+                                    <button type="button" class="btn btn-light border mb-3 w-100 text-start" id="addHabitBtn">
+                                        <i class="fas fa-plus me-2"></i>Thêm công việc
+                                    </button>
+
+                                    <div id="habitsList">
+                                        <div class="habit-item mb-2">
+                                            <div class="bg-white p-2 rounded d-flex justify-content-between align-items-center" style="; box-shadow: 0px 4px 5px 0px #dfdfdf;">
+                                                <span>Giãn cơ 5 phút</span>
+                                                <div class="d-flex align-items-center">
+                                                    <button type="button" class="btn btn-sm rounded-circle me-2" style="background-color: #28a745; width: 25px; height: 25px;"></button>
+                                                    <button type="button" class="btn btn-sm rounded-circle me-2" style="background-color: #dc3545; width: 25px; height: 25px;"></button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHabit(this)">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="saveChallengeBtn">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Daily Task Modal -->
+    <div class="modal fade" id="addDailyTaskModal" tabindex="-1" aria-labelledby="addDailyTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDailyTaskModalLabel">Thêm công việc hàng ngày</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="dailyTaskName" class="form-label">Tên công việc</label>
+                        <input type="text" class="form-control" id="dailyTaskName" placeholder="Nhập tên công việc...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="confirmAddDailyTask">Thêm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Habit Modal -->
+    <div class="modal fade" id="addHabitModal" tabindex="-1" aria-labelledby="addHabitModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addHabitModalLabel">Thêm thói quen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="habitName" class="form-label">Tên thói quen</label>
+                        <input type="text" class="form-control" id="habitName" placeholder="Nhập tên thói quen...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="confirmAddHabit">Thêm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Add challenge button click
-        const addChallengeBtn = document.querySelector('.add-challenge-btn');
-        if (addChallengeBtn) {
-            addChallengeBtn.addEventListener('click', function () {
-                alert('Thêm thử thách mới');
-            });
+        window.openCreateChallengeModal = () =>{
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('sv-SE');
+            document.getElementById("challengeTitle").value = '';
+            document.getElementById("challengeDescription").value = '';
+            document.getElementById("challengeEndDate").value = formattedDate;
+            document.getElementById("challengeDuration").value = '1';
+            document.getElementById("dailyTasksList").innerHTML = '';
+            document.getElementById("habitsList").innerHTML = '';
+
+            const formChallenge = document.getElementById("ChallengeForm")
+            const ChallengeTitleModal = document.getElementById("ChallengeModalLabel");
+
+            formChallenge.action = '/challenges/save';
+            ChallengeTitleModal.textContent = "Tạo thử thách mới";
+
+            const modalChallenge = new bootstrap.Modal(document.getElementById("ChallengeModal"))
+            modalChallenge.show();
         }
 
-        // Search functionality
+        const challengeEndDate = document.getElementById("challengeEndDate");
+
+        challengeEndDate.addEventListener("change",()=>{
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            console.log(today)
+            const end = new Date(challengeEndDate.value);
+            end.setHours(0, 0, 0, 0);
+
+            document.getElementById("challengeDuration").value = (Math.ceil((end - today) / (1000 * 60 * 60 * 24))) + 1;
+        })
+
         const searchInput = document.querySelector('.search-input');
         if (searchInput) {
             searchInput.addEventListener('keyup', function () {
@@ -107,6 +277,7 @@
                 console.log('Clicked on challenge:', challengeName);
             });
         });
+
     });
 
 </script>
