@@ -31,9 +31,7 @@ public class Challenge {
     @OneToMany(mappedBy = "challenge")
     List<UserChallenge> userChallenges;
 
-    enum Visibility {
+    public enum Visibility {
         PUBLIC, PRIVATE
     }
-
-
 }

@@ -74,6 +74,7 @@
                 <!-- Modal Header -->
                 <div class="modal-header text-center p-0" style="background-color: #f7b924; color: #000;">
                     <h5 class="modal-title w-100 py-3 mb-0 fw-bold" id="ChallengeModalLabel"></h5>
+                    <input type="hidden" id="challengeId" value="">
                 </div>
 
                 <!-- Modal Body -->
@@ -88,21 +89,21 @@
                         <!-- Description -->
                         <div class="mb-3">
                             <label for="challengeDescription" class="form-label fw-bold">Mô tả</label>
-                            <textarea class="form-control bg-light border-0" id="challengeDescription" rows="3" style="; box-shadow: 0px 4px 5px 0px #dfdfdf;"></textarea>
+                            <textarea class="form-control bg-light border-0" id="challengeDescription" rows="3" style="box-shadow: 0px 4px 5px 0px #dfdfdf;"></textarea>
                         </div>
 
                         <div class="p-5">
                             <!-- End Date -->
                             <div class="mb-3">
                                 <label for="challengeEndDate" class="form-label fw-bold">Ngày kết thúc</label>
-                                <input type="date" class="form-control bg-light border-0" id="challengeEndDate" style="height: 45px;; box-shadow: 0px 4px 5px 0px #dfdfdf;">
+                                <input type="date" class="form-control bg-light border-0" id="challengeEndDate" style="height: 45px; box-shadow: 0px 4px 5px 0px #dfdfdf;">
                             </div>
 
                             <!-- Duration -->
                             <div class="mb-4">
                                 <div class="col-md-12">
                                     <label for="challengeDuration" class="form-label fw-bold">Số ngày thực hiện thử thách</label>
-                                    <div class="input-group" style="; box-shadow: 0px 4px 5px 0px #dfdfdf;">
+                                    <div class="input-group" style="box-shadow: 0px 4px 5px 0px #dfdfdf;">
                                         <input type="number" class="form-control bg-light border-0" id="challengeDuration" disabled="true" style="height: 45px;">
                                         <span class="btn btn-secondary disabled" style="height: 45px; line-height: 33px;">Ngày</span>
                                     </div>
@@ -113,7 +114,7 @@
                             <div class="mb-4">
                                 <label class="form-label fw-bold">Thói quen hàng ngày</label>
                                 <div class="bg-light p-3 rounded">
-                                    <button type="button" class="btn btn-light border mb-3 w-100 text-start" id="addDailyTaskBtn">
+                                    <button type="button" class="btn btn-light border mb-3 w-100 text-start" id="addDailyTaskBtn" data-bs-toggle="modal" data-bs-target="#modalDaily">
                                         <i class="fas fa-plus me-2"></i>Thêm công việc
                                     </button>
 
@@ -126,7 +127,6 @@
                                                 </button>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -135,13 +135,13 @@
                             <div class="mb-4">
                                 <label class="form-label fw-bold">Thói quen</label>
                                 <div class="bg-light p-3 rounded">
-                                    <button type="button" class="btn btn-light border mb-3 w-100 text-start" id="addHabitBtn">
+                                    <button type="button" class="btn btn-light border mb-3 w-100 text-start" id="addHabitBtn" data-bs-toggle="modal" data-bs-target="#modalHabit">
                                         <i class="fas fa-plus me-2"></i>Thêm công việc
                                     </button>
 
                                     <div id="habitsList">
                                         <div class="habit-item mb-2">
-                                            <div class="bg-white p-2 rounded d-flex justify-content-between align-items-center" style="; box-shadow: 0px 4px 5px 0px #dfdfdf;">
+                                            <div class="bg-white p-2 rounded d-flex justify-content-between align-items-center" style="box-shadow: 0px 4px 5px 0px #dfdfdf;">
                                                 <span>Giãn cơ 5 phút</span>
                                                 <div class="d-flex align-items-center">
                                                     <button type="button" class="btn btn-sm rounded-circle me-2" style="background-color: #28a745; width: 25px; height: 25px;"></button>
@@ -166,48 +166,167 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Add Daily Task Modal -->
-    <div class="modal fade" id="addDailyTaskModal" tabindex="-1" aria-labelledby="addDailyTaskModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="modalHabit" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addDailyTaskModalLabel">Thêm công việc hàng ngày</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="dailyTaskName" class="form-label">Tên công việc</label>
-                        <input type="text" class="form-control" id="dailyTaskName" placeholder="Nhập tên công việc...">
+                <form id="habitForm" th:action="@{/habits/save}" method="post" th:object="${newHabit}">
+                    <div class="modal-header text-bg-warning p-4">
+                        <div class="w-100 ">
+                            <h4 id="habitContent" class="fw-bold mb-3">Tạo mới</h4>
+                            <input type="text" id="habitId" style="display: none" th:field="*{habitId}">
+                            <div class="mb-3" >
+                                <label for="habitTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="habitTitle" th:field="*{title}">
+                                <div id="habitTitleError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
+                            </div>
+                            <div class="mb-3" >
+                                <label for="habitDescription" class="form-label">Ghi chú</label>
+                                <textarea class="form-control" id="habitDescription" th:field="*{description}" rows="3" placeholder="Thêm ghi chú"></textarea>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" id="confirmAddDailyTask">Thêm</button>
-                </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label for="habitType" class="form-label">Loại</label>
+                            <select class="form-control" id="habitType" th:field="*{type}">
+                                <option th:each="type : ${newHabit.habitTypesOption}" th:value="${type}" th:text="${type}">Tích cực</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="habitDifficulty" class="form-label">Độ khó</label>
+                            <select class="form-control" id="habitDifficulty" th:field="*{difficulty}">
+                                <option th:each="difficult : ${newHabit.habitDifficultiesOption}" th:value="${difficult}" th:text="${difficult}">Dễ</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="habitTarget" class="form-label">Mục tiêu</label>
+                            <input type="number" class="form-control" id="habitTarget" th:field="*{targetCount}">
+                            <div id="habitTargetError" class="text-danger mt-1" style="display: none;">Vui lòng chọn mục tiêu >1</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="habitChallenge"  class="form-label">Thử thách</label>
+                            <select class="form-control"  id="habitChallenge" th:field="*{challengeId}">
+                                <option th:value="${null}" selected>Không có</option>
+                                <option th:each="challenge : ${userChallenges}" th:value="${challenge.getChallenge().getChallengeId()}" th:text="${challenge.getChallenge().getTitle()}"></option>
+                            </select>
+                        </div>
+
+                        <div class="modal-footer d-flex justify-content-between">
+                            <div>
+                                <button id="deleteHabitButton" style="display: none" type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteHabitModal">Xóa</button>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-primary">Lưu</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Add Habit Modal -->
-    <div class="modal fade" id="addHabitModal" tabindex="-1" aria-labelledby="addHabitModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="modalDaily" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addHabitModalLabel">Thêm thói quen</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="habitName" class="form-label">Tên thói quen</label>
-                        <input type="text" class="form-control" id="habitName" placeholder="Nhập tên thói quen...">
+                <form id="dailyForm" th:action="@{dailies/create}" method="post" th:object="${newDaily}">
+                    <div class="modal-header text-bg-warning p-4">
+                        <div class="w-100">
+                            <h4 id="DailyModalTitle" class="fw-bold mb-3">Tạo mới Daily</h4>
+                            <input type="hidden" id="dailyId" th:field="*{dailyId}" />
+                            <div class="mb-3">
+                                <label for="dailyTitle" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="dailyTitle" th:field="*{title}">
+                                <div id="dailyTitleError" class="text-danger mt-1" style="display: none;">Vui lòng nhập tiêu đề.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="dailyDes" class="form-label">Ghi chú</label>
+                                <textarea class="form-control" id="dailyDes" th:field="*{description}" rows="3" placeholder="Thêm ghi chú"></textarea>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" id="confirmAddHabit">Thêm</button>
-                </div>
+                    <div class="modal-body p-4">
+                        <!-- Difficulty -->
+                        <div class="mb-3">
+                            <label for="dailyDifficulty" class="form-label">Độ khó</label>
+                            <select class="form-control" id="dailyDifficulty" th:field="*{difficulty}">
+                                <option th:each="diff : ${newDaily.difficultyOptions}"
+                                        th:value="${diff}"
+                                        th:text="${diff}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Repeat Frequency -->
+                        <div class="mb-3">
+                            <label for="repeatFrequency" class="form-label">Tần suất lặp lại</label>
+                            <select class="form-control" id="repeatFrequency" th:field="*{repeatFrequency}">
+                                <option th:each="freq : ${newDaily.repeatFrequencyOptions}"
+                                        th:value="${freq}"
+                                        th:text="${freq}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Repeat Every -->
+                        <div class="mb-3" id="repeatEverySection" style="display: none">
+                            <label for="repeatEvery" class="form-label">Lặp lại sau mỗi</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="repeatEvery" th:field="*{repeatEvery}" min="1" />
+                                <span class="input-group-text" id="repeatEveryUnit">Days</span>
+                            </div>
+                            <div id="repeatEveryError" class="text-danger mt-1" style="display: none;">Vui lòng nhập giá trị lớn hơn 0.</div>
+                        </div>
+
+                        <!-- Repeat Days (Weekly) -->
+                        <div class="mb-3" id="repeatDaysSection" style="display: none;">
+                            <label class="form-label">Lặp lại vào</label>
+                            <div style="width: 100%">
+                                <div th:each="day : ${newDaily.dayOfWeekOptions}" class="form-check form-check-inline" style="width: 20%">
+                                    <input class="form-check-input" type="checkbox" th:field="*{repeatDays}" th:value="${day}" th:id="'day-' + ${day}">
+                                    <label class="form-check-label" th:for="'day-' + ${day}" th:text="${day}"></label>
+                                </div>
+                            </div>
+                            <div id="repeatDaysError" class="text-danger mt-1" style="display: none;">Vui lòng chọn ít nhất 1 ngày.</div>
+                        </div>
+
+                        <!-- Repeat Month Days (Monthly) -->
+                        <div class="mb-3" id="repeatMonthDaysSection" style="display: none;">
+                            <label class="form-label">Lặp lại vào ngày</label>
+                            <div class="d-flex flex-wrap gap-2" style="max-height: 150px; width: 100%; overflow-y: auto;">
+                                <div th:each="day : ${#numbers.sequence(1, 31)}" class="form-check form-check-inline" style="width: 14%">
+                                    <input class="form-check-input" type="checkbox" th:field="*{repeatMonthDays}" th:value="${day}" th:id="'month-day-' + ${day}" />
+                                    <label class="form-check-label" th:for="'month-day-' + ${day}" th:text="${day}"></label>
+                                </div>
+                            </div>
+                            <div id="repeatMonthDaysError" class="text-danger mt-1" style="display: none;">Vui lòng chọn ít nhất 1 ngày trong tháng.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="dailyChallenge" class="form-label">Thử thách</label>
+                            <select class="form-control" id="dailyChallenge" th:field="*{challengeId}">
+                                <option th:value="${null}" selected>Không có</option>
+                                <option th:each="challenge : ${userChallenges}"
+                                        th:value="${challenge.getChallenge().getChallengeId()}"
+                                        th:text="${challenge.getChallenge().getTitle()}"></option>
+                            </select>
+                        </div>
+
+                        <div class="modal-footer d-flex justify-content-between">
+                            <div>
+                                <button id="deleteDailyButton" style="display: none" type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteDailyModal">Xóa</button>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-primary">Lưu</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
