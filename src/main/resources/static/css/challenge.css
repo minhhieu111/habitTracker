@@ -234,6 +234,15 @@ body {
     margin-left: 5px;
 }
 
+/*modal habit daily*/
+.modal-header input, .modal-header textarea{
+    background-color: rgba(253, 253, 253, 0.5);
+}
+
+.modal-header input:focus, .modal-header textarea:focus{
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     #sidebar {
