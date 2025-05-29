@@ -21,6 +21,7 @@ public class Challenge {
     @Enumerated(EnumType.STRING)
     private Visibility isPublic;
     private Long participantCount;
+    private Long creatorId;
 
     @OneToMany(mappedBy = "challenge")
     private List<Habit> habits;
