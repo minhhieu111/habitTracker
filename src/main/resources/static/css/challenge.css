@@ -210,6 +210,8 @@ body {
     font-size: 0.9rem;
     color: #666;
     margin-bottom: 15px;
+    overflow-x: hidden;
+    height: 21.5px;
 }
 
 .challenge-progress {
@@ -222,11 +224,26 @@ body {
     font-weight: bold;
 }
 
+.footer-content{
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    justify-content: space-between;
+}
+
 .streak-info {
     display: flex;
     align-items: center;
     font-size: 0.9rem;
     justify-content: end;
+}
+
+.update-button{
+    border: none;
+}
+
+.update-button:hover{
+    color: cornflowerblue;
 }
 
 .streak-info i {
