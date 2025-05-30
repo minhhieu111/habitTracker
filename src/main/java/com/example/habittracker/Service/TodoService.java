@@ -112,7 +112,7 @@ public class TodoService {
     public void deleteTodo(User user, Long todoId){
         Todo todo = this.todoRepository.findByUserAndTodoId(user, todoId).orElseThrow(()->new RuntimeException("Không tìm thấy việc cần làm!"));
 
-        this.todoSubTaskRepository.deleteAll();
+        this.todoSubTaskRepository.deleteAllByTodo(todo);
         this.todoRepository.delete(todo);
     }
 

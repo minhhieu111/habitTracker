@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+
 import java.util.List;
 import java.util.Optional;
 
@@ -15,4 +16,7 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
 
     @Query("SELECT uc FROM UserChallenge uc WHERE uc.user = :user AND uc.challenge = :challenge")
     Optional<UserChallenge> findByUserAndChallenge (@Param("user")User user,@Param("challenge") Challenge challenge);
+
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.challenge= :challenge")
+    Optional<UserChallenge> findByChallenge(@Param("challenge") Challenge challenge);
 }

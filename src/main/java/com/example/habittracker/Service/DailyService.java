@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DailyService {
@@ -75,7 +76,7 @@ public class DailyService {
         Daily daily = this.dailyRepository.findById(dailyId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy"));
         UserDaily userDaily = userDailyRepository.findByUserAndDaily(dailyUser, daily)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy UserDaily"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy dữ liệu"));
 
         return DailyDTO.builder()
                 .dailyId(daily.getDailyId())
@@ -98,7 +99,7 @@ public class DailyService {
         Daily daily = dailyRepository.findById(dailyDTO.getDailyId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy"));
         UserDaily userDaily = userDailyRepository.findByUserAndDaily(user, daily)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy UserDaily"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy dữ liệu"));
         Challenge challenge = challengeRepository.findById(dailyDTO.getChallengeId()).get();
 
         daily.setTitle(dailyDTO.getTitle());
@@ -120,7 +121,7 @@ public class DailyService {
         Daily daily = this.dailyRepository.findById(dailyId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy"));
         UserDaily userDaily = this.userDailyRepository.findByUserAndDaily(user, daily)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy UserDaily"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy dữ liệu"));
 
         if (daily == null && userDaily == null) {
             throw new RuntimeException("Có lỗi xảy ra khi xóa! Không tìm thấy thói quen để xóa");
@@ -162,7 +163,7 @@ public class DailyService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy"));
         User user = this.userService.getUser(username);
         UserDaily userDaily = this.userDailyRepository.findByUserAndDaily(user, daily)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy UserDaily"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy dữ liệu"));
         DailyDTO dailyDTO = new DailyDTO();
         LocalDate today = LocalDate.now();
 
@@ -245,6 +246,27 @@ public class DailyService {
                 this.dailyHistoryRepository.save(dailyHistory);
             }
         }
+    }
+
+    public List<DailyDTO> getDailiesByChallengeId(Long challengeId) {
+        List<UserDaily> userDailies = dailyRepository.findByChallenge_ChallengeId(challengeId);
+        return userDailies.stream().map(userDaily -> DailyDTO.builder()
+                .dailyId(userDaily.getDaily().getDailyId())
+                .title(userDaily.getDaily().getTitle())
+                .description(userDaily.getDaily().getDescription())
+                .difficulty(userDaily.getDaily().getDifficulty())
+                .repeatFrequency(userDaily.getDaily().getRepeatFrequency())
+                .repeatEvery(userDaily.getDaily().getRepeatEvery())
+                .repeatDays(userDaily.getRepeatDays())
+                .repeatMonthDays(userDaily.getRepeatMonthDays())
+                .build()).collect(Collectors.toList());
+    }
+
+    public void unlinkDailyFromChallenge(Long dailyId) {
+        Daily daily = dailyRepository.findById(dailyId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thói quen hàng ngày"));
+        daily.setChallenge(null);
+        dailyRepository.save(daily);
     }
 
     public DailyHistory findLastEnableHistory(UserDaily userDaily, LocalDate today){

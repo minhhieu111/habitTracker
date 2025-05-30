@@ -20,4 +20,7 @@ public interface UserHabitRepository extends JpaRepository<UserHabit,Long> {
     Optional<List<UserHabit>> findHabitsForUser(@Param("userId")Long userId);
 
     Optional<UserHabit> findUserHabitByHabitAndUser(Habit habit, User user);
+
+    @Query("SELECT uh FROM UserHabit uh WHERE uh.habit.challenge.challengeId = :challengeId")
+    List<UserHabit> findByChallenge_ChallengeId(@Param("challengeId")Long challengeId);
 }

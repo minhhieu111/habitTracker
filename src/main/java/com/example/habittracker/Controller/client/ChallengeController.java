@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -61,7 +62,63 @@ public class ChallengeController {
             this.challengeService.createChallenge(challengeDTO, user);
             redirectAttributes.addFlashAttribute("success", "Tạo Thử Thách Thành Công!");
         }catch (RuntimeException e){
-            redirectAttributes.addFlashAttribute("fail", e.getMessage());
+            redirectAttributes.addFlashAttribute("failed", e.getMessage());
+            return "redirect:/challenge_overview";
+        }
+        return "redirect:/challenge_overview";
+    }
+
+    @GetMapping("/{challengeId}")
+    @ResponseBody
+    public ResponseEntity<ChallengeDTO> getChallenge(@PathVariable Long challengeId) {
+        ChallengeDTO challengeDTO = challengeService.getChallengeById(challengeId);
+        if (challengeDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().body(challengeDTO);
+    }
+
+    @PostMapping("/{challengeId}")
+    public String updateChallenge(HttpServletRequest request,
+                                  @RequestParam("challengeId") Long challengeId,
+                                  @RequestParam("title") String title,
+                                  @RequestParam("description") String description,
+                                  @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                  @RequestParam("day") Long day,
+                                  @RequestParam("habits") String habitsJson,
+                                  @RequestParam("dailies") String dailiesJson, RedirectAttributes redirectAttributes) throws Exception{
+        try{
+            List<HabitDTO> habits = objectMapper.readValue(habitsJson, new TypeReference<List<HabitDTO>>() {});
+            List<DailyDTO> dailies = objectMapper.readValue(dailiesJson, new TypeReference<List<DailyDTO>>() {});
+
+            ChallengeDTO challengeDTO = ChallengeDTO.builder()
+                    .challengeId(challengeId)
+                    .title(title)
+                    .description(description)
+                    .endDate(endDate)
+                    .day(day)
+                    .habits(habits)
+                    .dailies(dailies)
+                    .build();
+
+            User user = getUserFromRequest(request);
+            this.challengeService.updateChallenge(challengeDTO, user);
+            redirectAttributes.addFlashAttribute("success", "Chỉnh sửa Thử Thách Thành Công!");
+        }catch (RuntimeException e){
+            redirectAttributes.addFlashAttribute("failed", e.getMessage());
+            return "redirect:/challenge_overview";
+        }
+        return "redirect:/challenge_overview";
+    }
+
+    @GetMapping("/delete/{challengeId}")
+    public String deleteChallenge(HttpServletRequest request,@PathVariable Long challengeId, RedirectAttributes redirectAttributes) {
+        try{
+            User user = getUserFromRequest(request);
+            this.challengeService.deleteChallenge(challengeId,user);
+            redirectAttributes.addFlashAttribute("success", "Xóa thử thách thành công!");
+        }catch(RuntimeException e){
+            redirectAttributes.addFlashAttribute("failed", e.getMessage());
             return "redirect:/challenge_overview";
         }
         return "redirect:/challenge_overview";

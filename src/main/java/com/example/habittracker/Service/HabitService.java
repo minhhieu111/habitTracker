@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class HabitService {
@@ -200,5 +201,25 @@ public class HabitService {
             userHabit.setCompleted(false);
             this.userHabitRepository.save(userHabit);
         }
+    }
+
+    public List<HabitDTO> getHabitsByChallengeId(Long challengeId) {
+        List<UserHabit> userHabits = userHabitRepository.findByChallenge_ChallengeId(challengeId);
+        return userHabits.stream().map(userHabit -> HabitDTO.builder()
+                .habitId(userHabit.getHabit().getHabitId())
+                .title(userHabit.getHabit().getTitle())
+                .description(userHabit.getHabit().getDescription())
+                .type(userHabit.getHabit().getType())
+                .difficulty(userHabit.getHabit().getDifficulty())
+                .targetCount(userHabit.getHabit().getTargetCount())
+                .challengeId(userHabit.getHabit().getChallenge() != null ? userHabit.getHabit().getChallenge().getChallengeId() : null)
+                .build()).collect(Collectors.toList());
+    }
+
+    public void unlinkHabitFromChallenge(Long habitId) {
+        Habit habit = habitRepository.findById(habitId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thây dữ liệu"));
+        habit.setChallenge(null);
+        habitRepository.save(habit);
     }
 }

@@ -44,13 +44,13 @@
             </div>
         </div>
 
-        <!-- Challenges Section -->
+
         <div class="challenges-header" th:text="'Thử Thách Đang Tham Gia: ' + ${challenges.size()}">
             Thử Thách Đang Tham Gia: 4
         </div>
 
         <div class="challenges-grid">
-            <div th:each="challenge : ${challenges}" class="challenge-card">
+            <div th:each="challenge : ${challenges}" class="challenge-card" >
                 <div class="challenge-name" th:text="${challenge.getChallenge().getTitle()}"></div>
                 <div class="challenge-description" th:text="${challenge.getChallenge().getDescription()}">
                     Mô tả:
@@ -60,8 +60,11 @@
                         Ngày thực hiện:
                     </span>
                 </div>
-                <div class="streak-info">
-                    <span th:text="'Chuỗi liên tiếp: ' + ${challenge.streak}">Chuỗi liên tiếp: </span><i class="fas fa-fire"></i>
+                <div class="footer-content">
+                    <button class="update-button" th:onclick="|openChallengeUpdateModal(${challenge.getChallenge().getChallengeId()})|">Chỉnh sửa</button>
+                    <div class="streak-info">
+                        <span th:text="'Chuỗi liên tiếp: ' + ${challenge.streak}">Chuỗi liên tiếp: </span><i class="fas fa-fire"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,16 +145,19 @@
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" id="saveChallengeBtn">Lưu</button>
+                <div class="modal-footer d-flex justify-content-between mx-5">
+                    <div>
+                        <button id="deleteChallengeButton" style="display: none" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteChallengeModal">Xóa</button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-primary" id="saveChallengeBtn">Lưu</button>
+                    </div>
                     <button type="button" class="btn btn-success" id="shareChallengeBtn" style="display: none;">Chia sẻ thử thách</button>
                 </div>
             </div>
         </div>
     </div>
-
-
 
     <!--modal daily-->
     <div class="modal fade" id="modalDaily" style="background-color: #b0b0b073;" tabindex="-1">
@@ -297,12 +303,30 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="deleteChallengeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa thử thách này? Các Task vẫn sẽ được giữ lại để bạn tiếp tục duy trì.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <a id="deleteChallenge" class="btn btn-danger" href="#">Xóa</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Mở modal tạo thử thách
+        // Modal create challenge
         window.openCreateChallengeModal = function() {
             const today = new Date();
             const formattedDate = today.toLocaleDateString('sv-SE');
@@ -313,6 +337,8 @@
             document.getElementById("dailyTasksList").innerHTML = '';
             document.getElementById("habitsList").innerHTML = '';
 
+            document.getElementById("deleteChallengeButton").style.display = "none";
+
             const formChallenge = document.getElementById("ChallengeForm");
             const ChallengeTitleModal = document.getElementById("ChallengeModalLabel");
 
@@ -321,6 +347,81 @@
 
             const modalChallenge = new bootstrap.Modal(document.getElementById("ChallengeModal"));
             modalChallenge.show();
+        };
+        // Modal update challenge
+        window.openChallengeUpdateModal = (challengeId)=> {
+            fetch(`/challenges/${challengeId}`)
+                .then(response => {
+                    if (response.url.includes('/login')) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(challenge => {
+                    console.log(challenge)
+                    document.getElementById("challengeId").value = challenge.challengeId;
+                    document.getElementById("challengeTitle").value = challenge.title;
+                    document.getElementById("challengeDescription").value = challenge.description;
+                    document.getElementById("challengeEndDate").value = challenge.endDate;
+                    document.getElementById("challengeDuration").value = challenge.day;
+                    document.getElementById("habitsField").value = JSON.stringify(challenge.habits);
+                    document.getElementById("dailiesField").value = JSON.stringify(challenge.dailies);
+
+                    document.getElementById("deleteChallengeButton").style.display = "block";
+                    document.getElementById("deleteChallenge").setAttribute("href",`/challenges/delete/${challengeId}`)
+
+                    habitsList = challenge.habits || [];
+                    dailiesList = challenge.dailies || [];
+
+                    // Hiển thị danh sách habits
+                    const habitsListElement = document.getElementById("habitsList");
+                    habitsListElement.innerHTML = '';
+                    habitsList.forEach((habit, index) => {
+                        const habitItem = document.createElement("div");
+                        habitItem.className = "habit-item mb-2";
+                        habitItem.innerHTML = `
+                        <div class="bg-white p-2 rounded d-flex justify-content-between align-items-center" style="box-shadow: 0px 4px 5px 0px #dfdfdf;">
+                            <span>${habit.title}</span>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm rounded-circle me-2" style="background-color: #28a745; width: 25px; height: 25px;"></button>
+                                <button type="button" class="btn btn-sm rounded-circle me-2" style="background-color: #dc3545; width: 25px; height: 25px;"></button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeHabit(this, ${index})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>`;
+                        habitsListElement.appendChild(habitItem);
+                    });
+
+                    // Hiển thị danh sách dailies
+                    const dailiesListElement = document.getElementById("dailyTasksList");
+                    dailiesListElement.innerHTML = '';
+                    dailiesList.forEach((daily, index) => {
+                        const dailyItem = document.createElement("div");
+                        dailyItem.className = "daily-task-item mb-2";
+                        dailyItem.innerHTML = `
+                        <div class="bg-white p-2 rounded d-flex justify-content-between align-items-center" style="box-shadow: 0px 4px 5px 0px #dfdfdf;">
+                            <span>${daily.title}</span>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDailyTask(this, ${index})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>`;
+                        dailiesListElement.appendChild(dailyItem);
+                    });
+
+                    const formChallenge = document.getElementById("ChallengeForm");
+                    const ChallengeTitleModal = document.getElementById("ChallengeModalLabel");
+                    formChallenge.action = `/challenges/${challengeId}`;
+                    ChallengeTitleModal.textContent = "Chỉnh sửa thử thách";
+
+                    const modalChallenge = new bootstrap.Modal(document.getElementById("ChallengeModal"));
+                    modalChallenge.show();
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu thử thách:', error);
+                    alert('Không thể lấy dữ liệu thử thách. Do phiên đăng nhập hết hạn! Mời đăng nhập lại');
+                });
         };
 
         const challengeEndDate = document.getElementById("challengeEndDate");
@@ -443,7 +544,6 @@
 
                 if (valid) {
                     const habit = { title, description, type, difficulty, targetCount: parseInt(targetCount) };
-                    console.log(habit)
                     addHabitToList(habit);
                     habitModal.hide();
                 }
