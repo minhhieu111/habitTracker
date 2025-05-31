@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/css/challenge.css">
     <link rel="stylesheet" href="/css/layout.css">
 </head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <body>
 
@@ -50,10 +51,12 @@
         </div>
 
         <div class="challenges-grid">
-            <div th:each="challenge : ${challenges}" class="challenge-card" >
-                <div class="challenge-name" th:text="${challenge.getChallenge().getTitle()}"></div>
-                <div class="challenge-description" th:text="${challenge.getChallenge().getDescription()}">
-                    Mô tả:
+            <div th:each="challenge : ${challenges}" class="challenge-card">
+                <div class="challenge-detail" th:onclick="|DetailChallenge(${challenge.getChallenge().getChallengeId()})|">
+                    <div class="challenge-name" th:text="${challenge.getChallenge().getTitle()}"></div>
+                    <div class="challenge-description" th:text="${challenge.getChallenge().getDescription()}">
+                        Mô tả:
+                    </div>
                 </div>
                 <div class="challenge-progress">
                     <span class="progress-text" th:text="'Ngày thực hiện: ' + ${challenge.getDaysSinceStart()} + '/' + ${challenge.getChallenge().getDay()}">
@@ -304,6 +307,7 @@
         </div>
     </div>
 
+<!--    delete challenge modal-->
     <div class="modal fade" id="deleteChallengeModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -321,6 +325,121 @@
             </div>
         </div>
     </div>
+
+    <!-- Challenge Overview Modal -->
+    <div class="modal fade" id="challengeOverviewModal" tabindex="-1" aria-labelledby="challengeOverviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header with Challenge Info -->
+                <div class="modal-header text-white p-4" style="background-color: #0049F2;">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12 text-center mb-3">
+                                <h1 class="modal-title fw-bold" id="challengeOverviewTitle">Thay Đổi Lối Sống</h1>
+                            </div>
+                        </div>
+                        <div class="row d-flex justify-content-center">
+                            <div class="col-8 text-center mb-3 ">
+                                <span class="mb-0">Mô tả</span>
+                                <div class="bg-light bg-opacity-25 rounded p-2 mt-1" style="height: 100px" id="challengeOverviewDescription">
+                                    Thay đổi thói quen trở nên lành mạnh
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="bg-white opacity-50">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h4 class="display-4 fw-bold" id="bestStreak">5</h4>
+                                <p class="mb-0">Chuỗi tốt nhất</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="display-4 fw-bold" id="completionRate">74%</h4>
+                                <p class="mb-0">Tỷ lệ hoàn thành</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="display-4 fw-bold" id="totalHabits">42</h4>
+                                <p class="mb-0">Tổng số thói quen thực hiện</p>
+                            </div>
+                        </div>
+                        <hr class="bg-white opacity-50">
+                    </div>
+                    <button type="button" class="btn-close btn-close-white position-absolute" style="top: 15px; right: 15px;" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <!-- Line Chart -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="chart-container" style="position: relative; height:250px;">
+                                    <canvas id="habitCompletionChart"></canvas>
+                                </div>
+                                <p class="text-center mt-2">Biểu đồ hoàn thiện các thói quen</p>
+                            </div>
+                        </div>
+
+                        <!-- Donut Chart and Calendar -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container" style="position: relative; height:250px;">
+                                    <canvas id="habitProgressChart"></canvas>
+                                </div>
+                                <div class="d-flex justify-content-center mt-2">
+                                    <div class="me-3">
+                                        <span class="badge rounded-pill" style="background-color: #0066ff;">&nbsp;</span>
+                                        <span>Bỏ qua</span>
+                                    </div>
+                                    <div>
+                                        <span class="badge rounded-pill" style="background-color: #05ff12;">&nbsp;</span>
+                                        <span>Hoàn Thành</span>
+                                    </div>
+                                </div>
+                                <p class="text-center">Biểu đồ về tiến độ thói quen</p>
+                            </div>
+
+                            <div class="col-md-6 d-flex justify-content-between">
+                                <!-- Calendar -->
+                                <div class="calendar">
+                                    <div class="calendar__opts">
+                                        <select name="calendar__month" id="calendar__month">
+                                            <option th:each="month, stat : ${months}"
+                                                    th:value="${stat.count}"
+                                                    th:selected="${stat.count == currentMonth}"
+                                                    th:text="${month}"></option>
+                                        </select>
+
+                                        <select name="calendar__year" id="calendar__year">
+                                            <option th:each="year : ${#numbers.sequence(currentYear - 5, currentYear + 5)}"
+                                                    th:value="${year}"
+                                                    th:selected="${year == currentYear}"
+                                                    th:text="${year}"></option>
+                                        </select>
+                                    </div>
+
+                                    <div class="calendar__body">
+                                        <div class="calendar__days">
+                                            <div>Su</div>
+                                            <div>Mo</div>
+                                            <div>Tu</div>
+                                            <div>We</div>
+                                            <div>Th</div>
+                                            <div>Fr</div>
+                                            <div>Sa</div>
+                                        </div>
+
+                                        <div class="calendar__dates" id="calendarDates">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -666,53 +785,53 @@
             document.getElementById("ChallengeForm").submit();
         });
 
-        shareChallengeBtn.addEventListener("click", function() {
-            const challengeId = document.getElementById("challengeId").value;
-            if (!challengeId) {
-                alert("Vui lòng chọn một thử thách để chia sẻ!");
-                return;
-            }
-
-            fetch(`/challenges/complete/${challengeId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        $('#ChallengeModal').modal('hide');
-                        loadCompletedChallenges();
-                    } else {
-                        alert("Lỗi: " + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert("Đã có lỗi xảy ra!");
-                });
-        });
-
-        function loadCompletedChallenges() {
-            fetch('/challenges/completed', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data) {
-                        console.log("Completed Challenges:", data);
-                        displayCompletedChallenges(data);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
+        // shareChallengeBtn.addEventListener("click", function() {
+        //     const challengeId = document.getElementById("challengeId").value;
+        //     if (!challengeId) {
+        //         alert("Vui lòng chọn một thử thách để chia sẻ!");
+        //         return;
+        //     }
+        //
+        //     fetch(`/challenges/complete/${challengeId}`, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         }
+        //     })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.success) {
+        //                 alert(data.message);
+        //                 $('#ChallengeModal').modal('hide');
+        //                 loadCompletedChallenges();
+        //             } else {
+        //                 alert("Lỗi: " + data.message);
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error:', error);
+        //             alert("Đã có lỗi xảy ra!");
+        //         });
+        // });
+        //
+        // function loadCompletedChallenges() {
+        //     fetch('/challenges/completed', {
+        //         method: 'GET',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         }
+        //     })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data) {
+        //                 console.log("Completed Challenges:", data);
+        //                 displayCompletedChallenges(data);
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error:', error);
+        //         });
+        // }
 
         function displayCompletedChallenges(challenges) {
             const container = document.getElementById("completedChallengesList") || document.createElement("div");
@@ -745,7 +864,7 @@
         }
 
         $('#ChallengeModal').on('shown.bs.modal', checkChallengeCompletion);
-    });
+
 
         const searchInput = document.querySelector('.search-input');
         if (searchInput) {
@@ -766,15 +885,204 @@
             });
         }
 
-        // Challenge card click
-        const challengeCards = document.querySelectorAll('.challenge-card');
-        challengeCards.forEach(function (card) {
-            card.addEventListener('click', function () {
-                const challengeNameElem = card.querySelector('.challenge-name');
-                const challengeName = challengeNameElem ? challengeNameElem.textContent : "Không rõ";
-                console.log('Clicked on challenge:', challengeName);
+        //detail modal
+        window.DetailChallenge = function(challengeId) {
+            showChallengeDetails(challengeId);
+        }
+
+        let completedDates = [];
+        function showChallengeDetails(challengeId) {
+        // Fetch challenge data from API
+        fetch(`/challenges/detail/challenge/${challengeId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                // Update modal with challenge data
+                $('#challengeTitle').text(data.name);
+                $('#challengeDescription').text(data.description);
+                $('#bestStreak').text(data.bestStreak);
+                $('#completionRate').text(data.completionRate + '%');
+                $('#totalHabits').text(data.totalHabitsCompleted);
+
+                // Initialize charts
+                initLineChart(data.lineChartData);
+                initDonutChart(data.donutChartData);
+
+                // Initialize calendar
+                completedDates = data.completedDates || [];
+                initCalendar();
+
+                // Show the modal
+                const challengeModal = new bootstrap.Modal(document.getElementById('challengeOverviewModal'));
+                challengeModal.show();
+            })
+            .catch(error => {
+                console.error('Error fetching challenge details:', error);
             });
+        }
+
+    // Initialize line chart
+        function initLineChart(data) {
+        const ctx = document.getElementById('habitCompletionChart').getContext('2d');
+
+        // Destroy existing chart if it exists and has destroy method
+        if (window.habitCompletionChart && typeof window.habitCompletionChart.destroy === 'function') {
+            window.habitCompletionChart.destroy();
+        }
+
+        // Create new chart
+        window.habitCompletionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(item => item.date),
+                datasets: [{
+                    label: 'Tỷ lệ hoàn thành (%)',
+                    data: data.map(item => item.value),
+                    fill: {
+                        target: 'origin',
+                        above: 'rgba(200, 220, 255, 0.5)',
+                    },
+                    borderColor: '#0066ff',
+                    tension: 0.4,
+                    pointBackgroundColor: '#0066ff',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
         });
+    }
+
+    // Initialize donut chart
+        function initDonutChart(data) {
+        const ctx = document.getElementById('habitProgressChart').getContext('2d');
+
+        // Destroy existing chart if it exists and has destroy method
+        if (window.habitProgressChart && typeof window.habitProgressChart.destroy === 'function') {
+            window.habitProgressChart.destroy();
+        }
+
+        // Create new chart
+        window.habitProgressChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Bỏ qua', 'Hoàn Thành'],
+                datasets: [{
+                    data: [data.remaining,data.completed],
+                    backgroundColor: ['#0066ff', '#05ff12'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Initialize calendar
+        function initCalendar() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+
+            // Update dropdowns
+            $('#calendar__month').val(currentMonth);
+            $('#calendar__year').val(currentYear);
+
+            // Generate calendar for current month
+            generateCalendar(currentYear, currentMonth);
+        }
+
+        // Function to generate calendar for a specific month and year
+        function generateCalendar(year, month) {
+            const calendarDates = document.getElementById('calendarDates');
+            calendarDates.innerHTML = '';
+
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0);
+
+            const firstDayOfWeek = firstDay.getDay(); // 0 = Sunday
+            const daysInMonth = lastDay.getDate();
+
+            // Previous month days
+            const prevMonthLastDay = new Date(year, month - 1, 0).getDate();
+            for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+                const greyDay = prevMonthLastDay - i;
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'calendar__date calendar__date--grey';
+                dateDiv.innerHTML = `<span>${greyDay}</span>`;
+                calendarDates.appendChild(dateDiv);
+            }
+
+            // Current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'calendar__date';
+                dateDiv.innerHTML = `<span>${day}</span>`;
+                dateDiv.setAttribute('data-date', dateStr);
+                dateDiv.addEventListener('click', function () {
+                    selectDay(dateStr, this);
+                });
+
+                // Highlight today
+                const today = new Date();
+                if (year === today.getFullYear() && month === today.getMonth() + 1 && day === today.getDate()) {
+                    dateDiv.classList.add('calendar__date--selected');
+                }
+
+                // Highlight completed dates
+                if (completedDates && completedDates.includes(dateStr)) {
+                    dateDiv.classList.add('calendar__date--completed');
+                }
+
+                calendarDates.appendChild(dateDiv);
+            }
+
+            // Next month days
+            const totalCellsUsed = firstDayOfWeek - 1 + daysInMonth;
+            const remainingCells = 42 - totalCellsUsed; // 6 rows x 7 columns = 42 cells
+            for (let i = 1; i <= remainingCells; i++) {
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'calendar__date calendar__date--grey';
+                dateDiv.innerHTML = `<span>${i}</span>`;
+                calendarDates.appendChild(dateDiv);
+            }
+        }
+
+        // Month and year change handlers
+        $('#calendar__month, #calendar__year').on('change', function () {
+            const selectedMonth = parseInt($('#calendar__month').val());
+            const selectedYear = parseInt($('#calendar__year').val());
+            generateCalendar(selectedYear, selectedMonth);
+        });
+
+    });
 
 
 
