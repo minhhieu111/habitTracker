@@ -407,9 +407,9 @@
         });
 
         // Calendar functionality
-        const time = new Date();
-        const currentYear = [[${currentYear}]] ;
-        const currentMonth = [[${currentMonth}]];
+        const now = new Date();
+        const currentYear = now.getMonth()+1 ;
+        const currentMonth = now.getFullYear();
 
         generateCalendar(currentYear, currentMonth);
 
