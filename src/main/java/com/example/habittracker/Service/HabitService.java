@@ -2,10 +2,7 @@ package com.example.habittracker.Service;
 
 import com.example.habittracker.DTO.HabitDTO;
 import com.example.habittracker.Domain.*;
-import com.example.habittracker.Repository.ChallengeRepository;
-import com.example.habittracker.Repository.HabitHistoryRepository;
-import com.example.habittracker.Repository.HabitRepository;
-import com.example.habittracker.Repository.UserHabitRepository;
+import com.example.habittracker.Repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -172,6 +169,7 @@ public class HabitService {
         }
         this.userHabitRepository.save(userHabit);
         this.habitHistoryRepository.save(habitHistory);
+
 
         return habitDTO;
     }

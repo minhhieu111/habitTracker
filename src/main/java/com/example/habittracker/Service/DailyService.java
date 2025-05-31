@@ -2,10 +2,7 @@ package com.example.habittracker.Service;
 
 import com.example.habittracker.DTO.DailyDTO;
 import com.example.habittracker.Domain.*;
-import com.example.habittracker.Repository.ChallengeRepository;
-import com.example.habittracker.Repository.DailyHistoryRepository;
-import com.example.habittracker.Repository.DailyRepository;
-import com.example.habittracker.Repository.UserDailyRepository;
+import com.example.habittracker.Repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +18,7 @@ public class DailyService {
     private final UserDailyRepository userDailyRepository;
     private final DailyHistoryRepository dailyHistoryRepository;
     private final ChallengeRepository challengeRepository;
+
     public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository, DailyHistoryRepository dailyHistoryRepository, ChallengeRepository challengeRepository) {
         this.dailyRepository = dailyRepository;
         this.userService = userService;
@@ -134,7 +132,7 @@ public class DailyService {
     }
 
 
-    private boolean enableToday(UserDaily userDaily, LocalDate today) {
+    public boolean enableToday(UserDaily userDaily, LocalDate today) {
         long daysSinceCreation = ChronoUnit.DAYS.between(userDaily.getDaily().getCreateAt(), today);
         switch (userDaily.getRepeatFrequency()) {
             case DAILY:

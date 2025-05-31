@@ -2,6 +2,7 @@ package com.example.habittracker.Repository;
 
 import com.example.habittracker.Domain.HabitHistory;
 import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.UserDaily;
 import com.example.habittracker.Domain.UserHabit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,4 +26,10 @@ public interface HabitHistoryRepository extends JpaRepository<HabitHistory, Long
 
     @Query("SELECT hh FROM HabitHistory hh WHERE hh.userHabit.user = :user AND hh.isCompleted = true AND DATE(hh.date) = :date")
     List<HabitHistory> findCompletedHabitHisByUserAndDate(@Param("user") User user, @Param("date")LocalDate date);
+
+    @Query("SELECT COUNT(hh) FROM HabitHistory hh WHERE hh.userHabit IN :userHabits AND hh.date=:date AND hh.isCompleted=true ")
+    Long countByUserHabitInAndDateAndIsCompletedTrue(@Param("userHabits")List<UserHabit> userHabits, @Param("date")LocalDate date);
+
+    @Query("SELECT COUNT(hh) FROM HabitHistory hh WHERE hh.userHabit=:userHabit AND hh.date BETWEEN :start AND :end AND hh.isCompleted=true")
+    Long countByUserHabitAndDateBetweenAndIsCompletedTrue(@Param("userHabit")UserHabit userHabit, @Param("start")LocalDate startDate, @Param("end")LocalDate endDate);
 }

@@ -26,6 +26,7 @@ public class UserChallenge {
     private Long daysSinceStart;
 
     private Long totalCompletedTasks;
+    private Long totalExpectedTasks;
     private Long completedTasks;
     private Long skippedTasks;
 
