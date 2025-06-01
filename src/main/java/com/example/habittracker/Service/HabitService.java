@@ -17,13 +17,17 @@ public class HabitService {
     private final UserHabitRepository userHabitRepository;
     private final HabitHistoryRepository habitHistoryRepository;
     private final ChallengeRepository challengeRepository;
+    private final UserChallengeRepository userChallengeRepository;
+    private final ChallengeProgressService challengeProgressService;
 
-    public HabitService(HabitRepository habitRepository, UserService userService, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, ChallengeRepository challengeRepository) {
+    public HabitService(HabitRepository habitRepository, UserService userService, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, ChallengeRepository challengeRepository, UserChallengeRepository userChallengeRepository, ChallengeProgressService challengeProgressService) {
         this.habitRepository = habitRepository;
         this.userService = userService;
         this.userHabitRepository = userHabitRepository;
         this.habitHistoryRepository = habitHistoryRepository;
         this.challengeRepository = challengeRepository;
+        this.userChallengeRepository = userChallengeRepository;
+        this.challengeProgressService = challengeProgressService;
     }
 
     @Transactional
@@ -170,6 +174,12 @@ public class HabitService {
         this.userHabitRepository.save(userHabit);
         this.habitHistoryRepository.save(habitHistory);
 
+        if(habit.getChallenge() != null) {
+            UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, habit.getChallenge()).get();
+            this.challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),today);
+            this.challengeProgressService.recalculateUserChallengeProgress(userChallenge);
+            this.challengeProgressService.updateChallengeStreak(userChallenge);
+        }
 
         return habitDTO;
     }

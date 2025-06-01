@@ -16,8 +16,16 @@ public class ChallengeDTO {
     private String title;
     private String description;
     private LocalDate endDate;
-    private Long day; // Số ngày thực hiện
+    private Long day;
     private Challenge.Visibility isPublic;
-    private List<HabitDTO> habits; // Danh sách Habit
-    private List<DailyDTO> dailies; // Danh sách Daily
+    private List<HabitDTO> habits;
+    private List<DailyDTO> dailies;
+
+    private Double progress;
+    private Long bestStreak;
+    private Long totalCompletedTasks;
+    private Long completedTasks;
+    private Long skippedTasks;
+    private List<LocalDate> completedTasksList;
+    private List<DailyProgressDTO> dailyProgresses;
 }

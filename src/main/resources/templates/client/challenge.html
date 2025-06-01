@@ -833,37 +833,47 @@
         //         });
         // }
 
-        function displayCompletedChallenges(challenges) {
-            const container = document.getElementById("completedChallengesList") || document.createElement("div");
-            container.id = "completedChallengesList";
-            container.innerHTML = "";
-            challenges.forEach(challenge => {
-                const div = document.createElement("div");
-                div.className = "challenge-card mb-2 p-2 border";
-                div.innerHTML = `<span>${challenge.title} (Hoàn thành: ${challenge.endDate})</span>`;
-                container.appendChild(div);
-            });
-            document.body.appendChild(container);
-        }
+        // function displayCompletedChallenges(challenges) {
+        //     const container = document.getElementById("completedChallengesList") || document.createElement("div");
+        //     container.id = "completedChallengesList";
+        //     container.innerHTML = "";
+        //     challenges.forEach(challenge => {
+        //         const div = document.createElement("div");
+        //         div.className = "challenge-card mb-2 p-2 border";
+        //         div.innerHTML = `<span>${challenge.title} (Hoàn thành: ${challenge.endDate})</span>`;
+        //         container.appendChild(div);
+        //     });
+        //     document.body.appendChild(container);
+        // }
 
-        function checkChallengeCompletion() {
-            const challengeId = document.getElementById("challengeId").value;
-            if (challengeId) {
-                fetch(`/challenges/complete/check/${challengeId}`, {
-                    method: 'GET'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.completed) {
-                            shareChallengeBtn.style.display = "block";
-                        } else {
-                            shareChallengeBtn.style.display = "none";
-                        }
-                    });
-            }
-        }
+        // function checkChallengeCompletion() {
+        //     const challengeId = document.getElementById("challengeId").value;
+        //     if (challengeId) {
+        //         fetch(`/challenges/complete/check/${challengeId}`)
+        //             .then(response=>{
+        //                 if(response.url.includes("/login")){
+        //                     window.location.href="/login"
+        //                     return;
+        //                 }
+        //                 return response.json()
+        //             })
+        //             .then(data => {
+        //                 if (data.completed) {
+        //                     shareChallengeBtn.style.display = "block";
+        //                 } else {
+        //                     shareChallengeBtn.style.display = "none";
+        //                 }
+        //             })
+        //             .catch(error => {
+        //                     console.error('Lỗi khi lấy dữ liệu thử thách:', error);
+        //                     alert('Không thể lấy dữ liệu thử thách. Do phiên đăng nhập hết hạn! Mời đăng nhập lại');
+        //                 });
+        //     }else{
+        //         alert('Không thể lấy dữ liệu thử thách!');
+        //     }
+        // }
 
-        $('#ChallengeModal').on('shown.bs.modal', checkChallengeCompletion);
+        // $('#ChallengeModal').on('shown.bs.modal', checkChallengeCompletion);
 
 
         const searchInput = document.querySelector('.search-input');
@@ -892,24 +902,31 @@
 
         let completedDates = [];
         function showChallengeDetails(challengeId) {
-        // Fetch challenge data from API
         fetch(`/challenges/detail/challenge/${challengeId}`)
-            .then(response => response.json())
+            .then(response=>{
+                if(response.url.includes("/login")){
+                    window.location.href="/login"
+                    return;
+                }
+                return response.json()
+            })
             .then(data => {
-                console.log(data)
+                console.log(data.title)
+                console.log(data.description)
+
                 // Update modal with challenge data
-                $('#challengeTitle').text(data.name);
-                $('#challengeDescription').text(data.description);
+                $('#challengeOverviewTitle').text(data.title);
+                $('#challengeOverviewDescription').text(data.description);
                 $('#bestStreak').text(data.bestStreak);
-                $('#completionRate').text(data.completionRate + '%');
-                $('#totalHabits').text(data.totalHabitsCompleted);
+                $('#completionRate').text(data.progress + '%');
+                $('#totalHabits').text(data.totalCompletedTasks);
 
                 // Initialize charts
-                initLineChart(data.lineChartData);
-                initDonutChart(data.donutChartData);
+                initLineChart(data.dailyProgresses);
+                initDonutChart(data);
 
                 // Initialize calendar
-                completedDates = data.completedDates || [];
+                completedDates = data.completedTasksList || [];
                 initCalendar();
 
                 // Show the modal
@@ -917,7 +934,8 @@
                 challengeModal.show();
             })
             .catch(error => {
-                console.error('Error fetching challenge details:', error);
+                console.error('Lỗi khi lấy dữ liệu thử thách:', error);
+                alert('Không thể lấy dữ liệu thử thách. Do phiên đăng nhập hết hạn! Mời đăng nhập lại');
             });
         }
 
@@ -937,7 +955,7 @@
                 labels: data.map(item => item.date),
                 datasets: [{
                     label: 'Tỷ lệ hoàn thành (%)',
-                    data: data.map(item => item.value),
+                    data: data.map(item => item.completionPercentage),
                     fill: {
                         target: 'origin',
                         above: 'rgba(200, 220, 255, 0.5)',
@@ -984,9 +1002,9 @@
         window.habitProgressChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Bỏ qua', 'Hoàn Thành'],
+                labels: ['Chưa Hoàn Thành', 'Hoàn Thành'],
                 datasets: [{
-                    data: [data.remaining,data.completed],
+                    data: [data.skippedTasks,data.completedTasks],
                     backgroundColor: ['#0066ff', '#05ff12'],
                     borderWidth: 0
                 }]

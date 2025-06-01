@@ -408,8 +408,8 @@
 
         // Calendar functionality
         const now = new Date();
-        const currentYear = now.getMonth()+1 ;
-        const currentMonth = now.getFullYear();
+        const currentMonth = now.getMonth()+1 ;
+        const currentYear = now.getFullYear();
 
         generateCalendar(currentYear, currentMonth);
 
@@ -457,11 +457,17 @@
         }
 
         // Month and year change handlers
-        $('#calendar__month, #calendar__year').on('change', function() {
-            const selectedMonth = $('#calendar__month').prop('selectedIndex') + 1;
-            const selectedYear = parseInt($('#calendar__year').val());
+        const monthEl = document.getElementById('calendar__month');
+        const yearEl = document.getElementById('calendar__year');
+
+        monthEl.addEventListener('change', onChange);
+        yearEl.addEventListener('change', onChange);
+
+        function onChange() {
+            const selectedMonth = monthEl.selectedIndex + 1;
+            const selectedYear = parseInt(yearEl.value, 10);
             generateCalendar(selectedYear, selectedMonth);
-        });
+        }
 
         // Day selection
 

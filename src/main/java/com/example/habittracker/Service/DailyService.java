@@ -18,13 +18,17 @@ public class DailyService {
     private final UserDailyRepository userDailyRepository;
     private final DailyHistoryRepository dailyHistoryRepository;
     private final ChallengeRepository challengeRepository;
+    private final ChallengeProgressService challengeProgressService;
+    private final UserChallengeRepository userChallengeRepository;
 
-    public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository, DailyHistoryRepository dailyHistoryRepository, ChallengeRepository challengeRepository) {
+    public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository, DailyHistoryRepository dailyHistoryRepository, ChallengeRepository challengeRepository, ChallengeProgressService challengeProgressService, UserChallengeRepository userChallengeRepository) {
         this.dailyRepository = dailyRepository;
         this.userService = userService;
         this.userDailyRepository = userDailyRepository;
         this.dailyHistoryRepository = dailyHistoryRepository;
         this.challengeRepository = challengeRepository;
+        this.challengeProgressService = challengeProgressService;
+        this.userChallengeRepository = userChallengeRepository;
     }
 
     public List<UserDaily> getUserDaily(User user){
@@ -186,6 +190,13 @@ public class DailyService {
         this.userDailyRepository.save(userDaily);
         dailyHistory.setStreak(userDaily.getStreak());
         this.dailyHistoryRepository.save(dailyHistory);
+
+        if(daily.getChallenge() != null) {
+            UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, daily.getChallenge()).get();
+            this.challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),today);
+            this.challengeProgressService.recalculateUserChallengeProgress(userChallenge);
+            this.challengeProgressService.updateChallengeStreak(userChallenge);
+        }
 
         dailyDTO.setStreak(userDaily.getStreak());
         dailyDTO.setCompleted(userDaily.isCompleted());
