@@ -11,8 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,9 +23,11 @@ public class ChallengeService {
     private final UserChallengeRepository userChallengeRepository;
     private final UserChallengeDPRepository userChallengeDPRepository;
     private final ChallengeProgressService challengeProgressService;
+    private final UserHabitRepository userHabitRepository;
+    private final UserDailyRepository userDailyRepository;
+    private final HabitHistoryRepository habitHistoryRepository;
 
-
-    public ChallengeService(ChallengeRepository challengeRepository, UserService userService, HabitService habitService, DailyService dailyService, UserChallengeRepository userChallengeRepository, UserChallengeDPRepository userChallengeDPRepository, ChallengeProgressService challengeProgressService) {
+    public ChallengeService(ChallengeRepository challengeRepository, UserService userService, HabitService habitService, DailyService dailyService, UserChallengeRepository userChallengeRepository, UserChallengeDPRepository userChallengeDPRepository, ChallengeProgressService challengeProgressService, UserHabitRepository userHabitRepository, UserDailyRepository userDailyRepository, HabitHistoryRepository habitHistoryRepository) {
         this.challengeRepository = challengeRepository;
         this.userService = userService;
         this.habitService = habitService;
@@ -34,6 +35,9 @@ public class ChallengeService {
         this.userChallengeRepository = userChallengeRepository;
         this.userChallengeDPRepository = userChallengeDPRepository;
         this.challengeProgressService = challengeProgressService;
+        this.userHabitRepository = userHabitRepository;
+        this.userDailyRepository = userDailyRepository;
+        this.habitHistoryRepository = habitHistoryRepository;
     }
 
     public List<UserChallenge> getChallenges(Long userId) {
@@ -271,45 +275,155 @@ public class ChallengeService {
         this.challengeRepository.delete(challenge);
     }
 
+    public Challenge shareChallenge(User user, Long challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thử thách"));
 
-    @Transactional(readOnly = true)
-    public List<ChallengeDTO> getCompletedChallenges(String username) {
-        User user = userService.getUser(username);
-        return userChallengeRepository.findByUser(user).stream()
-                .filter(uc -> uc.getStatus() == UserChallenge.Status.COMPLETE && uc.getChallenge().getIsPublic() == Challenge.Visibility.PUBLIC)
-                .map(uc -> {
-                    Challenge challenge = uc.getChallenge();
-                    return ChallengeDTO.builder()
-                            .challengeId(challenge.getChallengeId())
-                            .title(challenge.getTitle())
-                            .description(challenge.getDescription())
-                            .endDate(uc.getEndDate())
-                            .day(challenge.getDay())
-                            .isPublic(challenge.getIsPublic())
-                            .build();
-                })
-                .collect(Collectors.toList());
-    }
+        UserChallenge userChallenge = userChallengeRepository.findByUserAndChallenge(user, challenge)
+                .orElseThrow(() -> new RuntimeException("Lấy dữ liệu thử thách thất bại"));
 
-    @Transactional
-    public void completeChallenge(Long challengeId, String username) {
-        User user = userService.getUser(username);
-        UserChallenge userChallenge = userChallengeRepository.findByUserAndChallenge(user, challengeRepository.findById(challengeId)
-                        .orElseThrow(() -> new RuntimeException("Không tìm thấy thử thách!")))
-                .orElseThrow(() -> new RuntimeException("Bạn không tham gia thử thách này!"));
-
-        Long dateComplete = ChronoUnit.DAYS.between(userChallenge.getStartDate(), LocalDate.now());
-
-        if (userChallenge.getStatus() == UserChallenge.Status.ACTIVE && userChallenge.getChallenge().getDay() >= dateComplete) {
-            userChallenge.setStatus(UserChallenge.Status.COMPLETE);
-            Challenge challenge = userChallenge.getChallenge();
-            challenge.setIsPublic(Challenge.Visibility.PUBLIC);
-            userChallengeRepository.save(userChallenge);
-            challengeRepository.save(challenge);
-        } else {
-            throw new RuntimeException("Thử thách chưa hoàn thành hoặc không thể chia sẻ!");
+        if (!challenge.getCreatorId().equals(user.getUserId())) {
+            throw new RuntimeException("Bạn không có quyền chia sẻ thử thách này");
         }
+        if (userChallenge.getStatus() != UserChallenge.Status.COMPLETE) {
+            throw new RuntimeException("Thử Thách cần hoàn thành trước khi chia sẻ");
+        }
+
+        challenge.setIsPublic(Challenge.Visibility.PENDING);
+        return challengeRepository.save(challenge);
     }
+
+    public UserChallenge joinChallenge(User user, Long challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new RuntimeException("Challenge not found"));
+
+        if (challenge.getIsPublic() != Challenge.Visibility.PUBLIC) {
+            throw new RuntimeException("Challenge is not public");
+        }
+
+        // Kiểm tra xem người dùng đã tham gia chưa
+        Optional<UserChallenge> existingUserChallenge = userChallengeRepository.findByUserAndChallenge(user, challenge);
+        if (existingUserChallenge.isPresent()) {
+            throw new RuntimeException("You have already joined this challenge");
+        }
+
+        // Tạo UserChallenge mới
+        UserChallenge userChallenge = UserChallenge.builder()
+                .user(user)
+                .challenge(challenge)
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(challenge.getDay()))
+                .status(UserChallenge.Status.ACTIVE)
+                .streak(0L)
+                .bestStreak(0L)
+                .progress(0.0)
+                .totalCompletedTasks(0L)
+                .daysSinceStart(0L)
+                .totalExpectedTasks(0L)
+                .completedTasks(0L)
+                .skippedTasks(0L)
+                .completedTasksList(new ArrayList<>())
+                .build();
+        userChallenge = userChallengeRepository.save(userChallenge);
+
+        // Sao chép danh sách Habit vào UserHabit
+        for (Habit habit : challenge.getHabits()) {
+            UserHabit userHabit = UserHabit.builder()
+                    .user(user)
+                    .habit(habit)
+                    .currentCount(0L)
+                    .targetCount(habit.getTargetCount())
+                    .unavailable(false)
+                    .difficulty(habit.getDifficulty())
+                    .build();
+            if(habit.getType() == Habit.HabitType.NEGATIVE){
+                userHabit.setCompleted(true);
+            }else{
+                userHabit.setCompleted(false);
+            }
+            userHabitRepository.save(userHabit);
+            if (habit.getType() == Habit.HabitType.NEGATIVE) {
+                HabitHistory initialHistory = HabitHistory.builder()
+                        .userHabit(userHabit)
+                        .date(LocalDate.now())
+                        .isCompleted(userHabit.isCompleted())
+                        .positiveCount(0L)
+                        .negativeCount(0L)
+                        .expEarned(0L)
+                        .build();
+                this.habitHistoryRepository.save(initialHistory);
+            };
+        }
+
+        // Sao chép danh sách Daily vào UserDaily
+        for (Daily daily : challenge.getDailies()) {
+            UserDaily userDaily = UserDaily.builder()
+                    .user(user)
+                    .daily(daily)
+                    .streak(0L)
+                    .executionTime(null)
+                    .isCompleted(false)
+                    .isEnabled(true)
+                    .difficulty(daily.getDifficulty())
+                    .repeatFrequency(daily.getRepeatFrequency())
+                    .repeatEvery(daily.getRepeatEvery())
+                    .build();
+            if(daily.getRepeatFrequency() == Daily.RepeatFrequency.WEEKLY){
+//                userDaily.setRepeatDays(new HashSet<>(Arrays.asList(UserDaily.DayOfWeek.values())));
+                userDaily.setRepeatDays(daily.getUserDailies().get(0).getRepeatDays());
+            } else if (daily.getRepeatFrequency() == Daily.RepeatFrequency.MONTHLY) {
+//                userDaily.setRepeatMonthDays(new HashSet<>(Arrays.asList(1, 2, 3)));
+                userDaily.setRepeatMonthDays(daily.getUserDailies().get(0).getRepeatMonthDays());
+            }
+            userDailyRepository.save(userDaily);
+        }
+
+        // Cập nhật participantCount
+        challenge.setParticipantCount(challenge.getParticipantCount() + 1);
+        challengeRepository.save(challenge);
+
+        return userChallenge;
+    }
+
+
+//    @Transactional(readOnly = true)
+//    public List<ChallengeDTO> getCompletedChallenges(String username) {
+//        User user = userService.getUser(username);
+//        return userChallengeRepository.findByUser(user).stream()
+//                .filter(uc -> uc.getStatus() == UserChallenge.Status.COMPLETE && uc.getChallenge().getIsPublic() == Challenge.Visibility.PUBLIC)
+//                .map(uc -> {
+//                    Challenge challenge = uc.getChallenge();
+//                    return ChallengeDTO.builder()
+//                            .challengeId(challenge.getChallengeId())
+//                            .title(challenge.getTitle())
+//                            .description(challenge.getDescription())
+//                            .endDate(uc.getEndDate())
+//                            .day(challenge.getDay())
+//                            .isPublic(challenge.getIsPublic())
+//                            .build();
+//                })
+//                .collect(Collectors.toList());
+//    }
+//
+//    @Transactional
+//    public void completeChallenge(Long challengeId, String username) {
+//        User user = userService.getUser(username);
+//        UserChallenge userChallenge = userChallengeRepository.findByUserAndChallenge(user, challengeRepository.findById(challengeId)
+//                        .orElseThrow(() -> new RuntimeException("Không tìm thấy thử thách!")))
+//                .orElseThrow(() -> new RuntimeException("Bạn không tham gia thử thách này!"));
+//
+//        Long dateComplete = ChronoUnit.DAYS.between(userChallenge.getStartDate(), LocalDate.now());
+//
+//        if (userChallenge.getStatus() == UserChallenge.Status.ACTIVE && userChallenge.getChallenge().getDay() >= dateComplete) {
+//            userChallenge.setStatus(UserChallenge.Status.COMPLETE);
+//            Challenge challenge = userChallenge.getChallenge();
+//            challenge.setIsPublic(Challenge.Visibility.PUBLIC);
+//            userChallengeRepository.save(userChallenge);
+//            challengeRepository.save(challenge);
+//        } else {
+//            throw new RuntimeException("Thử thách chưa hoàn thành hoặc không thể chia sẻ!");
+//        }
+//    }
 
     public void CalChallengeProgressEndDay(){
         LocalDate today = LocalDate.now();

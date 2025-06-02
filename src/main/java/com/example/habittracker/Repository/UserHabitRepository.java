@@ -14,13 +14,13 @@ import java.util.Optional;
 @Repository
 public interface UserHabitRepository extends JpaRepository<UserHabit,Long> {
     @Query("SELECT uh FROM UserHabit uh WHERE uh.user.userId = :userId")
-    Optional<List<UserHabit>> findHabitsForUser(@Param("userId")Long userId);
+    List<UserHabit> findHabitsForUser(@Param("userId")Long userId);
 
     Optional<UserHabit> findUserHabitByHabitAndUser(Habit habit, User user);
 
     @Query("SELECT uh FROM UserHabit uh WHERE uh.habit.challenge.challengeId = :challengeId")
     List<UserHabit> findByChallenge_ChallengeId(@Param("challengeId")Long challengeId);
 
-    @Query("SELECT uh FROM UserHabit uh WHERE uh.user =:user AND uh.habit.challenge = :challenge")
-    List<UserHabit> findByUserAndHabitChallengeAndIsActiveTrue(@Param("user")User user, @Param("challenge") Challenge challenge);
+    @Query("SELECT uh FROM UserHabit uh WHERE uh.user =:user AND uh.habit.challenge = :challenge AND uh.unavailable = false ")
+    List<UserHabit> findByUserAndHabitChallengeAndUnavailableFalse(@Param("user")User user, @Param("challenge") Challenge challenge);
 }

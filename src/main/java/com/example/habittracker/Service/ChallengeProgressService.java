@@ -34,10 +34,10 @@ public class ChallengeProgressService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy dữ liệu(userChallenge)"));
 
         // Lấy tất cả Daily Habits của người dùng thuộc challenge này mà HOẠT ĐỘNG
-        List<UserDaily> activeUserDailies = userDailyRepository.findByUserAndDailyChallengeAndIsEnabledTrue(userChallenge.getUser(), userChallenge.getChallenge());
+        List<UserDaily> activeUserDailies = userDailyRepository.findByUserAndDailyChallengeAndUnavailableFalse(userChallenge.getUser(), userChallenge.getChallenge());
 
         // Lấy tất cả Habits của người dùng thuộc challenge này mà HOẠT ĐỘNG
-        List<UserHabit> activeUserHabits = userHabitRepository.findByUserAndHabitChallengeAndIsActiveTrue(userChallenge.getUser(), userChallenge.getChallenge());
+        List<UserHabit> activeUserHabits = userHabitRepository.findByUserAndHabitChallengeAndUnavailableFalse(userChallenge.getUser(), userChallenge.getChallenge());
 
         // --- Tính Total Expected Tasks cho ngày targetDate ---
         long expectedTasksForDay = 0L;
@@ -101,8 +101,8 @@ public class ChallengeProgressService {
         LocalDate challengeEndDate = userChallenge.getEndDate();
 
         // --- BƯỚC 2: Lấy các UserDaily, UserHabit, Todo (active) thuộc thử thách này của người dùng ---
-        List<UserDaily> activeUserDailies = userDailyRepository.findByUserAndDailyChallengeAndIsEnabledTrue(userChallenge.getUser(), userChallenge.getChallenge());
-        List<UserHabit> activeUserHabits = userHabitRepository.findByUserAndHabitChallengeAndIsActiveTrue(userChallenge.getUser(), userChallenge.getChallenge());
+        List<UserDaily> activeUserDailies = userDailyRepository.findByUserAndDailyChallengeAndUnavailableFalse(userChallenge.getUser(), userChallenge.getChallenge());
+        List<UserHabit> activeUserHabits = userHabitRepository.findByUserAndHabitChallengeAndUnavailableFalse(userChallenge.getUser(), userChallenge.getChallenge());
 
         // --- BƯỚC 3: Tính Total Expected Tasks và completed/skipped cho biểu đồ tròn ---
         long totalExpectedTasks = 0L;
@@ -186,8 +186,8 @@ public class ChallengeProgressService {
             return 0L;
         }
 
-        List<UserDaily> activeUserDailies = userDailyRepository.findByUserAndDailyChallengeAndIsEnabledTrue(userChallenge.getUser(), userChallenge.getChallenge());
-        List<UserHabit> activeUserHabits = userHabitRepository.findByUserAndHabitChallengeAndIsActiveTrue(userChallenge.getUser(), userChallenge.getChallenge());
+        List<UserDaily> activeUserDailies = userDailyRepository.findByUserAndDailyChallengeAndUnavailableFalse(userChallenge.getUser(), userChallenge.getChallenge());
+        List<UserHabit> activeUserHabits = userHabitRepository.findByUserAndHabitChallengeAndUnavailableFalse(userChallenge.getUser(), userChallenge.getChallenge());
 
         for (UserDaily ud : activeUserDailies) {
             expectedTasks += calculateExpectedDailyTasksInPeriod(ud, challengeStartDate, actualEndDate);

@@ -24,6 +24,8 @@ public class UserHabit {
     private Long positiveCount = 0L;
     private boolean isCompleted;
 
+    private boolean unavailable = false;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

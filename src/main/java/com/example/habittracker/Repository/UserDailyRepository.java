@@ -17,6 +17,6 @@ public interface UserDailyRepository extends JpaRepository<UserDaily,Long> {
     Optional<UserDaily> findByUserAndDaily(User user, Daily daily);
 
 
-@Query("SELECT ud FROM UserDaily ud WHERE ud.user =:user AND ud.daily.challenge = :challenge")
-    List<UserDaily> findByUserAndDailyChallengeAndIsEnabledTrue(@Param("user")User user,@Param("challenge") Challenge challenge);
+@Query("SELECT ud FROM UserDaily ud WHERE ud.user =:user AND ud.daily.challenge = :challenge AND ud.unavailable = false ")
+    List<UserDaily> findByUserAndDailyChallengeAndUnavailableFalse(@Param("user")User user,@Param("challenge") Challenge challenge);
 }

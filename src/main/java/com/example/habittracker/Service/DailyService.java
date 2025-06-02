@@ -32,7 +32,9 @@ public class DailyService {
     }
 
     public List<UserDaily> getUserDaily(User user){
-        List<UserDaily>userDailies = this.dailyRepository.findUserDailiesByUserId(user.getUserId()).get();
+        List<UserDaily>userDailies = this.dailyRepository.findUserDailiesByUserId(user.getUserId()).stream()
+                .filter(userDaily -> !userDaily.isUnavailable())
+                .collect(Collectors.toList());
         LocalDate today = LocalDate.now();
 
         for (UserDaily userDaily : userDailies) {
@@ -130,9 +132,23 @@ public class DailyService {
         }
 
         List<DailyHistory> dailyHistories = this.dailyHistoryRepository.findAllByUserDaily(userDaily);
-        this.dailyHistoryRepository.deleteAll(dailyHistories);
-        this.dailyRepository.delete(daily);
-        this.userDailyRepository.delete(userDaily);
+
+        if(daily.getChallenge() != null){
+            UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user,daily.getChallenge()).orElseThrow(()->new RuntimeException("Không tìm thấy dữ liệu để xóa!"));
+            if(userChallenge.getStatus() == UserChallenge.Status.COMPLETE){
+                userDaily.setUnavailable(true);
+                this.userDailyRepository.save(userDaily);
+            }else{
+                this.dailyHistoryRepository.deleteAll(dailyHistories);
+                this.dailyRepository.delete(daily);
+                this.userDailyRepository.delete(userDaily);
+            }
+        }else{
+            this.dailyHistoryRepository.deleteAll(dailyHistories);
+            this.dailyRepository.delete(daily);
+            this.userDailyRepository.delete(userDaily);
+        }
+
     }
 
 

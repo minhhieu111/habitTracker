@@ -30,9 +30,15 @@ public class HabitService {
         this.challengeProgressService = challengeProgressService;
     }
 
+
+//    public List<UserHabit> getUserHabits(User user) {
+//        return this.userHabitRepository.findHabitsForUser(user.getUserId()).get();
+//    }
     @Transactional
     public List<UserHabit> getUserHabits(User user) {
-        return this.userHabitRepository.findHabitsForUser(user.getUserId()).get();
+        return this.userHabitRepository.findHabitsForUser(user.getUserId()).stream()
+                .filter(userHabit -> !userHabit.isUnavailable())
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -160,9 +166,23 @@ public class HabitService {
         Habit habit = getHabit(habitId);
         UserHabit userHabit = this.userHabitRepository.findUserHabitByHabitAndUser(habit,user).orElseThrow(()->new RuntimeException("Lỗi xảy ra khi xóa thói quen!"));
         List<HabitHistory> habitHistories = this.habitHistoryRepository.findAllByUserHabit(userHabit);
-        this.habitHistoryRepository.deleteAll(habitHistories);
-        this.userHabitRepository.delete(userHabit);
-        this.habitRepository.delete(habit);
+
+        if(habit.getChallenge() != null){
+            UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user,habit.getChallenge()).orElseThrow(()->new RuntimeException("Không tìm thấy dữ liệu để xóa!"));
+            if(userChallenge.getStatus() == UserChallenge.Status.COMPLETE){
+                userHabit.setUnavailable(true);
+                this.userHabitRepository.save(userHabit);
+            }else{
+                this.habitHistoryRepository.deleteAll(habitHistories);
+                this.userHabitRepository.delete(userHabit);
+                this.habitRepository.delete(habit);
+            }
+        }else{
+            this.habitHistoryRepository.deleteAll(habitHistories);
+            this.userHabitRepository.delete(userHabit);
+            this.habitRepository.delete(habit);
+        }
+
     }
 
     @Transactional
