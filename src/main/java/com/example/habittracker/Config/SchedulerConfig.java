@@ -1,12 +1,15 @@
 package com.example.habittracker.Config;
 
-import com.example.habittracker.Service.ChallengeProgressService;
-import com.example.habittracker.Service.ChallengeService;
-import com.example.habittracker.Service.DailyService;
-import com.example.habittracker.Service.HabitService;
+import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.UserDaily;
+import com.example.habittracker.Domain.UserHabit;
+import com.example.habittracker.Repository.UserRepository;
+import com.example.habittracker.Service.*;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class SchedulerConfig {
@@ -14,12 +17,16 @@ public class SchedulerConfig {
     private final DailyService dailyService;
     private final ChallengeService challengeService;
     private final ChallengeProgressService challengeProgressService;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
 
-    public SchedulerConfig(HabitService habitService, DailyService dailyService, ChallengeService challengeService, ChallengeProgressService challengeProgressService) {
+    public SchedulerConfig(HabitService habitService, DailyService dailyService, ChallengeService challengeService, ChallengeProgressService challengeProgressService, UserRepository userRepository, EmailService emailService) {
         this.habitService = habitService;
         this.dailyService = dailyService;
         this.challengeService = challengeService;
         this.challengeProgressService = challengeProgressService;
+        this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
 
@@ -48,5 +55,16 @@ public class SchedulerConfig {
     @Scheduled(cron = "0 0 0 * * ?")
     public void checkAllChallenges() {
         this.challengeService.checkChallengeCompleted();
+    }
+
+    @Scheduled(cron = "0 0 21 * * ?") // Chạy vào 21:00 (9:00 PM) hàng ngày
+    public void sendUncompletedTasksEmailForAllUsers() {
+        List<User> users = userRepository.findAll();
+
+        users.forEach(user -> {
+            List<UserHabit> userHabitsUnComplete = this.habitService.getHabitIsUnComplete(user);
+            List<UserDaily> userDailiesUnComplete = this.dailyService.getDailyUnCompleteEnableToday(user);
+            this.emailService.sendEmailTaskUnComplete(userDailiesUnComplete,userHabitsUnComplete, user);
+        });
     }
 }

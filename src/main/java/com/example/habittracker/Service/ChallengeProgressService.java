@@ -18,14 +18,16 @@ public class ChallengeProgressService {
     private final DailyHistoryRepository dailyHistoryRepository;
     private final UserChallengeDPRepository userChallengeDPRepository;
     private final UserChallengeRepository userChallengeRepository;
+    private final EmailService emailService;
 
-    public ChallengeProgressService(UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, UserChallengeDPRepository userChallengeDPRepository, UserChallengeRepository userChallengeRepository) {
+    public ChallengeProgressService(UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, UserChallengeDPRepository userChallengeDPRepository, UserChallengeRepository userChallengeRepository, EmailService emailService) {
         this.userDailyRepository = userDailyRepository;
         this.userHabitRepository = userHabitRepository;
         this.habitHistoryRepository = habitHistoryRepository;
         this.dailyHistoryRepository = dailyHistoryRepository;
         this.userChallengeDPRepository = userChallengeDPRepository;
         this.userChallengeRepository = userChallengeRepository;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -238,6 +240,10 @@ public class ChallengeProgressService {
                     currentStreak = 1L;
                 }
             } else {
+                if (currentStreak > 0) {
+
+                    emailService.sendStreakLostNotification(userChallenge, currentStreak);
+                }
                 currentStreak = 0L;
             }
         }
@@ -269,6 +275,7 @@ public class ChallengeProgressService {
                 userChallenge.setNotificationShown(false);
             }
             userChallenge.setStatus(UserChallenge.Status.COMPLETE);
+            this.emailService.sendEmailCompleteChallenge(userChallenge);
             userChallengeRepository.save(userChallenge);
 
 

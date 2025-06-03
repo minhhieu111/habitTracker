@@ -16,7 +16,9 @@ import java.util.Optional;
 public interface UserDailyRepository extends JpaRepository<UserDaily,Long> {
     Optional<UserDaily> findByUserAndDaily(User user, Daily daily);
 
-
-@Query("SELECT ud FROM UserDaily ud WHERE ud.user =:user AND ud.daily.challenge = :challenge AND ud.unavailable = false ")
+    @Query("SELECT ud FROM UserDaily ud WHERE ud.user =:user AND ud.daily.challenge = :challenge AND ud.unavailable = false ")
     List<UserDaily> findByUserAndDailyChallengeAndUnavailableFalse(@Param("user")User user,@Param("challenge") Challenge challenge);
+
+    @Query("SELECT ud FROM UserDaily ud WHERE ud.user.userId = :userId")
+    List<UserDaily> findByUserId(@Param("userId")Long userId);
 }

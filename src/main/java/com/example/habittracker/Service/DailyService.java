@@ -44,6 +44,14 @@ public class DailyService {
         return userDailies;
     }
 
+    public List<UserDaily> getDailyUnCompleteEnableToday(User user){
+        return this.userDailyRepository.findByUserId(user.getUserId()).stream()
+                .filter(userDaily->enableToday(userDaily,LocalDate.now()))
+                .filter(userDaily -> !userDaily.isCompleted())
+                .filter(userDaily->!userDaily.isEnabled())
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void createDaily(DailyDTO dailyDTO, String username) {
         User creator = userService.getUser(username);

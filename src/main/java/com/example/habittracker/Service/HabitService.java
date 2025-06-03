@@ -46,6 +46,13 @@ public class HabitService {
         return this.habitRepository.findById(habitId).orElseThrow(()->new RuntimeException("Không tìm thấy thói quen!"));
     }
 
+    public List<UserHabit> getHabitIsUnComplete(User user){
+        return this.userHabitRepository.findHabitsForUser(user.getUserId()).stream()
+                .filter(userHabit -> !userHabit.isCompleted())
+                .filter(userHabit-> !userHabit.isUnavailable())
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void save(HabitDTO habitDTO, String username) {
         User user = this.userService.getUser(username);

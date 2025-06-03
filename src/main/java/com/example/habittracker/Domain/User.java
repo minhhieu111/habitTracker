@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,8 @@ public class User {
     private Long level;
 
     private String token;
+
+    private LocalDateTime lastLogin;
 
     @OneToMany(mappedBy = "user")
     List<UserHabit> userHabits;
