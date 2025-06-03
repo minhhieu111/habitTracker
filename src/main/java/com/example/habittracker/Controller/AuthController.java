@@ -45,7 +45,7 @@ public class AuthController {
             // Lưu token vào cookie
             Cookie cookie = new Cookie("token", user.getToken());
             cookie.setHttpOnly(true);
-            cookie.setMaxAge(60 * 120); // 2 giờ
+            cookie.setMaxAge(5 * 60 * 60); // 5 giờ
             cookie.setPath("/");
             response.addCookie(cookie);
 

@@ -147,6 +147,11 @@
                                     <div id="habitsList"></div>
                                 </div>
                             </div>
+
+                            <div id="tasksError" class="text-danger mt-1" style="display: none;">
+                                Vui lòng thêm ít nhất một Daily Task hoặc Habit.
+                            </div>
+
                         </div>
                     </form>
                 </div>
@@ -555,6 +560,7 @@
         const saveChallengeBtn = document.getElementById("saveChallengeBtn");
         const shareChallengeBtn = document.getElementById("shareChallengeBtn");
         const challengeDurationError = document.getElementById("challengeDurationError")
+        const tasksError = document.getElementById("tasksError");
 
         let habitsList = [];
         let dailiesList = [];
@@ -760,6 +766,7 @@
             };
         });
 
+        // validate challenge
         saveChallengeBtn.addEventListener("click", function() {
             let valid = true;
             if (challengeTitleInput.value.trim() === "") {
@@ -782,6 +789,13 @@
                 valid=false;
             }else{
                 challengeDurationError.style.display = "none";
+            }
+
+            if (dailiesList.length === 0 && habitsList.length === 0) {
+                tasksError.style.display = "block";
+                valid = false;
+            } else {
+                tasksError.style.display = "none";
             }
 
             if (!valid) return;

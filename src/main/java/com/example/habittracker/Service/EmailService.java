@@ -8,6 +8,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -65,6 +67,50 @@ public class EmailService {
     }
 
     public void sendEmailTaskUnComplete(List<UserDaily> userDailyUnCompleteList, List<UserHabit> userHabitUnCompleteList, User user){
+        if (userDailyUnCompleteList.isEmpty() && userHabitUnCompleteList.isEmpty()) {
+            return;
+        }
+        String recipientEmail = user.getEmail();
+        String userName = user.getUserName();
 
+        // Kiểm tra nếu người dùng chưa đăng nhập hôm nay
+//        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+//        if (user.getLastLogin() != null && user.getLastLogin().isAfter(todayStart)) {
+//            return;
+//        }
+
+        // Tạo nội dung email
+        String subject = "Thông báo: Bạn có các thói quen chưa hoàn thành!";
+        StringBuilder body = new StringBuilder();
+        body.append("Chào bạn ").append(userName).append(",\n\n")
+                .append("Hôm nay sắp kết thúc, nhưng bạn vẫn chưa hoàn thành một số thói quen \n\n")
+                .append("Danh sách các nhiệm vụ chưa hoàn thành:\n");
+
+        if (!userDailyUnCompleteList.isEmpty()) {
+            body.append("-Thói quen hàng ngày:\n");
+            for (UserDaily userDaily : userDailyUnCompleteList) {
+                body.append("  +").append(userDaily.getDaily().getTitle()).append("\n");
+            }
+        }
+
+        if (!userHabitUnCompleteList.isEmpty()) {
+            body.append("-Thói quen:\n");
+            for (UserHabit userHabit : userHabitUnCompleteList) {
+                body.append("  +").append(userHabit.getHabit().getTitle()).append("\n");
+            }
+        }
+
+        body.append("\nHãy đăng nhập ngay để hoàn thành các nhiệm vụ này trước khi ngày kết thúc nhé!\n\n")
+                .append("Trân trọng,\n")
+                .append("Đội ngũ ứng dụng của bạn\n")
+                .append("Bebet");
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("bebet.habittracker@gmail.com");
+        message.setTo(recipientEmail);
+        message.setSubject(subject);
+        message.setText(body.toString());
+
+        mailSender.send(message);
     }
 }

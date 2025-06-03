@@ -8,6 +8,8 @@ import com.example.habittracker.Repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class AuthService {
 
@@ -54,6 +56,7 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(user.getUserName(), user.getRole().toString());
         user.setToken(token);
+        user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
         return user;
     }

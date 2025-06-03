@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@Configuration
 public class SchedulerConfig {
     private final HabitService habitService;
     private final DailyService dailyService;
@@ -57,7 +57,7 @@ public class SchedulerConfig {
         this.challengeService.checkChallengeCompleted();
     }
 
-    @Scheduled(cron = "0 0 21 * * ?") // Chạy vào 21:00 (9:00 PM) hàng ngày
+    @Scheduled(cron = "0 0 21 * * ?")
     public void sendUncompletedTasksEmailForAllUsers() {
         List<User> users = userRepository.findAll();
 

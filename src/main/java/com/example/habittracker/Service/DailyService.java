@@ -44,11 +44,12 @@ public class DailyService {
         return userDailies;
     }
 
+    @Transactional
     public List<UserDaily> getDailyUnCompleteEnableToday(User user){
         return this.userDailyRepository.findByUserId(user.getUserId()).stream()
                 .filter(userDaily->enableToday(userDaily,LocalDate.now()))
                 .filter(userDaily -> !userDaily.isCompleted())
-                .filter(userDaily->!userDaily.isEnabled())
+                .filter(userDaily->!userDaily.isUnavailable())
                 .collect(Collectors.toList());
     }
 

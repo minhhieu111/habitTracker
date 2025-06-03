@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cộng Đồng Thử Thách - BeBet</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --primary-color: #f7b924;
+            --primary-hover: #e5a91f;
+            --dark-bg: #2c2c2c;
+            --light-bg: #f2f2f2;
+            --sidebar-bg: #2c2c2c;
+            --sidebar-color: #e0e0e0;
+            --progress-bar-height: 8px;
+            --yellow-color: #ffcc00;
+            --green-color: #28a745;
+            --red-color: #dc3545;
+            --blue-color: #007bff;
+            --purple-color: #6f42c1;
+            --gray-bg: #f2f2f2;
+            --card-radius: 15px;
+            --task-radius: 8px;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: #f8f9fa;
+            font-family: "Nunito", sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar styles */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-color);
+            transition: all 0.3s;
+            z-index: 1020;
+            overflow-y: auto;
+        }
+
+        #sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-brand {
+            padding: 30px 20px;
+            text-align: left;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        #sidebar .nav-link {
+            padding: 15px 20px;
+            color: var(--sidebar-color);
+            border: none;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            text-decoration: none;
+            margin: 2px 0;
+            border-radius: 0;
+        }
+
+        #sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        #sidebar .nav-link.active {
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: bold;
+        }
+
+        #sidebar .nav-link i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        #sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        /* Main content area */
+        #content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        #content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        /* Header styles */
+        .app-header {
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-left: 15px;
+            color: #333;
+        }
+
+        .share-challenge-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+
+        .share-challenge-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* Content area */
+        .content-area {
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Community post cards */
+        .community-post {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: var(--card-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            color: white;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .community-post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .username {
+            font-weight: 600;
+            margin-bottom: 2px;
+            font-size: 1rem;
+        }
+
+        .post-time {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .challenge-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .challenge-description {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .challenge-duration {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .participants-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: calc(var(--sidebar-width) * -1);
+            }
+
+            #sidebar.active {
+                margin-left: 0;
+            }
+
+            #content {
+                margin-left: 0;
+            }
+
+            #content.expanded {
+                margin-left: 0;
+            }
+
+            .content-area {
+                padding: 20px 15px;
+            }
+
+            .app-header {
+                padding: 15px 20px;
+            }
+
+            .page-title {
+                font-size: 1.3rem;
+            }
+
+            .share-challenge-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Loading animation */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner-border {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<nav id="sidebar">
+    <div class="sidebar-brand">
+        BeBet
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link" href="/home">
+                <i class="fas fa-home"></i>
+                <span>Trang chủ</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/dashboard">
+                <i class="fas fa-yin-yang"></i>
+                <span>Thói quen</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-calendar-check"></i>
+                <span>Hàng ngày</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="#">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Việc cần làm</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/challenges">
+                <i class="fas fa-trophy"></i>
+                <span>Thử Thách</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-user"></i>
+                <span>Hồ Sơ</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<!-- Page Content -->
+<div id="content">
+    <!-- Header -->
+    <div class="app-header">
+        <div class="header-left">
+            <!-- Toggle Button -->
+            <button id="sidebarCollapse" class="btn btn-link text-dark">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">Cộng Đồng Thử Thách</div>
+        </div>
+
+        <button class="btn share-challenge-btn" id="shareChallenge">
+            <i class="fas fa-share-alt"></i>
+            Chia sẻ thói thách của bạn
+        </button>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content-area">
+        <!-- Community Posts -->
+        <div id="communityPosts">
+            <div th:each="post : ${communityPosts}" class="community-post" th:attr="data-id=${post.id}">
+                <div class="post-header">
+                    <div class="user-avatar" th:text="${post.avatar}">😀</div>
+                    <div class="user-info">
+                        <div class="username" th:text="${post.username}">user 1</div>
+                        <div class="post-time" th:text="${post.timeAgo}">2 giờ trước</div>
+                    </div>
+                </div>
+
+                <div class="challenge-title" th:text="${post.challengeName}">Chơi Thể Thao</div>
+                <div class="challenge-description" th:text="${post.challengeDescription}">
+                    Mô tả: Duy trì chơi thể thao thay đổi hình thể
+                </div>
+                <div class="challenge-duration" th:text="${post.duration}">20 Ngày</div>
+
+                <div class="participants-badge" th:text="${post.participants} + ' người tham gia'">
+                    2345 người tham gia
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-spinner d-none">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state d-none">
+            <i class="fas fa-users"></i>
+            <h4>Chưa có thử thách nào</h4>
+            <p>Hãy là người đầu tiên chia sẻ thử thách của bạn với cộng đồng!</p>
+        </div>
+    </div>
+</div>
+
+<!-- Share Challenge Modal -->
+<div class="modal fade" id="shareChallengeModal" tabindex="-1" aria-labelledby="shareChallengeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareChallengeModalLabel">Chia sẻ thử thách của bạn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="shareChallengeForm">
+                    <div class="mb-3">
+                        <label for="challengeName" class="form-label">Tên thử thách</label>
+                        <input type="text" class="form-control" id="challengeName" placeholder="Nhập tên thử thách" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="challengeDesc" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="challengeDesc" rows="3" placeholder="Mô tả chi tiết về thử thách" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="challengeDuration" class="form-label">Thời gian (ngày)</label>
+                        <input type="number" class="form-control" id="challengeDuration" placeholder="Số ngày thực hiện" min="1" max="365" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="submitChallenge">Chia sẻ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Toggle sidebar
+        $('#sidebarCollapse').on('click', function() {
+            $('#sidebar').toggleClass('collapsed');
+            $('#content').toggleClass('expanded');
+        });
+
+        // Share challenge button
+        $('#shareChallenge').on('click', function() {
+            const shareChallengeModal = new bootstrap.Modal(document.getElementById('shareChallengeModal'));
+            shareChallengeModal.show();
+        });
+
+        // Submit challenge form
+        $('#submitChallenge').on('click', function() {
+            const form = document.getElementById('shareChallengeForm');
+            if (form.checkValidity()) {
+                const challengeData = {
+                    name: $('#challengeName').val(),
+                    description: $('#challengeDesc').val(),
+                    duration: $('#challengeDuration').val()
+                };
+
+                // Show loading state
+                $('#loadingState').removeClass('d-none');
+
+                // Simulate API call
+                setTimeout(() => {
+                    // Add new challenge to the top of the list
+                    addNewChallengePost(challengeData);
+
+                    // Hide loading state
+                    $('#loadingState').addClass('d-none');
+
+                    // Close modal and reset form
+                    bootstrap.Modal.getInstance(document.getElementById('shareChallengeModal')).hide();
+                    form.reset();
+
+                    // Show success message
+                    showToast('Thử thách đã được chia sẻ thành công!', 'success');
+                }, 1500);
+            } else {
+                form.reportValidity();
+            }
+        });
+
+        // Community post click
+        $(document).on('click', '.community-post', function() {
+            const postId = $(this).data('id');
+            const challengeName = $(this).find('.challenge-title').text();
+
+            // This would navigate to challenge details or join challenge
+            showToast(`Bạn đã quan tâm đến thử thách: ${challengeName}`, 'info');
+        });
+
+        // Function to add new challenge post
+        function addNewChallengePost(challengeData) {
+            const newPost = `
+                    <div class="community-post" data-id="${Date.now()}">
+                        <div class="post-header">
+                            <div class="user-avatar">😊</div>
+                            <div class="user-info">
+                                <div class="username">Bạn</div>
+                                <div class="post-time">Vừa xong</div>
+                            </div>
+                        </div>
+
+                        <div class="challenge-title">${challengeData.name}</div>
+                        <div class="challenge-description">Mô tả: ${challengeData.description}</div>
+                        <div class="challenge-duration">${challengeData.duration} Ngày</div>
+
+                        <div class="participants-badge">1 người tham gia</div>
+                    </div>
+                `;
+
+            $('#communityPosts').prepend(newPost);
+
+            // Add animation to new post
+            $('.community-post').first().hide().fadeIn(500);
+        }
+
+        // Function to show toast notifications
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toastId = 'toast-' + Date.now();
+            const toastHtml = `
+                    <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0"
+                         id="${toastId}" role="alert" aria-live="assertive" aria-atomic="true"
+                         style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
+                    </div>
+                `;
+
+            $('body').append(toastHtml);
+
+            const toast = new bootstrap.Toast(document.getElementById(toastId));
+            toast.show();
+
+            // Remove toast element after it's hidden
+            document.getElementById(toastId).addEventListener('hidden.bs.toast', function() {
+                this.remove();
+            });
+        }
+
+        // Infinite scroll (optional)
+        $(window).scroll(function() {
+            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                // Load more posts if needed
+                // loadMorePosts();
+            }
+        });
+
+        // Check if there are no posts and show empty state
+        if ($('.community-post').length === 0) {
+            $('#emptyState').removeClass('d-none');
+        }
+    });
+</script>
+</body>
+</html>
