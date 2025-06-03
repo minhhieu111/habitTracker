@@ -53,7 +53,7 @@ public class ChallengeOverviewController {
         model.addAttribute("months", new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
 
 
-        List<UserChallenge> userChallenges  = this.challengeService.getChallenges(user.getUserId());
+        List<UserChallenge> userChallenges  = this.challengeService.getValidChallenges(user.getUserId());
         model.addAttribute("challenges", userChallenges);
         model.addAttribute("newChallenge", new ChallengeDTO());
         model.addAttribute("daysOfWeek", List.of("SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"));

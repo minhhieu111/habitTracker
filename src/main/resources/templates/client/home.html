@@ -60,13 +60,13 @@
                                     <svg viewBox="0 0 100 100">
                                         <circle class="background" cx="50" cy="50" r="40"></circle>
                                         <circle class="progress" cx="50" cy="50" r="40"
-                                                th:style="'--progress: ' + ${challenge.getStreak()}"></circle>
+                                                th:style="'--progress: ' + ${challenge.progress}"></circle>
                                     </svg>
-                                    <div class="habit-progress-text" th:text="${challenge.getStreak()} + '%'">50%</div>
+                                    <div class="habit-progress-text" th:text="${challenge.progress} + '%'">50%</div>
                                 </div>
                                 <div class="habit-info">
                                     <div class="habit-title" th:text="${challenge.getChallenge().getTitle()}">Chơi Thể Thao</div>
-                                    <div class="habit-tasks" th:text="'Bạn có ' + ${challenge.getBestStreak()} + ' công việc cần làm'">
+                                    <div class="habit-tasks" th:text="'Bạn có ' + ${challenge.skippedTasks} + ' công việc chưa hoàn thành'">
                                         Bạn có 4 công việc cần làm
                                     </div>
                                 </div>
@@ -341,13 +341,15 @@
         </div>
     </div>
 </div>
-
+<!--check login-->
+<div th:replace="layout/checklogin.html"></div>
 <!-- Bootstrap JS Bundle with Popper -->
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script th:inline="javascript">
+
     document.addEventListener("DOMContentLoaded", function() {
 
         // Function to open edit reward modal
@@ -408,8 +410,8 @@
 
         // Calendar functionality
         const now = new Date();
-        const currentYear = now.getMonth()+1 ;
-        const currentMonth = now.getFullYear();
+        const currentMonth = now.getMonth()+1 ;
+        const currentYear = now.getFullYear();
 
         generateCalendar(currentYear, currentMonth);
 
@@ -457,11 +459,17 @@
         }
 
         // Month and year change handlers
-        $('#calendar__month, #calendar__year').on('change', function() {
-            const selectedMonth = $('#calendar__month').prop('selectedIndex') + 1;
-            const selectedYear = parseInt($('#calendar__year').val());
+        const monthEl = document.getElementById('calendar__month');
+        const yearEl = document.getElementById('calendar__year');
+
+        monthEl.addEventListener('change', onChange);
+        yearEl.addEventListener('change', onChange);
+
+        function onChange() {
+            const selectedMonth = monthEl.selectedIndex + 1;
+            const selectedYear = parseInt(yearEl.value, 10);
             generateCalendar(selectedYear, selectedMonth);
-        });
+        }
 
         // Day selection
 

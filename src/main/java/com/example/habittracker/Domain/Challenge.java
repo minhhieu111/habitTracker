@@ -33,6 +33,6 @@ public class Challenge {
     List<UserChallenge> userChallenges;
 
     public enum Visibility {
-        PUBLIC, PRIVATE
+        PUBLIC, PRIVATE, PENDING
     }
 }

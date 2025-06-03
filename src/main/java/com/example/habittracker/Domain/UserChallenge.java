@@ -16,19 +16,27 @@ public class UserChallenge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userChallengeId;
-    private Double progress;
     private LocalDate startDate;
     private LocalDate endDate;
     @Enumerated(EnumType.STRING)
     private Status status;
     private Long streak;
-    private Long bestStreak;
     private Long daysSinceStart;
 
+    private Double progress;
+    private Long bestStreak;
     private Long totalCompletedTasks;
     private Long totalExpectedTasks;
     private Long completedTasks;
     private Long skippedTasks;
+
+    private boolean isNotificationShown = false;
+
+    @ElementCollection
+    @CollectionTable(name = "user_challenge_completed_dates",
+            joinColumns = @JoinColumn(name = "user_challenge_id"))
+    @Column(name = "completed_date")
+    private List<LocalDate> completedTasksList;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")

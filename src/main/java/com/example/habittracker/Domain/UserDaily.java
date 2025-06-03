@@ -27,6 +27,8 @@ public class UserDaily {
     private boolean isEnabled;
     private Integer repeatEvery;
 
+    private boolean unavailable = false;
+
     @Enumerated(EnumType.STRING)
     private Daily.RepeatFrequency repeatFrequency;
 

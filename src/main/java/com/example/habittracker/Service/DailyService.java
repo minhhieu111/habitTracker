@@ -18,17 +18,23 @@ public class DailyService {
     private final UserDailyRepository userDailyRepository;
     private final DailyHistoryRepository dailyHistoryRepository;
     private final ChallengeRepository challengeRepository;
+    private final ChallengeProgressService challengeProgressService;
+    private final UserChallengeRepository userChallengeRepository;
 
-    public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository, DailyHistoryRepository dailyHistoryRepository, ChallengeRepository challengeRepository) {
+    public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository, DailyHistoryRepository dailyHistoryRepository, ChallengeRepository challengeRepository, ChallengeProgressService challengeProgressService, UserChallengeRepository userChallengeRepository) {
         this.dailyRepository = dailyRepository;
         this.userService = userService;
         this.userDailyRepository = userDailyRepository;
         this.dailyHistoryRepository = dailyHistoryRepository;
         this.challengeRepository = challengeRepository;
+        this.challengeProgressService = challengeProgressService;
+        this.userChallengeRepository = userChallengeRepository;
     }
 
     public List<UserDaily> getUserDaily(User user){
-        List<UserDaily>userDailies = this.dailyRepository.findUserDailiesByUserId(user.getUserId()).get();
+        List<UserDaily>userDailies = this.dailyRepository.findUserDailiesByUserId(user.getUserId()).stream()
+                .filter(userDaily -> !userDaily.isUnavailable())
+                .collect(Collectors.toList());
         LocalDate today = LocalDate.now();
 
         for (UserDaily userDaily : userDailies) {
@@ -126,9 +132,23 @@ public class DailyService {
         }
 
         List<DailyHistory> dailyHistories = this.dailyHistoryRepository.findAllByUserDaily(userDaily);
-        this.dailyHistoryRepository.deleteAll(dailyHistories);
-        this.dailyRepository.delete(daily);
-        this.userDailyRepository.delete(userDaily);
+
+        if(daily.getChallenge() != null){
+            UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user,daily.getChallenge()).orElseThrow(()->new RuntimeException("Không tìm thấy dữ liệu để xóa!"));
+            if(userChallenge.getStatus() == UserChallenge.Status.COMPLETE){
+                userDaily.setUnavailable(true);
+                this.userDailyRepository.save(userDaily);
+            }else{
+                this.dailyHistoryRepository.deleteAll(dailyHistories);
+                this.dailyRepository.delete(daily);
+                this.userDailyRepository.delete(userDaily);
+            }
+        }else{
+            this.dailyHistoryRepository.deleteAll(dailyHistories);
+            this.dailyRepository.delete(daily);
+            this.userDailyRepository.delete(userDaily);
+        }
+
     }
 
 
@@ -187,6 +207,15 @@ public class DailyService {
         dailyHistory.setStreak(userDaily.getStreak());
         this.dailyHistoryRepository.save(dailyHistory);
 
+        if(daily.getChallenge() != null) {
+            UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, daily.getChallenge()).orElse(null);;
+            if(userChallenge != null && userChallenge.getStatus() == UserChallenge.Status.ACTIVE){
+                this.challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),today);
+                this.challengeProgressService.recalculateUserChallengeProgress(userChallenge);
+                this.challengeProgressService.updateChallengeStreak(userChallenge);
+            }
+        }
+
         dailyDTO.setStreak(userDaily.getStreak());
         dailyDTO.setCompleted(userDaily.isCompleted());
 
@@ -241,6 +270,25 @@ public class DailyService {
                 userDaily.setCompleted(false);
 
                 this.userDailyRepository.save(userDaily);
+                this.dailyHistoryRepository.save(dailyHistory);
+            }
+        }
+    }
+
+    @Transactional
+    public void setDailyHistoryNewDay(){
+        List<UserDaily> userDailies = this.userDailyRepository.findAll();
+        LocalDate today = LocalDate.now();
+        for (UserDaily userDaily : userDailies) {
+            if (enableToday(userDaily, today)) {
+                DailyHistory dailyHistory = this.dailyHistoryRepository.findDailyHistory(userDaily, today)
+                        .orElseGet(() -> new DailyHistory().builder()
+                                .userDaily(userDaily)
+                                .date(today)
+                                .streak(0L)
+                                .isCompleted(false)
+                                .build());
+
                 this.dailyHistoryRepository.save(dailyHistory);
             }
         }

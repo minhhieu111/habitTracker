@@ -19,4 +19,10 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
 
     @Query("SELECT uc FROM UserChallenge uc WHERE uc.challenge= :challenge")
     Optional<UserChallenge> findByChallenge(@Param("challenge") Challenge challenge);
+
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.status = :status")
+    List<UserChallenge> findByStatus(@Param("status") UserChallenge.Status status);
+
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.status = :status AND uc.user=:user AND uc.isNotificationShown=false")
+    List<UserChallenge> findByUserAndStatusAndIsNotificationShownFalse(@Param("user")User user,@Param("status") UserChallenge.Status status);
 }

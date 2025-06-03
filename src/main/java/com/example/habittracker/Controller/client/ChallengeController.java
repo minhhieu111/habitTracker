@@ -153,54 +153,10 @@ public class ChallengeController {
 
     @GetMapping("/detail/challenge/{id}")
     @ResponseBody
-    public Map<String, Object> getChallengeDetails(@PathVariable Long id) {
-
-
-        Map<String, Object> response = new HashMap<>();
-
-        // Challenge details
-        response.put("id", id);
-        response.put("name", "Thay Đổi Lối Sống");
-        response.put("description", "Thay đổi thói quen trở nên lành mạnh");
-        response.put("bestStreak", 5);
-        response.put("completionRate", 74);
-        response.put("totalHabitsCompleted", 42);
-
-        // Line chart data
-        List<Map<String, Object>> lineChartData = new ArrayList<>();
-        String[] dates = {"Apr 21", "Apr 25", "Apr 30", "May 05", "May 10"};
-        int[] values = {60, 35, 50, 90, 30};
-
-        for (int i = 0; i < dates.length; i++) {
-            Map<String, Object> point = new HashMap<>();
-            point.put("date", dates[i]);
-            point.put("value", values[i]);
-            lineChartData.add(point);
-        }
-        response.put("lineChartData", lineChartData);
-
-        // Donut chart data
-        Map<String, Object> donutChartData = new HashMap<>();
-        donutChartData.put("completed", 74);
-        donutChartData.put("remaining", 26);
-        response.put("donutChartData", donutChartData);
-
-        // Calendar data
-        List<String> completedDates = new ArrayList<>();
-        completedDates.add("2025-05-02");
-        completedDates.add("2025-05-03");
-        completedDates.add("2025-05-05");
-        completedDates.add("2025-05-06");
-        completedDates.add("2025-05-07");
-        completedDates.add("2025-05-08");
-        completedDates.add("2025-05-10");
-        completedDates.add("2025-05-11");
-        completedDates.add("2025-05-14");
-        completedDates.add("2025-05-16");
-        completedDates.add("2025-05-18");
-        response.put("completedDates", completedDates);
-
-        return response;
+    public ResponseEntity<ChallengeDTO> getChallengeDetails(HttpServletRequest request, @PathVariable Long id) {
+        User user = getUserFromRequest(request);
+        ChallengeDTO challengeDTO = this.challengeService.getUserChallengeDetail(user,id);
+        return ResponseEntity.ok().body(challengeDTO);
     }
 
     private User getUserFromRequest(HttpServletRequest request) {
