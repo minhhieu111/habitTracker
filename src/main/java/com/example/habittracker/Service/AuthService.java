@@ -25,9 +25,6 @@ public class AuthService {
     }
 
     public void register(Register register) {
-        if (userRepository.existsUserByUserName(register.getUsername())) {
-            throw new RuntimeException("Tên người dùng đã tồn tại ");
-        }
         if (userRepository.existsUserByEmail(register.getEmail())) {
             throw new RuntimeException("Email đã tồn tại");
         }
@@ -49,7 +46,11 @@ public class AuthService {
     }
 
     public User login(Login login) {
-        User user = userRepository.findUserByUserName(login.getUserName()).orElseThrow(()->new RuntimeException("Tên đăng nhập không đúng!"));
+        User user = userRepository.findByEmail(login.getEmail());
+
+        if(user == null){
+            throw new RuntimeException("Không tìm thấy Email!");
+        }
         if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
             throw new RuntimeException("Mật khẩu không chính xác!");
         }

@@ -23,6 +23,7 @@ public class User {
 
     @NotBlank(message = "Nhập mật khẩu")
     private String password;
+    private String avatar;
 
     @NotBlank(message = "Nhập email")
     private String email;

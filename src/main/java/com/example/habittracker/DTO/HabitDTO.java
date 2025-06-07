@@ -22,6 +22,8 @@ public class HabitDTO {
     private Long negativeCount;
     private Long positiveCount;
     private boolean isCompleted =false;
+    private boolean isPublic;
+    private boolean isInChallenge;
 
     private final Habit.Difficulty[] habitDifficultiesOption = Habit.Difficulty.values();
     private final Habit.HabitType[] habitTypesOption = Habit.HabitType.values();

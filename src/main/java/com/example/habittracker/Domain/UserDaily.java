@@ -29,6 +29,8 @@ public class UserDaily {
 
     private boolean unavailable = false;
 
+    private boolean isInChallenge = false;
+
     @Enumerated(EnumType.STRING)
     private Daily.RepeatFrequency repeatFrequency;
 

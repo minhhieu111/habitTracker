@@ -30,22 +30,30 @@ public class SecurityConfig{
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login",
                                 "/register",
+                                "/login_with_google",
                                 "/css/**",
                                 "/js/**",
-                                "/images/**").permitAll()
+                                "/images/**",
+                                "/home",
+                                "admin/dashboard").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/home").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                         .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/login_with_google")
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .deleteCookies("token")
+                        .deleteCookies("token","JSESSIONID")
                         .logoutSuccessUrl("/login")
                         .permitAll()
                 );

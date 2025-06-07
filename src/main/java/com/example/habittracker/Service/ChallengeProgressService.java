@@ -80,6 +80,7 @@ public class ChallengeProgressService {
         dailyProgress.setCompletionPercentage(completionPercentage);
         userChallengeDPRepository.save(dailyProgress);
 
+//        lưu ngày hoàn thành cho calendar
         int completionThreshold = 100;
         UserChallengeDailyProgress userChallengeDailyProgress = this.userChallengeDPRepository.findByUserChallengeAndDate(userChallenge,targetDate).get();
         if(userChallengeDailyProgress.getCompletionPercentage() >= completionThreshold){
@@ -158,8 +159,8 @@ public class ChallengeProgressService {
 
         checkAndCompleteChallenge(userChallenge);
     }
-
-    private Long calculateExpectedDailyTasksInPeriod(UserDaily userDaily, LocalDate startDate, LocalDate endDate) {
+    @Transactional
+    public Long calculateExpectedDailyTasksInPeriod(UserDaily userDaily, LocalDate startDate, LocalDate endDate) {
         Long count = 0L;
         LocalDate current = startDate;
         while (!current.isAfter(endDate)) {
@@ -178,8 +179,8 @@ public class ChallengeProgressService {
         }
         return ChronoUnit.DAYS.between(startDate, endDate) + 1;
     }
-
-    private Long calculateTotalExpectedTasksUpToDate(UserChallenge userChallenge, LocalDate upToDate) {
+    @Transactional
+    public Long calculateTotalExpectedTasksUpToDate(UserChallenge userChallenge, LocalDate upToDate) {
         long expectedTasks = 0L;
         LocalDate challengeStartDate = userChallenge.getStartDate();
         LocalDate actualEndDate = upToDate.isBefore(userChallenge.getEndDate()) ? upToDate : userChallenge.getEndDate();
@@ -202,10 +203,18 @@ public class ChallengeProgressService {
     }
 
     @Transactional
-    public void updateChallengeStreak(UserChallenge userChallenge) {
+    public void updateChallengeStreak(UserChallenge userChallenge,boolean isEndDay) {
 
-        LocalDate today = LocalDate.now();
+            LocalDate today = LocalDate.now();
         int completionThreshold = 100;
+
+        UserChallengeDailyProgress userChallengeDailyProgress = this.userChallengeDPRepository.findByUserChallengeAndDate(userChallenge,today).orElse(null);
+
+        double progress = 0;
+        if(userChallengeDailyProgress != null){
+            progress = userChallengeDailyProgress.getCompletionPercentage();
+        }
+        int unComplete = (int) Math.round(progress);
 
         LocalDate yesterday = today.minusDays(1);
 
@@ -230,26 +239,31 @@ public class ChallengeProgressService {
             }
         }
 
-        long currentStreak = userChallenge.getStreak();
+           long currentStreak = userChallenge.getStreak();
 
         if (!today.isBefore(userChallenge.getStartDate()) && !today.isAfter(userChallenge.getEndDate())) {
-            if (isCompletedToday) {
-                if (wasCompletedYesterday || today.equals(userChallenge.getStartDate())) {
-                    currentStreak++;
-                } else {
-                    currentStreak = 1L;
+            if(isCompletedToday){
+                if (!isEndDay) {
+                    if (wasCompletedYesterday || today.equals(userChallenge.getStartDate())) {
+                        currentStreak++;
+                        userChallenge.setCompletedToday(true);
+                    } else {
+                        currentStreak = 1L;
+                    }
                 }
-            } else {
-                if (currentStreak > 0) {
-
+            }else{
+                if (currentStreak > 0 && isEndDay) {
                     emailService.sendStreakLostNotification(userChallenge, currentStreak);
+                    currentStreak = 0L;
+                } else if (currentStreak > 0 && userChallenge.isCompletedToday()) {
+                    currentStreak--;
+                    userChallenge.setCompletedToday(false);
                 }
-                currentStreak = 0L;
             }
         }
 
         long bestStreak = userChallenge.getBestStreak();
-        if (currentStreak > bestStreak) {
+        if (currentStreak > bestStreak && isEndDay) {
             bestStreak = currentStreak;
         }
 
@@ -278,14 +292,27 @@ public class ChallengeProgressService {
             this.emailService.sendEmailCompleteChallenge(userChallenge);
             userChallengeRepository.save(userChallenge);
 
+//sẽ thực hiện sau khi hoàn thành
 
+//            đặt incomplete của các task là false cho phép xóa task
+            List<UserHabit> userHabitsInChallenge = this.userHabitRepository.findByUserAndHabitChallengeAndUnavailableFalse(userChallenge.getUser(),userChallenge.getChallenge());
+            userHabitsInChallenge.forEach(userHabit -> {
+                userHabit.setInChallenge(false);
+                userHabitRepository.save(userHabit);
+            });
+
+            List<UserDaily> userDailiesInChallenge = this.userDailyRepository.findByUserAndDailyChallengeAndUnavailableFalse(userChallenge.getUser(),userChallenge.getChallenge());
+            userDailiesInChallenge.forEach(userDaily -> {
+                userDaily.setInChallenge(false);
+                userDailyRepository.save(userDaily);
+            });
         }else{
             userChallenge.setStatus(UserChallenge.Status.ACTIVE);
             userChallenge.setNotificationShown(true);
             userChallengeRepository.save(userChallenge);
         }
     }
-
+    @Transactional
     public boolean enableToday(UserDaily userDaily, LocalDate today) {
         long daysSinceCreation = ChronoUnit.DAYS.between(userDaily.getDaily().getCreateAt(), today);
         switch (userDaily.getRepeatFrequency()) {

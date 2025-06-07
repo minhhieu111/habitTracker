@@ -26,6 +26,8 @@ public class UserHabit {
 
     private boolean unavailable = false;
 
+    private boolean isInChallenge = false;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

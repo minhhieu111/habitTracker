@@ -165,7 +165,6 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button type="button" class="btn btn-primary" id="saveChallengeBtn">Lưu</button>
                     </div>
-                    <button type="button" class="btn btn-success" id="shareChallengeBtn" style="display: none;">Chia sẻ thử thách</button>
                 </div>
             </div>
         </div>
@@ -239,7 +238,7 @@
                             <label class="form-label">Lặp lại vào ngày</label>
                             <div class="d-flex flex-wrap gap-2" style="max-height: 150px; width: 100%; overflow-y: auto;">
                                 <div th:each="day : ${#numbers.sequence(1, 31)}" class="form-check form-check-inline" style="width: 14%" th:data-day="${day}">
-                                    <input class="form-check-input" type="checkbox" value="${day}" th:id="|month-day-${day}|" />
+                                    <input class="form-check-input" type="checkbox" th:value="${day}" th:id="|month-day-${day}|" />
                                     <label class="form-check-label" th:for="|month-day-${day}|" th:text="${day}">1</label>
                                 </div>
                             </div>
@@ -464,6 +463,8 @@
             document.getElementById("challengeDuration").value = '1';
             document.getElementById("dailyTasksList").innerHTML = '';
             document.getElementById("habitsList").innerHTML = '';
+            document.getElementById("habitsField").value = '';
+            document.getElementById("dailiesField").value = '';
 
             document.getElementById("deleteChallengeButton").style.display = "none";
 
@@ -487,7 +488,6 @@
                     return response.json();
                 })
                 .then(challenge => {
-                    console.log(challenge)
                     document.getElementById("challengeId").value = challenge.challengeId;
                     document.getElementById("challengeTitle").value = challenge.title;
                     document.getElementById("challengeDescription").value = challenge.description;
@@ -720,7 +720,9 @@
                 const repeatFrequency = document.getElementById("repeatFrequency").value;
                 const repeatEvery = document.getElementById("repeatEvery").value;
                 const repeatDays = Array.from(document.querySelectorAll("#repeatDaysSection input:checked")).map(input => input.value);
-                const repeatMonthDays = Array.from(document.querySelectorAll("#repeatMonthDaysSection input:checked")).map(input => parseInt(input.value));
+                const repeatMonthDays = Array.from(document.querySelectorAll("#repeatMonthDaysSection input:checked")).map(input => {console.log(input.value);
+                    return parseInt(input.value);});
+                console.log(repeatMonthDays)
 
                 if (!title || title.trim() === "") {
                     document.getElementById("dailyTitleError").style.display = 'block';
@@ -802,97 +804,6 @@
 
             document.getElementById("ChallengeForm").submit();
         });
-
-        // shareChallengeBtn.addEventListener("click", function() {
-        //     const challengeId = document.getElementById("challengeId").value;
-        //     if (!challengeId) {
-        //         alert("Vui lòng chọn một thử thách để chia sẻ!");
-        //         return;
-        //     }
-        //
-        //     fetch(`/challenges/complete/${challengeId}`, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         }
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.success) {
-        //                 alert(data.message);
-        //                 $('#ChallengeModal').modal('hide');
-        //                 loadCompletedChallenges();
-        //             } else {
-        //                 alert("Lỗi: " + data.message);
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.error('Error:', error);
-        //             alert("Đã có lỗi xảy ra!");
-        //         });
-        // });
-        //
-        // function loadCompletedChallenges() {
-        //     fetch('/challenges/completed', {
-        //         method: 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         }
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data) {
-        //                 console.log("Completed Challenges:", data);
-        //                 displayCompletedChallenges(data);
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.error('Error:', error);
-        //         });
-        // }
-
-        // function displayCompletedChallenges(challenges) {
-        //     const container = document.getElementById("completedChallengesList") || document.createElement("div");
-        //     container.id = "completedChallengesList";
-        //     container.innerHTML = "";
-        //     challenges.forEach(challenge => {
-        //         const div = document.createElement("div");
-        //         div.className = "challenge-card mb-2 p-2 border";
-        //         div.innerHTML = `<span>${challenge.title} (Hoàn thành: ${challenge.endDate})</span>`;
-        //         container.appendChild(div);
-        //     });
-        //     document.body.appendChild(container);
-        // }
-
-        // function checkChallengeCompletion() {
-        //     const challengeId = document.getElementById("challengeId").value;
-        //     if (challengeId) {
-        //         fetch(`/challenges/complete/check/${challengeId}`)
-        //             .then(response=>{
-        //                 if(response.url.includes("/login")){
-        //                     window.location.href="/login"
-        //                     return;
-        //                 }
-        //                 return response.json()
-        //             })
-        //             .then(data => {
-        //                 if (data.completed) {
-        //                     shareChallengeBtn.style.display = "block";
-        //                 } else {
-        //                     shareChallengeBtn.style.display = "none";
-        //                 }
-        //             })
-        //             .catch(error => {
-        //                     console.error('Lỗi khi lấy dữ liệu thử thách:', error);
-        //                     alert('Không thể lấy dữ liệu thử thách. Do phiên đăng nhập hết hạn! Mời đăng nhập lại');
-        //                 });
-        //     }else{
-        //         alert('Không thể lấy dữ liệu thử thách!');
-        //     }
-        // }
-
-        // $('#ChallengeModal').on('shown.bs.modal', checkChallengeCompletion);
-
 
         const searchInput = document.querySelector('.search-input');
         if (searchInput) {

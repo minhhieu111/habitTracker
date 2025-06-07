@@ -4,6 +4,7 @@ import com.example.habittracker.Domain.Reward;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Repository.RewardRepository;
 import com.example.habittracker.Repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +16,7 @@ public class RewardService {
         this.rewardRepository = rewardRepository;
         this.userRepository = userRepository;
     }
-
+    @Transactional
     public void save(Reward reward, String userName) {
         User user = userRepository.findUserByUserName(userName).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
         if (reward.getTitle().isEmpty()) {
@@ -34,11 +35,12 @@ public class RewardService {
 
         this.rewardRepository.save(rewardCreate);
     }
-
+    @Transactional
     public Reward getRewardById (Long rewardId) {
         return this.rewardRepository.findById(rewardId).get();
     }
 
+    @Transactional
     public void updateReward(Reward reward) {
         Reward updateReward = this.rewardRepository.findById(reward.getRewardId()).get();
         if (updateReward == null) {
@@ -54,6 +56,7 @@ public class RewardService {
         this.rewardRepository.save(updateReward);
     }
 
+    @Transactional
     public void deleteReward(Long rewardId) {
         Reward reward = this.rewardRepository.findById(rewardId).get();
         if(reward == null) {
@@ -62,6 +65,7 @@ public class RewardService {
         this.rewardRepository.delete(reward);
     }
 
+    @Transactional
     public Long exchangeReward(User user, Reward reward) {
         if(user==null || reward==null) {
             throw new RuntimeException("Không tìm thấy người dùng hoặc phần thưởng!");

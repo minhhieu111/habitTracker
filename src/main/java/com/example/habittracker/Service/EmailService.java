@@ -26,12 +26,12 @@ public class EmailService {
         String recipientEmail = userChallenge.getUser().getEmail();
         String emailSubject = "Chúc mừng bạn đã hoàn thành thử thách: " + userChallenge.getChallenge().getTitle();
         String emailBody = "Chào " + (userChallenge.getUser() != null ? userChallenge.getUser().getUserName() : "") + ",\n\n"
-                + "Chúng tôi xin chúc mừng bạn đã **hoàn thành thử thách \"" + userChallenge.getChallenge().getTitle() + "\"** một cách xuất sắc!\n"
-                + "Bạn đã trải qua một hành trình đáng nhớ từ ngày **" + userChallenge.getStartDate().format(dateFormatter) + "** đến ngày **" + userChallenge.getEndDate().format(dateFormatter) + "**.\n\n"
+                + "Chúng tôi xin chúc mừng bạn đã hoàn thành thử thách \"" + userChallenge.getChallenge().getTitle() + "\" một cách xuất sắc!\n"
+                + "Bạn đã trải qua một hành trình đáng nhớ từ ngày " + userChallenge.getStartDate().format(dateFormatter) + " đến ngày " + userChallenge.getEndDate().format(dateFormatter) + ".\n\n"
                 + "Trong suốt thử thách, bạn đã đạt được những kết quả ấn tượng:\n"
-                + "- Tổng số lần thực hiện thói quen thành công: **" + userChallenge.getTotalCompletedTasks() + "**\n"
-                + "- Chuỗi thực hiện tốt nhất của bạn: **" + userChallenge.getBestStreak() + "** ngày liên tiếp\n"
-                + "- Tổng số lần bỏ lỡ thói quen: **" + userChallenge.getSkippedTasks() + "**\n\n"
+                + "- Tổng số lần thực hiện thói quen thành công: " + userChallenge.getTotalCompletedTasks() + "\n"
+                + "- Chuỗi thực hiện tốt nhất của bạn: " + userChallenge.getBestStreak() + " ngày liên tiếp\n"
+                + "- Tổng số lần bỏ lỡ thói quen: " + userChallenge.getSkippedTasks() + "\n\n"
                 + "Đây là một thành tựu đáng tự hào! Bạn có thể chia sẻ hành trình và kết quả này với bạn bè và cộng đồng.\n\n"
                 + "Trân trọng,\n"
                 + "Đội ngũ ứng dụng của bạn\n"
@@ -51,8 +51,8 @@ public class EmailService {
 
         String subject = "Thông báo: Chuỗi của thử thách \"" + userChallenge.getChallenge().getTitle() + "\" của bạn đã bị mất!";
         String body = "Chào bạn " + userChallenge.getUser().getUserName() + ",\n\n"
-                + "Chúng tôi rất tiếc phải thông báo rằng chuỗi liên tiếp thực hiện thử thách **\"" + userChallenge.getChallenge().getTitle() + "\"** của bạn đã bị mất.\n\n"
-                + "Bạn đã có một chuỗi ấn tượng là **" + currentStreak + "** ngày liên tiếp!\n"
+                + "Chúng tôi rất tiếc phải thông báo rằng chuỗi liên tiếp thực hiện thử thách \"" + userChallenge.getChallenge().getTitle() + "\" của bạn đã bị mất.\n\n"
+                + "Bạn đã có một chuỗi ấn tượng là " + currentStreak + " ngày liên tiếp!\n"
                 + "Đừng nản lòng nhé! Hãy bắt đầu lại từ hôm nay và xây dựng một chuỗi mới.\n\n"
                 + "Trân trọng,\n"
                 + "Đội ngũ ứng dụng của bạn\n"
@@ -87,16 +87,16 @@ public class EmailService {
                 .append("Danh sách các nhiệm vụ chưa hoàn thành:\n");
 
         if (!userDailyUnCompleteList.isEmpty()) {
-            body.append("-Thói quen hàng ngày:\n");
+            body.append("- Thói quen hàng ngày:\n");
             for (UserDaily userDaily : userDailyUnCompleteList) {
-                body.append("  +").append(userDaily.getDaily().getTitle()).append("\n");
+                body.append("  + ").append(userDaily.getDaily().getTitle()).append("\n");
             }
         }
 
         if (!userHabitUnCompleteList.isEmpty()) {
-            body.append("-Thói quen:\n");
+            body.append("- Thói quen:\n");
             for (UserHabit userHabit : userHabitUnCompleteList) {
-                body.append("  +").append(userHabit.getHabit().getTitle()).append("\n");
+                body.append("  + ").append(userHabit.getHabit().getTitle()).append("\n");
             }
         }
 

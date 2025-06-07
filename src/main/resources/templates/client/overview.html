@@ -26,7 +26,6 @@
 
 <!-- Main Content -->
 <div id="content">
-    <!-- Main content matching the image -->
     <div class="row mx-0">
         <div class="col-md-8 head-content">
             <!-- Include user information from existing template -->
@@ -160,9 +159,17 @@
                                 <div id="habitTargetError" class="text-danger mt-1" style="display: none;">Vui lòng chọn mục tiêu >1</div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="habitChallenge"  class="form-label">Thử thách</label>
-                                <select class="form-control"  id="habitChallenge" th:field="*{challengeId}">
+                            <div class="mb-3" id="habitCreateChallengeField">
+                                <label for="habitCreateChallenge"  class="form-label">Thử thách</label>
+                                <select class="form-control"  id="habitCreateChallenge" th:field="*{challengeId}">
+                                    <option th:value="${null}" selected>Không có</option>
+                                    <option th:each="challenge : ${userChallengeOwner}" th:value="${challenge.getChallenge().getChallengeId()}" th:text="${challenge.getChallenge().getTitle()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" id="habitUpdateChallengeField">
+                                <label for="habitUpdateChallenge"  class="form-label">Thử thách</label>
+                                <select class="form-control"  id="habitUpdateChallenge" th:field="*{challengeId}">
                                     <option th:value="${null}" selected>Không có</option>
                                     <option th:each="challenge : ${userChallenges}" th:value="${challenge.getChallenge().getChallengeId()}" th:text="${challenge.getChallenge().getTitle()}"></option>
                                 </select>
@@ -325,9 +332,19 @@
                                 <div id="repeatMonthDaysError" class="text-danger mt-1" style="display: none;">Vui lòng chọn ít nhất 1 ngày trong tháng.</div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="dailyChallenge" class="form-label">Thử thách</label>
-                                <select class="form-control" id="dailyChallenge" th:field="*{challengeId}">
+                            <div class="mb-3" id="dailyCreateChallengeField">
+                                <label for="dailCreateChallenge" class="form-label">Thử thách</label>
+                                <select class="form-control" id="dailCreateChallenge" th:field="*{challengeId}">
+                                    <option th:value="${null}" selected>Không có</option>
+                                    <option th:each="challenge : ${userChallengeOwner}"
+                                            th:value="${challenge.getChallenge().getChallengeId()}"
+                                            th:text="${challenge.getChallenge().getTitle()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" id="dailyUpdateChallengeField">
+                                <label for="dailyUpdateChallenge" class="form-label">Thử thách</label>
+                                <select class="form-control" id="dailyUpdateChallenge" th:field="*{challengeId}">
                                     <option th:value="${null}" selected>Không có</option>
                                     <option th:each="challenge : ${userChallenges}"
                                             th:value="${challenge.getChallenge().getChallengeId()}"
@@ -576,17 +593,39 @@
 <script>
     document.addEventListener("DOMContentLoaded", function (){
 
-        //Open create habit modal
-        window.openHabitCreateModal = ()=>{
-            document.getElementById("habitId").value=''
-            document.getElementById("habitTitle").value='';
-            document.getElementById("habitDescription").value='';
-            document.getElementById("habitDifficulty").value='EASY';
-            document.getElementById("habitType").value = 'BOTH';
-            document.getElementById("habitTarget").value = 1;
-            document.getElementById("habitChallenge").value = '';
+        const habitInputId = document.getElementById("habitId")
+        const habitTitle = document.getElementById("habitTitle")
+        const habitDescription = document.getElementById("habitDescription")
+        const habitDifficulty = document.getElementById("habitDifficulty")
+        const habitType = document.getElementById("habitType")
+        const habitTarget = document.getElementById("habitTarget")
+        const habitCreateChallenge = document.getElementById("habitCreateChallenge")
+        const habitUpdateChallenge = document.getElementById("habitUpdateChallenge")
+        const deleteHabitButton = document.getElementById("deleteHabitButton")
+        const deleteHabit = document.getElementById("deleteHabit")
 
-            document.getElementById("deleteHabitButton").style.display='none';
+            //Open create habit modal
+        window.openHabitCreateModal = ()=>{
+            habitInputId.value=''
+            habitTitle.value='';
+            habitDescription.value='';
+            habitDifficulty.value='EASY';
+            habitType.value = 'BOTH';
+            habitTarget.value = 1;
+            habitCreateChallenge.value = '';
+
+            deleteHabitButton.style.display='none';
+
+            habitTitle.readOnly = false;
+            habitDescription.readOnly = false;
+            habitDifficulty.readOnly = false;
+            habitType.readOnly = false;
+            habitCreateChallenge.removeEventListener("mousedown",null);
+
+            habitCreateChallenge.disabled = false
+            habitUpdateChallenge.disabled = true
+            document.getElementById("habitCreateChallengeField").setAttribute("style","display: block")
+            document.getElementById("habitUpdateChallengeField").setAttribute("style","display: none")
 
             const modalHabit = new bootstrap.Modal(document.getElementById("modalHabit"))
             modalHabit.show()
@@ -602,16 +641,40 @@
                     }
                     return response.json()})
                 .then(habit =>{
-                    document.getElementById("habitId").value=habitId
-                    document.getElementById("habitTitle").value=habit.title;
-                    document.getElementById("habitDescription").value=habit.description;
-                    document.getElementById("habitDifficulty").value=habit.difficulty;
-                    document.getElementById("habitType").value = habit.type;
-                    document.getElementById("habitTarget").value = habit.targetCount;
-                    document.getElementById("habitChallenge").value =habit.challengeId === null ? '' : habit.challengeId;
-                    document.getElementById("deleteHabit").setAttribute("href","/habits/delete/"+habitId);
+                    console.log(habit)
+                    habitInputId.value=habit.habitId
+                    habitTitle.value=habit.title;
+                    habitDescription.value=habit.description;
+                    habitDifficulty.value=habit.difficulty;
+                    habitType.value = habit.type;
+                    habitTarget.value = habit.targetCount;
+                    habitUpdateChallenge.value = habit.challengeId === null ? '' : habit.challengeId;
 
-                    document.getElementById("deleteHabitButton").style.display='block';
+                    deleteHabit.setAttribute("href","/habits/delete/"+habitId);
+
+
+
+                    if(habit.inChallenge){
+                        deleteHabitButton.style.display='none';
+                        habitCreateChallenge.disabled = true
+                        habitUpdateChallenge.disabled = false
+                        document.getElementById("habitCreateChallengeField").setAttribute("style","display: none")
+                        document.getElementById("habitUpdateChallengeField").setAttribute("style","display: block")
+                    }else{
+                        deleteHabitButton.style.display='block';
+                        habitCreateChallenge.disabled = false
+                        habitUpdateChallenge.disabled = true
+                        document.getElementById("habitCreateChallengeField").setAttribute("style","display: block")
+                        document.getElementById("habitUpdateChallengeField").setAttribute("style","display: none")
+                    }
+
+                    if(habit.public){
+                        habitTitle.readOnly = true;
+                        habitDescription.readOnly = true;
+                        habitDifficulty.readOnly = true;
+                        habitType.readOnly = true;
+                        habitUpdateChallenge.addEventListener('mousedown', function(event) {event.preventDefault();});
+                    }
 
                     const form = document.getElementById('habitForm');
                     const modalTitle = document.getElementById('habitContent');
@@ -631,7 +694,7 @@
         const habitForm = document.getElementById("habitForm");
         const habitTitleInput = document.getElementById("habitTitle");
         const habitTitleError = document.getElementById("habitTitleError");
-        const habitTarget = document.getElementById("habitTarget")
+
         const habitTargetError = document.getElementById("habitTargetError")
         habitForm.addEventListener("submit", (e) => {
             let valid = true;
@@ -677,25 +740,50 @@
         }
 
         // Daily
+
+        const dailyInput = document.getElementById('dailyTitle');
+        const dailyDes = document.getElementById('dailyDes')
+        const dailyInputCreateChallenge = document.getElementById('dailCreateChallenge')
+        const dailyInputUpdateChallenge = document.getElementById('dailyUpdateChallenge')
+        const dailyDifficult = document.getElementById('dailyDifficulty')
+
+        const dailyInputId = document.getElementById('dailyId')
+        const dailyRepeatFrequency = document.getElementById('repeatFrequency')
+        const repeatEvery = document.getElementById('repeatEvery')
+        const deleteDailyButton = document.getElementById("deleteDailyButton")
+        const deleteDaily = document.getElementById("deleteDaily")
+        const repeatDaysSection = document.querySelectorAll('#repeatDaysSection input[type="checkbox"]')
+        const repeatMonthDaysSection = document.querySelectorAll('#repeatMonthDaysSection input[type="checkbox"]')
+
         window.openDailyCreateModal= ()=>{
-            document.getElementById('dailyId').value = '';
-            document.getElementById('dailyTitle').value = '';
-            document.getElementById('dailyDes').value = '';
-            document.getElementById('dailyDifficulty').value = 'EASY';
-            document.getElementById('repeatFrequency').value = 'DAILY';
+            dailyInputId.value = '';
+            dailyInput.value = '';
+            dailyDes.value = '';
+            dailyDifficult.value = 'EASY';
+            dailyRepeatFrequency.value = 'DAILY';
             toggleRepeatOptions();
-            document.getElementById('repeatEvery').value = 1;
-            document.getElementById("deleteDailyButton").style.display='none'
+            repeatEvery.value = 1;
+            deleteDailyButton.style.display='none'
 
-            document.querySelectorAll('#repeatDaysSection input[type="checkbox"]').forEach(checkbox => {
+            repeatDaysSection.forEach(checkbox => {
                 checkbox.checked = false;
             });
 
-            document.querySelectorAll('#repeatMonthDaysSection input[type="checkbox"]').forEach(checkbox => {
+            repeatMonthDaysSection.forEach(checkbox => {
                 checkbox.checked = false;
             });
 
-            document.getElementById('dailyChallenge').value = '';
+            dailyInputCreateChallenge.value = '';
+
+            dailyInput.readOnly = false
+            dailyDes.readOnly = false
+            dailyInputCreateChallenge.removeEventListener("mousedown",null);
+            dailyDifficult.readOnly = false
+
+            dailyInputCreateChallenge.disabled = false
+            dailyInputUpdateChallenge.disabled = true
+            document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: none;");
+            document.getElementById("dailyCreateChallengeField").setAttribute("style", "display: block;");
 
             const modal = new bootstrap.Modal(document.getElementById('modalDaily'));
             modal.show();
@@ -710,26 +798,47 @@
                     }
                     return response.json()})
                 .then(daily => {
-                    document.getElementById('dailyId').value = dailyId || '';
-                    document.getElementById('dailyTitle').value = daily.title || '';
-                    document.getElementById('dailyDes').value = daily.description || '';
-                    document.getElementById('dailyDifficulty').value = daily.difficulty || '';
-                    document.getElementById('repeatFrequency').value = daily.repeatFrequency || 'DAILY';
+                    console.log(daily)
+                    dailyInputId.value = daily.dailyId || '';
+                    dailyInput.value = daily.title || '';
+                    dailyDes.value = daily.description || '';
+                    dailyDifficult.value = daily.difficulty || '';
+                    dailyRepeatFrequency.value = daily.repeatFrequency || 'DAILY';
                     toggleRepeatOptions();
-                    document.getElementById('repeatEvery').value = daily.repeatEvery || 1;
-                    document.getElementById("deleteDailyButton").style.display='block'
-                    document.getElementById("deleteDaily").setAttribute("href","dailies/delete/"+dailyId);
+                    repeatEvery.value = daily.repeatEvery || 1;
 
-                    document.querySelectorAll('#repeatDaysSection input[type="checkbox"]').forEach(checkbox => {
+                    if(daily.inChallenge){
+                        deleteDailyButton.style.display='none'
+                        dailyInputCreateChallenge.disabled = true
+                        dailyInputUpdateChallenge.disabled = false
+                        document.getElementById("dailyCreateChallengeField").setAttribute("style", "display: none;");
+                        document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: block;");
+                    }else{
+                        deleteDailyButton.style.display='block'
+                        dailyInputCreateChallenge.disabled = false
+                        dailyInputUpdateChallenge.disabled = true
+                        document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: none;");
+                        document.getElementById("dailyCreateChallengeField").setAttribute("style", "display: block;");
+                    }
+
+                    deleteDaily.setAttribute("href","dailies/delete/"+dailyId);
+
+                    repeatDaysSection.forEach(checkbox => {
                         checkbox.checked = daily.repeatDays.includes(checkbox.value);
                     });
 
-                    document.querySelectorAll('#repeatMonthDaysSection input[type="checkbox"]').forEach(checkbox => {
-                        console.log(daily.repeatMonthDays)
+                    repeatMonthDaysSection.forEach(checkbox => {
                         checkbox.checked = daily.repeatMonthDays.includes(Number(checkbox.value));
                     });
 
-                    document.getElementById('dailyChallenge').value = daily.challengeId || '';
+                    dailyInputUpdateChallenge.value = daily.challengeId || '';
+
+                    if(daily.public){
+                        dailyInput.readOnly = true
+                        dailyDes.readOnly = true
+                        dailyInputUpdateChallenge.addEventListener('mousedown', function(event) {event.preventDefault();});
+                        dailyDifficult.readOnly = true
+                    }
 
                     const form = document.getElementById('dailyForm');
                     const modalTitle = document.getElementById('DailyModalTitle');

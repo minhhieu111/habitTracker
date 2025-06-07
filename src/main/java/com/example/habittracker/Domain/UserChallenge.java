@@ -20,15 +20,18 @@ public class UserChallenge {
     private LocalDate endDate;
     @Enumerated(EnumType.STRING)
     private Status status;
-    private Long streak;
-    private Long daysSinceStart;
+    private Long streak = 0L;
+    private Long daysSinceStart = 0L;
 
     private Double progress;
-    private Long bestStreak;
-    private Long totalCompletedTasks;
-    private Long totalExpectedTasks;
-    private Long completedTasks;
-    private Long skippedTasks;
+    private Long bestStreak = 0L;
+    private Long totalCompletedTasks = 0L;
+    private Long totalExpectedTasks = 0L;
+    private Long completedTasks = 0L;
+    private Long skippedTasks = 0L;
+
+//   để tính streak
+    private boolean completedToday;
 
     private boolean isNotificationShown = false;
 

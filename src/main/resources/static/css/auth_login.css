@@ -61,7 +61,7 @@ body {
     padding: 12px;
     font-weight: bold;
     margin-top: 10px;
-    margin-bottom: 20px;
+    width: 65%;
 }
 
 .login-button:hover {
@@ -87,4 +87,40 @@ body {
     font-size: 14px;
     text-align: left;
 
+}
+
+.google-login-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    color: rgba(0, 0, 0, 0.54);
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    padding: 10px 24px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2); /* Đổ bóng nhẹ */
+    cursor: pointer;
+    margin-top: 10px;
+    width: 65%;
+    margin-bottom: 20px;
+}
+
+.google-login-button:hover {
+    background-color: #f8f9fa; /* Màu nền nhạt hơn khi hover */
+    border-color: #d2d3d4;
+    box-shadow: 0 2px 6px 0 rgba(0,0,0,0.25);
+}
+
+.google-login-button:active {
+    background-color: #ebebeb; /* Màu khi nhấp chuột */
+}
+
+.google-login-button img {
+    width: 18px; /* Kích thước logo */
+    height: 18px;
+    margin-right: 12px; /* Khoảng cách giữa logo và text */
 }

@@ -38,11 +38,11 @@ public class DiaryService {
         this.userDailyRepository = userDailyRepository;
         this.todoRepository = todoRepository;
     }
-
+    @Transactional
     public List<Diary> getDiariesByUser(User user) {
         return diaryRepository.findByUser(user);
     }
-
+    @Transactional
     public DiaryDTO getDiaryDTO(Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new RuntimeException("Nhật ký không tìm thấy"));
@@ -191,7 +191,7 @@ public class DiaryService {
         return getDiaryDTO(diaryId);
     }
 
-
+    @Transactional
     public List<TaskDTO> getCompletedTasks(User user) {
         LocalDate today = LocalDate.now();
 

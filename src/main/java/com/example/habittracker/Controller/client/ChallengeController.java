@@ -5,6 +5,7 @@ import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.DTO.ChallengeDTO;
 import com.example.habittracker.DTO.DailyDTO;
 import com.example.habittracker.DTO.HabitDTO;
+import com.example.habittracker.Domain.Challenge;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Service.ChallengeService;
 import com.example.habittracker.Service.UserService;
@@ -73,8 +74,15 @@ public class ChallengeController {
 
     @GetMapping("/{challengeId}")
     @ResponseBody
-    public ResponseEntity<ChallengeDTO> getChallenge(@PathVariable Long challengeId) {
-        ChallengeDTO challengeDTO = challengeService.getChallengeById(challengeId);
+    public ResponseEntity<ChallengeDTO> getChallenge(HttpServletRequest request,@PathVariable Long challengeId,@RequestParam(value = "creator",defaultValue = "true") Boolean creator) {
+        User user;
+        if(creator){
+            user = getUserFromRequest(request);
+        }else{
+            Challenge challenge = challengeService.getChallengeById(challengeId);
+            user = this.userService.getUserById(challenge.getCreatorId());
+        }
+        ChallengeDTO challengeDTO = challengeService.getChallengeDTOById(challengeId, user);
         if (challengeDTO == null) {
             return ResponseEntity.notFound().build();
         }
@@ -153,11 +161,19 @@ public class ChallengeController {
 
     @GetMapping("/detail/challenge/{id}")
     @ResponseBody
-    public ResponseEntity<ChallengeDTO> getChallengeDetails(HttpServletRequest request, @PathVariable Long id) {
-        User user = getUserFromRequest(request);
+    public ResponseEntity<ChallengeDTO> getChallengeDetails(HttpServletRequest request, @PathVariable Long id, @RequestParam(value = "creator",defaultValue = "true") Boolean creator) {
+        User user;
+        if(creator){
+            user = getUserFromRequest(request);
+        }else{
+            Challenge challenge = challengeService.getChallengeById(id);
+            user = this.userService.getUserById(challenge.getCreatorId());
+        }
+
         ChallengeDTO challengeDTO = this.challengeService.getUserChallengeDetail(user,id);
         return ResponseEntity.ok().body(challengeDTO);
     }
+
 
     private User getUserFromRequest(HttpServletRequest request) {
         String token = tokenUtil.getTokenFromCookies(request);

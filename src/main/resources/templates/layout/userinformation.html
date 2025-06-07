@@ -1,7 +1,7 @@
 <div class="user-profile row align-items-center" th:fragment="user(user)">
     <!-- Avatar và Cấp độ -->
     <div class="user-avatar">
-        <i class="fas fa-smile text-white"></i>
+        <img th:src="${user.avatar}"/>
     </div>
 
     <!-- Thông tin chi tiết -->
@@ -11,15 +11,6 @@
         </strong>
 
         <p>Người dùng: <span th:text="${user.getUserName()}"></span></p>
-        <strong>Cấp độ: <span th:text="${user.getLevel()}"></span></strong>
-        <div class="progress mt-1">
-            <div class="progress-bar" role="progressbar"
-                 th:style="'width: ' + (${user.getExp()} * 100 / ${user.getLevel()}) + '%'">
-            </div>
-        </div>
-        <div class="user-experiment">
-            <span class="me-2" th:text="'Kinh Nghiệm: ' + ${user.getExp()} + '/' + ${user.getLevel()}">Kinh Nghiệm: </span>
-        </div>
     </div>
 
     <!-- Coin -->

@@ -21,4 +21,7 @@ public interface DailyRepository extends JpaRepository<Daily,Long> {
 
     @Query("SELECT ud FROM UserDaily ud WHERE ud.daily.challenge.challengeId = :challengeId")
     List<UserDaily> findByChallenge_ChallengeId(@Param("challengeId")Long challengeId);
+
+    @Query("SELECT d FROM Daily d WHERE d.challenge.challengeId = :challengeId")
+    List<Daily> findByChallengeId(@Param("challengeId")Long challengeId);
 }

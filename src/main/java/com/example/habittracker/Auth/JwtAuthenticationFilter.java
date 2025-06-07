@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         // Bỏ qua filter cho các đường dẫn /login và /register
         String requestPath = request.getServletPath();
-        if (requestPath.equals("/login") || requestPath.equals("/register")|| requestPath.equals("/css/auth_login.css")|| requestPath.equals("/css/auth_register.css")) {
+        if (requestPath.equals("/login") || requestPath.equals("/register")|| requestPath.equals("/css/auth_login.css")|| requestPath.equals("/css/auth_register.css") || requestPath.equals("/login_with_google")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -52,6 +53,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (RuntimeException e) {
             // Token hết hạn hoặc không hợp lệ, chuyển hướng về /login
             response.sendRedirect("/login");
+            return;
+        }
+
+        if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                SecurityContextHolder.getContext().getAuthentication().isAuthenticated() &&
+                !(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)) { // Không phải xác thực ẩn danh
+            filterChain.doFilter(request, response);
             return;
         }
 

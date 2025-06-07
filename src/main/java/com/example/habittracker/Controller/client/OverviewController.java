@@ -54,6 +54,9 @@ public class OverviewController {
         List<UserChallenge> userChallenges  = this.challengeService.getChallenges(user.getUserId());
         model.addAttribute("userChallenges", userChallenges);
 
+        List<UserChallenge> userChallengeOwner = this.challengeService.getChallengesOwner(user.getUserId());
+        model.addAttribute("userChallengeOwner", userChallengeOwner);
+
         model.addAttribute("challengeName", "Lối Sống");
         model.addAttribute("challengeDay", 24);
         model.addAttribute("challengeTotalDays", 30);

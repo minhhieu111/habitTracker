@@ -22,6 +22,7 @@ public class ChallengeDTO {
     private List<HabitDTO> habits;
     private List<DailyDTO> dailies;
     private UserChallenge.Status status;
+    private Long challengeParticipant;
 
     private Double progress;
     private Long bestStreak;

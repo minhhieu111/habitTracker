@@ -106,12 +106,20 @@ public class HabitService {
         User user = this.userService.getUser(username);
         Habit habit = this.habitRepository.findById(habitId).orElseThrow(()->new RuntimeException("Lỗi khi chỉnh sửa thói quen!"));
         UserHabit userHabit = this.userHabitRepository.findUserHabitByHabitAndUser(habit,user).orElseThrow(()->new RuntimeException("Lỗi lấy dữ liệu chỉnh sửa!"));
+
+        boolean isPublic = false;
+        if(habit.getChallenge()!=null){
+            isPublic = habit.getChallenge().getIsPublic().equals(Challenge.Visibility.PUBLIC);
+        }
         HabitDTO habitDTO = new HabitDTO().builder()
+                .habitId(habit.getHabitId())
                 .title(habit.getTitle())
                 .description(habit.getDescription())
                 .type(habit.getType())
                 .difficulty(userHabit.getDifficulty())
                 .targetCount(userHabit.getTargetCount())
+                .isPublic(isPublic)
+                .isInChallenge(userHabit.isInChallenge())
                 .challengeId(habit.getChallenge() != null ? habit.getChallenge().getChallengeId() : null)
                 .build();
         return habitDTO;
@@ -128,7 +136,10 @@ public class HabitService {
         if(habitDTO.getTargetCount() < 1 || habitDTO.getTargetCount() == null){
             throw new RuntimeException("Tạo Thói quen thất Bại! Mục tiêu không được để trống và mục tiêu phải lớn hơn 1");
         }
-        Challenge challenge = this.challengeRepository.findById(habitDTO.getChallengeId()).get();
+        Challenge challenge = null;
+        if(habitDTO.getChallengeId()!=null){
+            challenge = this.challengeRepository.findById(habitDTO.getChallengeId()).orElse(null);
+        }
 
         habit.setTitle(habitDTO.getTitle());
         habit.setDescription(habitDTO.getDescription());
@@ -249,7 +260,7 @@ public class HabitService {
             if(userChallenge != null && userChallenge.getStatus() == UserChallenge.Status.ACTIVE){
                 this.challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),today);
                 this.challengeProgressService.recalculateUserChallengeProgress(userChallenge);
-                this.challengeProgressService.updateChallengeStreak(userChallenge);
+                this.challengeProgressService.updateChallengeStreak(userChallenge,false);
             }
         }
 
@@ -300,20 +311,36 @@ public class HabitService {
             habitHistoryRepository.save(habitHistory);
         }
     }
+//    @Transactional
+//    public List<HabitDTO> getHabitsByUser_ChallengeId(User user,Long challengeId) {
+//        List<UserHabit> userHabits = userHabitRepository.findByUser_ChallengeId(user,challengeId);
+//        return userHabits.stream().map(userHabit -> HabitDTO.builder()
+//                .habitId(userHabit.getHabit().getHabitId())
+//                .title(userHabit.getHabit().getTitle())
+//                .description(userHabit.getHabit().getDescription())
+//                .type(userHabit.getHabit().getType())
+//                .difficulty(userHabit.getHabit().getDifficulty())
+//                .targetCount(userHabit.getHabit().getTargetCount())
+//                .challengeId(userHabit.getHabit().getChallenge() != null ? userHabit.getHabit().getChallenge().getChallengeId() : null)
+//                .build()).collect(Collectors.toList());
+//    }
 
-    public List<HabitDTO> getHabitsByChallengeId(Long challengeId) {
-        List<UserHabit> userHabits = userHabitRepository.findByChallenge_ChallengeId(challengeId);
-        return userHabits.stream().map(userHabit -> HabitDTO.builder()
-                .habitId(userHabit.getHabit().getHabitId())
-                .title(userHabit.getHabit().getTitle())
-                .description(userHabit.getHabit().getDescription())
-                .type(userHabit.getHabit().getType())
-                .difficulty(userHabit.getHabit().getDifficulty())
-                .targetCount(userHabit.getHabit().getTargetCount())
-                .challengeId(userHabit.getHabit().getChallenge() != null ? userHabit.getHabit().getChallenge().getChallengeId() : null)
+    @Transactional
+    public List<HabitDTO> getHabitsByUser_ChallengeId(Long challengeId) {
+
+        List<Habit> habits = habitRepository.findByChallenge(challengeId);
+        return habits.stream().map(habit -> HabitDTO.builder()
+                .habitId(habit.getHabitId())
+                .title(habit.getTitle())
+                .description(habit.getDescription())
+                .type(habit.getType())
+                .targetCount(habit.getTargetCount())
+                .difficulty(habit.getDifficulty())
                 .build()).collect(Collectors.toList());
     }
 
+
+    @Transactional
     public void unlinkHabitFromChallenge(Long habitId) {
         Habit habit = habitRepository.findById(habitId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thây dữ liệu"));
