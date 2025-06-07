@@ -29,4 +29,7 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
     @Query("SELECT uc FROM UserChallenge uc WHERE uc.challenge.isPublic = 'PUBLIC' AND uc.challenge.creatorId = uc.user.userId ORDER BY uc.endDate DESC")
     List<UserChallenge> findByChallengePublic();
 
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.user = :user AND uc.status = 'COMPLETE' AND uc.challenge.isPublic = 'PRIVATE'")
+    List<UserChallenge> findByUserAndCompleted(@Param("user")User user);
+
 }

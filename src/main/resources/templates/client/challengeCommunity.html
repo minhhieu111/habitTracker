@@ -35,8 +35,8 @@
     </div>
 
     <!-- Content Area -->
-    <div class="content-area">
-        <button class="btn share-challenge-btn" id="shareChallenge">
+    <div class="content-area d-flex">
+        <button class="btn share-challenge-btn" id="shareChallenge" data-bs-toggle="modal" data-bs-target="#shareChallengeModal">
             <i class="fas fa-share-alt"></i>
             Chia sẻ thói thách của bạn
         </button>
@@ -59,6 +59,25 @@
                     2345 người tham gia
                 </div>
             </div>
+        </div>
+        <div id="rankingBoard">
+            <h4 class="fw-bold text-center w-100">Bảng Xếp Hạng Thử Thách Hoàn Thành</h4>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">STT</th>
+                    <th scope="col">Người dùng</th>
+                    <th scope="col">Thử thách hoàn thành</th>
+                </tr>
+                </thead>
+                <tbody th:each="stats, iterStat :${userChallengeStats}">
+                <tr>
+                    <th th:text="${iterStat.index + 1}">1</th>
+                    <td th:text="${stats.user.userName}">Mark</td>
+                    <td th:text="${stats.completedChallengesCount}">Otto</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
 
         <!-- Modal to view detailed information about a community challenge -->
@@ -116,14 +135,6 @@
                             <h5 class="fw-bold mb-3">Hàng ngày</h5>
                             <div id="dailyTasksList">
                                 <!-- Daily tasks will be populated here -->
-                                <div class="mb-3">
-                                    <input type="text" class="form-control bg-light border-0 rounded-pill py-3"
-                                           placeholder="Thiền" readonly style="background-color: #f0f0f0 !important;">
-                                </div>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control bg-light border-0 rounded-pill py-3"
-                                           placeholder="Thư giãn" readonly style="background-color: #f0f0f0 !important;">
-                                </div>
                             </div>
                         </div>
 
@@ -132,28 +143,6 @@
                             <h5 class="fw-bold mb-3">Thói quen</h5>
                             <div id="habitsList">
                                 <!-- Habits will be populated here -->
-                                <div class="bg-light rounded-pill p-3 mb-3 d-flex justify-content-between align-items-center">
-                                    <span>Giãn cơ 5 phút</span>
-                                    <div class="habit-toggles">
-                                        <button class="btn btn-success btn-sm rounded-circle me-2" style="width: 30px; height: 30px;">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm rounded-circle" style="width: 30px; height: 30px;">
-                                            <i class="fas fa-minus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="bg-light rounded-pill p-3 mb-3 d-flex justify-content-between align-items-center">
-                                    <span>Yoga 30 phút</span>
-                                    <div class="habit-toggles d-flex">
-                                        <button class="btn btn-success btn-sm rounded-circle me-2" style="width: 30px; height: 30px;">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm rounded-circle" style="width: 30px; height: 30px;">
-                                            <i class="fas fa-minus"></i>
-                                        </button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -283,6 +272,97 @@
             </div>
         </div>
 
+<!--        share challenge-->
+        <div class="modal fade" id="shareChallengeModal" tabindex="-1" aria-labelledby="shareChallengeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
+                    <!-- Modal Header with Purple Gradient -->
+                    <div class="modal-header text-white text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 30px 20px 20px;">
+                        <div class="w-100">
+                            <h4 class="modal-title fw-bold mb-2" id="shareChallengeModalLabel">Chia sẻ thử thách</h4>
+                            <p class="mb-0 opacity-75" id="shareableCount" th:text="'Thử thách có thể chia sẻ '+ ${userCompleteChallenge.size()}">Thử thách có thể chia sẻ: 3</p>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white position-absolute" style="top: 15px; right: 15px;" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Modal Body with Challenge Cards -->
+                    <div class="modal-body" style="padding: 20px; background-color: #f8f9fa;">
+                        <div id="shareableChallenges">
+                            <!-- Challenge Card 1 -->
+                            <div th:each="CompleteChallenge : ${userCompleteChallenge}" class="shareable-challenge-card mb-3" th:onclick="|showShareChallenge(${CompleteChallenge.challenge.challengeId})|">
+                                <div class="challenge-card-content">
+                                    <h5 class="challenge-name" th:text="${CompleteChallenge.challenge.title}">Chơi Thể Thao</h5>
+                                    <p class="challenge-desc" th:text="${CompleteChallenge.challenge.description}">Mô tả: Duy trì chơi thể thao thay đổi hình thể</p>
+                                    <div class="challenge-duration" th:text="${CompleteChallenge.challenge.day}+ ' Ngày'">20 Ngày</div>
+                                </div>
+                            </div>
+
+                        <!-- Empty State -->
+                        <div id="noChallengesState" class="text-center py-4 d-none">
+                            <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Chưa có thử thách nào</h5>
+                            <p class="text-muted">Hãy tạo thử thách đầu tiên của bạn!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <div class="modal fade" id="challengeDetailShareModal" tabindex="-1" aria-labelledby="challengeDetailShareModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-left">
+                    <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+                        <!-- Modal Header with Challenge Info (Purple Gradient Background) -->
+                        <div class="modal-header text-white p-4" style="background: #4900F2; border: none;">
+                            <div class="container-fluid p-0">
+                                <!-- Challenge Title -->
+                                <div class="row">
+                                    <div class="col-12 text-center mb-3">
+                                        <h3 class="modal-title fw-bold" id="shareTitle">Chơi Thể Thao</h3>
+                                    </div>
+                                </div>
+
+                                <!-- Challenge Description Box -->
+                                <div class="row">
+                                    <div class="col-12 text-center mb-3">
+                                    <textarea readonly class="challenge-modal-descrip rounded p-3" id="ShareDescription">
+                                        Thay đổi thói quen trở nên lành mạnh
+                                    </textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Body with Daily Tasks and Habits -->
+                        <div class="modal-body p-4">
+                            <!-- Daily Tasks Section -->
+                            <div class="mb-4">
+                                <h5 class="fw-bold mb-3">Hàng ngày</h5>
+                                <div id="ShareDailyTasksList">
+                                    <!-- Daily tasks will be populated here -->
+                                </div>
+                            </div>
+
+                            <!-- Habits Section -->
+                            <div class="mb-4">
+                                <h5 class="fw-bold mb-3">Thói quen</h5>
+                                <div id="ShareHabitsList">
+                                    <!-- Habits will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Footer with Join Button -->
+                        <div class="modal-footer border-0 p-4">
+                            <button type="button" class="btn w-100 py-3 fw-bold text-dark"
+                                    style="background-color: #ffc107; border-radius: 25px;" id="Share" >
+                                Chia sẻ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Loading State -->
         <div id="loadingState" class="loading-spinner d-none">
             <div class="spinner-border" role="status">
@@ -299,121 +379,9 @@
     </div>
 </div>
 
-<!-- Share Challenge Modal -->
-<div class="modal fade" id="shareChallengeModal" tabindex="-1" aria-labelledby="shareChallengeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="shareChallengeModalLabel">Chia sẻ thử thách của bạn</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="shareChallengeForm">
-                    <div class="mb-3">
-                        <label for="challengeName" class="form-label">Tên thử thách</label>
-                        <input type="text" class="form-control" id="challengeName" placeholder="Nhập tên thử thách" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="challengeDesc" class="form-label">Mô tả</label>
-                        <textarea class="form-control" id="challengeDesc" rows="3" placeholder="Mô tả chi tiết về thử thách" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="challengeDuration" class="form-label">Thời gian (ngày)</label>
-                        <input type="number" class="form-control" id="challengeDuration" placeholder="Số ngày thực hiện" min="1" max="365" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary" id="submitChallenge">Chia sẻ</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-
-        // Share challenge button
-        document.getElementById('shareChallenge').addEventListener('click', function() {
-            const shareChallengeModal = new bootstrap.Modal(document.getElementById('shareChallengeModal'));
-            shareChallengeModal.show();
-        });
-
-        // Submit challenge form
-        document.getElementById('submitChallenge').addEventListener('click', function() {
-            const form = document.getElementById('shareChallengeForm');
-            if (form.checkValidity()) {
-                const challengeData = {
-                    name: document.getElementById('challengeName').value,
-                    description: document.getElementById('challengeDesc').value,
-                    duration: document.getElementById('challengeDuration').value
-                };
-
-                // Show loading state
-                document.getElementById('loadingState').classList.remove('d-none');
-
-                // Simulate API call
-                setTimeout(() => {
-                    // Add new challenge to the top of the list
-                    addNewChallengePost(challengeData);
-
-                    // Hide loading state
-                    document.getElementById('loadingState').classList.add('d-none');
-
-                    // Close modal and reset form
-                    bootstrap.Modal.getInstance(document.getElementById('shareChallengeModal')).hide();
-                    form.reset();
-
-                    // Show success message
-                    showToast('Thử thách đã được chia sẻ thành công!', 'success');
-                }, 1500);
-            } else {
-                form.reportValidity();
-            }
-        });
-
-        // Community post click
-        // document.addEventListener('click', function(event) {
-        //     if (event.target.closest('.community-post')) {
-        //         const postId = event.target.closest('.community-post').dataset.id;
-        //         const challengeName = event.target.closest('.community-post').querySelector('.challenge-title').textContent;
-        //
-        //         // This would navigate to challenge details or join challenge
-        //         showToast(`Bạn đã quan tâm đến thử thách: ${challengeName}`, 'info');
-        //     }
-        // });
-
-        // Function to add new challenge post
-        function addNewChallengePost(challengeData) {
-            const newPost = `
-            <div class="community-post" data-id="${Date.now()}">
-                <div class="post-header">
-                    <div class="user-avatar">😊</div>
-                    <div class="user-info">
-                        <div class="username">Bạn</div>
-                        <div class="post-time">Vừa xong</div>
-                    </div>
-                </div>
-
-                <div class="challenge-title">${challengeData.name}</div>
-                <div class="challenge-description">Mô tả: ${challengeData.description}</div>
-                <div class="challenge-duration">${challengeData.duration} Ngày</div>
-
-                <div class="participants-badge">1 người tham gia</div>
-            </div>
-        `;
-
-            const communityPosts = document.getElementById('communityPosts');
-            communityPosts.insertAdjacentHTML('afterbegin', newPost);
-
-            // Add animation to new post
-            const firstPost = communityPosts.querySelector('.community-post');
-            firstPost.style.display = 'none';
-            firstPost.style.display = 'block';
-            setTimeout(() => firstPost.classList.add('fadeIn'), 10);
-        }
 
         // Function to show toast notifications
         function showToast(message, type = 'info') {
@@ -442,14 +410,6 @@
                 this.remove();
             });
         }
-
-        // Infinite scroll (optional)
-        window.addEventListener('scroll', function() {
-            if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 100) {
-                // Load more posts if needed
-                // loadMorePosts();
-            }
-        });
 
         // Check if there are no posts and show empty state
         if (document.querySelectorAll('.community-post').length === 0) {
@@ -540,6 +500,86 @@
             })
         }
 
+        window.showShareChallenge = (challengeId)=> {
+            fetch(`/challenges/${challengeId}`)
+                .then(response =>{
+                    if(response.url.includes("/login")){
+                        window.location.href = "/login";
+                        return;
+                    }
+                    return response.json()
+                }).then((challenge)=>{
+                document.querySelector("#shareTitle").textContent = challenge.title;
+                document.querySelector("#ShareDescription").textContent = challenge.description;
+                document.querySelector("#Share").setAttribute("onclick",`shareChallenge(${challenge.challengeId})`)
+
+                // Populate daily tasks (if available)
+                if (challenge.dailies) {
+                    document.querySelector('#ShareDailyTasksList').innerHTML = ""
+                    let dailyTasksHtml = '';
+                    challenge.dailies.forEach(task => {
+                        dailyTasksHtml += `
+                            <div class="mb-3">
+                                <input type="text" class="form-control bg-light border-0 rounded-pill py-3"
+                                       placeholder="${task.title}" readonly style="background-color: #f0f0f0 !important;">
+                            </div>
+                        `;
+                    });
+                    document.querySelector('#ShareDailyTasksList').innerHTML = dailyTasksHtml;
+                }
+
+                // Populate habits (if available)
+                if (challenge.habits) {
+                    document.querySelector('#ShareHabitsList').innerHTML = ""
+                    let habitsHtml = '';
+                    challenge.habits.forEach(habit => {
+                        let hiddenPositive = "block";
+                        let hiddenNegative = "block";
+                        if(habit.type === "POSITIVE"){
+                            hiddenNegative = "none"
+                        }else if(habit.type === "NEGATIVE"){
+                            hiddenPositive = "none"
+                        }
+                        habitsHtml += `
+                            <div class="bg-light rounded-pill p-3 mb-3 d-flex justify-content-between align-items-center">
+                                <span>${habit.title}</span>
+                                <div class="habit-toggles d-flex">
+                                    <button class="btn btn-success btn-sm rounded-circle me-2" style="display:${hiddenPositive};width: 30px; height: 30px;">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm rounded-circle" style="display:${hiddenNegative};width: 30px; height: 30px;">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    document.querySelector('#ShareHabitsList').innerHTML = habitsHtml;
+                }
+
+                const challengeDetailModal = new bootstrap.Modal(document.getElementById('challengeDetailShareModal'));
+                challengeDetailModal.show();
+            })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu thử thách:', error);
+                    alert('Không thể lấy dữ liệu thử thách. Do phiên đăng nhập hết hạn! Mời đăng nhập lại');
+                });
+        }
+
+        window.shareChallenge = (challengeId)=>{
+            fetch(`/challenge_community/share/${challengeId}`)
+                .then(response=>{
+                    if(response.url.includes("/login")){
+                        window.location.href = "/login"
+                        return;
+                    }
+                    return response.json();
+                }).then((message)=>{
+                bootstrap.Modal.getInstance(document.getElementById('challengeDetailShareModal')).hide();
+                showToast(message.message, message.type)
+            })
+        }
+
         // open modal detail user challenge
         window.DetailChallenge = function(challengeId) {
             showChallengeDetails(challengeId);
@@ -556,9 +596,6 @@
                     return response.json()
                 })
                 .then(data => {
-                    console.log(data.title)
-                    console.log(data.description)
-
                     // Update modal with challenge data
                     document.getElementById('challengeOverviewTitle').textContent = data.title;
                     document.getElementById('challengeOverviewDescription').textContent = data.description;

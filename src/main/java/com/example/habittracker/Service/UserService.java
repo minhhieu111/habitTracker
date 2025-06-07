@@ -1,5 +1,6 @@
 package com.example.habittracker.Service;
 
+import com.example.habittracker.DTO.UserChallengeStats;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -7,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -57,5 +59,10 @@ public class UserService {
         }
         this.userRepository.save(user);
         return user;
+    }
+
+    @Transactional
+    public List<UserChallengeStats> getUsersAndCompletedChallenges() {
+        return this.userRepository.findAllUsersOrderedByCompletedChallenges();
     }
 }

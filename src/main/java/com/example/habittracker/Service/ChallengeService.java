@@ -79,6 +79,7 @@ public class ChallengeService {
     public List<UserChallenge> getCompletedChallengesForNotification(User user) {
         return userChallengeRepository.findByUserAndStatusAndIsNotificationShownFalse(user, UserChallenge.Status.COMPLETE);
     }
+
     @Transactional
     public ChallengeDTO getUserChallengeDetail(User user, Long challengeId) {
         Challenge challenge = this.challengeRepository.findById(challengeId)
@@ -87,10 +88,6 @@ public class ChallengeService {
         UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, challenge)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy UserChallenge của người dùng này cho Challenge đó."));
 
-//        challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),LocalDate.now());
-//        challengeProgressService.recalculateUserChallengeProgress(userChallenge);
-//        challengeProgressService.updateChallengeStreak(userChallenge);
-
         List<DailyProgressDTO> dailyProgressDTOs = userChallenge.getDailyProgresses()
                 .stream()
                 .map(dp -> DailyProgressDTO.builder()
@@ -98,7 +95,6 @@ public class ChallengeService {
                         .completionPercentage(dp.getCompletionPercentage())
                         .build()).collect(Collectors.toList());
 
-        // 6. Gán các giá trị vào ChallengeDTO
         return ChallengeDTO.builder()
                 .challengeId(challenge.getChallengeId())
                 .title(challenge.getTitle())
@@ -117,9 +113,8 @@ public class ChallengeService {
     @Transactional
     public ChallengeDTO getChallengeDTOById(Long challengeId,User user) {
         Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new RuntimeException("Challenge not found"));
-        UserChallenge userChallenge = userChallengeRepository.findByUserAndChallenge(user,challenge)
-                .orElseThrow(() -> new RuntimeException("UserChallenge not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thử thách"));
+        UserChallenge userChallenge = userChallengeRepository.findByUserAndChallenge(user,challenge).get();
 
         List<HabitDTO> habits = habitService.getHabitsByUser_ChallengeId(challengeId);
         List<DailyDTO> dailies = dailyService.getDailiesByChallengeId(challengeId);
@@ -129,8 +124,8 @@ public class ChallengeService {
                 .title(challenge.getTitle())
                 .description(challenge.getDescription())
                 .challengeParticipant(challenge.getParticipantCount())
-                .endDate(userChallenge.getEndDate())
                 .day(challenge.getDay())
+                .endDate(userChallenge.getEndDate() != null ? userChallenge.getEndDate() : null)
                 .isPublic(challenge.getIsPublic())
                 .habits(habits)
                 .dailies(dailies)
@@ -289,9 +284,15 @@ public class ChallengeService {
         List<Daily> dailies = this.challengeRepository.findDailiesByChallengeId(challenge.getChallengeId());
         dailies.forEach(daily -> {this.dailyService.unlinkDailyFromChallenge(daily.getDailyId());});
 
-        this.userChallengeDPRepository.deleteAllByUserChallenge(userChallenge);
-        this.userChallengeRepository.delete(userChallenge);
-        this.challengeRepository.delete(challenge);
+        if(challenge.getIsPublic() == Challenge.Visibility.PRIVATE){
+            this.userChallengeDPRepository.deleteAllByUserChallenge(userChallenge);
+            this.userChallengeRepository.delete(userChallenge);
+            this.challengeRepository.delete(challenge);
+        }else{
+            this.userChallengeDPRepository.deleteAllByUserChallenge(userChallenge);
+            this.userChallengeRepository.delete(userChallenge);
+        }
+
     }
 
 
@@ -300,7 +301,14 @@ public class ChallengeService {
     public List<UserChallenge> getSharedChallenge(){
         return this.userChallengeRepository.findByChallengePublic();
     }
-    public Challenge shareChallenge(User user, Long challengeId) {
+
+    @Transactional
+    public List<UserChallenge> getUserCompleteChallenge(User user){
+        return this.userChallengeRepository.findByUserAndCompleted(user);
+    }
+
+    @Transactional
+    public void shareChallenge(User user, Long challengeId) {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thử thách"));
 
@@ -315,7 +323,7 @@ public class ChallengeService {
         }
 
         challenge.setIsPublic(Challenge.Visibility.PENDING);
-        return challengeRepository.save(challenge);
+        challengeRepository.save(challenge);
     }
 
     @Transactional

@@ -76,6 +76,7 @@ public class ChallengeController {
     @ResponseBody
     public ResponseEntity<ChallengeDTO> getChallenge(HttpServletRequest request,@PathVariable Long challengeId,@RequestParam(value = "creator",defaultValue = "true") Boolean creator) {
         User user;
+        //creator để lấy ra thông tin userChallenge của người tạo challenge community
         if(creator){
             user = getUserFromRequest(request);
         }else{
