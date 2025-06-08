@@ -33,7 +33,10 @@ public class UserChallenge {
 //   để tính streak
     private boolean completedToday;
 
+//    thông báo hoàn thành challenge hay chưa
     private boolean isNotificationShown = false;
+
+    private Long coinEarn;
 
     @ElementCollection
     @CollectionTable(name = "user_challenge_completed_dates",

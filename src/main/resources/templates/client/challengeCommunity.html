@@ -35,11 +35,21 @@
     </div>
 
     <!-- Content Area -->
-    <div class="content-area d-flex">
+    <div class="content-area">
         <button class="btn share-challenge-btn" id="shareChallenge" data-bs-toggle="modal" data-bs-target="#shareChallengeModal">
             <i class="fas fa-share-alt"></i>
             Chia sẻ thói thách của bạn
         </button>
+
+        <!-- Search Bar -->
+        <div class="search-container d-flex justify-content-center w-100">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search">
+                <button class="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
         <!-- Community Posts -->
         <div id="communityPosts">
             <div th:each="post : ${challengeShare}" class="community-post" th:onclick="|showChallengeDetail(${post.challenge.challengeId})|">
@@ -382,6 +392,29 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+
+        const searchInput = document.querySelector('.search-input');
+        let debounceTimeout;
+        searchInput.addEventListener('keyup', function () {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const communityPosts = document.querySelectorAll('.community-post');
+                let hasResults = false;
+
+                communityPosts.forEach(function (post) {
+                    const challengeTitleElem = post.querySelector('.challenge-title');
+                    const challengeTitle = challengeTitleElem ? challengeTitleElem.textContent.toLowerCase() : "";
+
+                    if (challengeTitle.includes(searchTerm)) {
+                        post.style.display = '';
+                        hasResults = true;
+                    } else {
+                        post.style.display = 'none';
+                    }
+                });
+            }, 300); // Chờ 300ms sau khi ngừng nhập
+        });
 
         // Function to show toast notifications
         function showToast(message, type = 'info') {

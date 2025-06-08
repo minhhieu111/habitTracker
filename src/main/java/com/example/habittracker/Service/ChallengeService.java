@@ -278,13 +278,13 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(()->new RuntimeException("Không tìm thấy thử thách! Xóa thất bại"));
         UserChallenge userChallenge = userChallengeRepository.findByUserAndChallenge(creator,challenge).orElseThrow(()->new RuntimeException("Lỗi khi tìm dữ liệu! Xóa thất bại"));
 
-        List<Habit> habits = this.challengeRepository.findHabitsByChallengeId(challenge.getChallengeId());
-        habits.forEach(habit -> {this.habitService.unlinkHabitFromChallenge(habit.getHabitId());});
-
-        List<Daily> dailies = this.challengeRepository.findDailiesByChallengeId(challenge.getChallengeId());
-        dailies.forEach(daily -> {this.dailyService.unlinkDailyFromChallenge(daily.getDailyId());});
-
         if(challenge.getIsPublic() == Challenge.Visibility.PRIVATE){
+            List<Habit> habits = this.challengeRepository.findHabitsByChallengeId(challenge.getChallengeId());
+            habits.forEach(habit -> {this.habitService.unlinkHabitFromChallenge(habit.getHabitId());});
+
+            List<Daily> dailies = this.challengeRepository.findDailiesByChallengeId(challenge.getChallengeId());
+            dailies.forEach(daily -> {this.dailyService.unlinkDailyFromChallenge(daily.getDailyId());});
+
             this.userChallengeDPRepository.deleteAllByUserChallenge(userChallenge);
             this.userChallengeRepository.delete(userChallenge);
             this.challengeRepository.delete(challenge);
@@ -383,7 +383,7 @@ public class ChallengeService {
                         .isCompleted(true)
                         .positiveCount(0L)
                         .negativeCount(0L)
-                        .expEarned(0L)
+                        .coinEarned(0L)
                         .build();
                 this.habitHistoryRepository.save(initialHistory);
             };

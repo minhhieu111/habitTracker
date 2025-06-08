@@ -19,4 +19,5 @@ public class DiaryDTO {
     private String imageUrl;
     private List<TaskDTO> completedTasks;
     private LocalDate today;
+    private String userCoinMessage;
 }

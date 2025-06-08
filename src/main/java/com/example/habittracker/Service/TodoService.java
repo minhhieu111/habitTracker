@@ -22,11 +22,15 @@ public class TodoService {
     private final TodoRepository todoRepository;
     private final TodoSubTaskRepository todoSubTaskRepository;
     private final TodoHistoryRepository todoHistoryRepository;
+    private final UserService userService;
+    private final CoinCalculationService coinCalculationService;
 
-    public TodoService(TodoRepository todoRepository, TodoSubTaskRepository todoSubTaskRepository, TodoHistoryRepository todoHistoryRepository) {
+    public TodoService(TodoRepository todoRepository, TodoSubTaskRepository todoSubTaskRepository, TodoHistoryRepository todoHistoryRepository, UserService userService, CoinCalculationService coinCalculationService) {
         this.todoRepository = todoRepository;
         this.todoSubTaskRepository = todoSubTaskRepository;
         this.todoHistoryRepository = todoHistoryRepository;
+        this.userService = userService;
+        this.coinCalculationService = coinCalculationService;
     }
 
     @Transactional
@@ -50,6 +54,7 @@ public class TodoService {
                 .title(todo.getTitle())
                 .description(todo.getDescription())
                 .difficulty(todo.getDifficulty())
+                .executionDate(todo.getExecution_date())
                 .todoSubtasks(todoSubtaskDTOs)
                 .build();
     }
@@ -59,6 +64,7 @@ public class TodoService {
                 .title(todoDTO.getTitle())
                 .description(todoDTO.getDescription())
                 .difficulty(todoDTO.getDifficulty())
+                .execution_date(todoDTO.getExecutionDate())
                 .user(user)
                 .isCompleted(false)
                 .todoSubTasks(new ArrayList<>())
@@ -88,6 +94,7 @@ public class TodoService {
         todo.setTitle(todoDTO.getTitle());
         todo.setDescription(todoDTO.getDescription());
         todo.setDifficulty(todoDTO.getDifficulty());
+        todo.setExecution_date(todoDTO.getExecutionDate());
 
         this.todoSubTaskRepository.deleteAllByTodo(todo);
         if(todoDTO.getSubtasks() != null && !todoDTO.getSubtasks().isEmpty()){
@@ -126,6 +133,7 @@ public class TodoService {
                         .date(today)
                         .todo(todo)
                         .isCompleted(false)
+                        .coinEarned(0L)
                         .build()
         );
 
@@ -139,11 +147,40 @@ public class TodoService {
                     subtask.setCompleted(true);
                     this.todoSubTaskRepository.save(subtask);
                 }
+
+                Long coinEarned = this.coinCalculationService.calculateTodoCoins(todo);
+                todoHistory.setCoinEarned(coinEarned);
+                String message = this.userService.getCoinComplete(user,coinEarned);
+                todoDTO.setUserCoinMessage(message);
+            }else{
+                for (TodoSubtask subtask : todo.getTodoSubTasks()) {
+                    subtask.setCompleted(false);
+                    this.todoSubTaskRepository.save(subtask);
+                }
+                Long coinBack = this.todoHistoryRepository.findCoinEarnedByTodoAndToday(todo,today);
+                todoHistory.setCoinEarned(0L);
+                String message = this.userService.getCoinComplete(user,-coinBack);
+                todoDTO.setUserCoinMessage(message);
             }
+
+            //hiển thị subtask hoàn thành trên giao diện
+            List<TodoSubtaskDTO> todoSubtaskDTOS = todo.getTodoSubTasks().stream().map(subtask->
+                TodoSubtaskDTO.builder()
+                        .todoSubtaskId(subtask.getTodoSubtaskId())
+                        .title(subtask.getTitle())
+                        .isCompleted(subtask.isCompleted())
+                        .build()
+            ).collect(Collectors.toList());
+            todoDTO.setTodoSubtasks(todoSubtaskDTOS);
         } else {
             boolean allCompleted = todo.isAllSubtasksCompleted();
             todo.setCompleted(allCompleted);
             todoHistory.setCompleted(allCompleted);
+
+            Long coinEarned = this.coinCalculationService.calculateTodoCoins(todo);
+            todoHistory.setCoinEarned(coinEarned);
+            String message = this.userService.getCoinComplete(user,coinEarned);
+            todoDTO.setUserCoinMessage(message);
         }
         todoHistoryRepository.save(todoHistory);
         todoRepository.save(todo);

@@ -31,4 +31,5 @@ public class ChallengeDTO {
     private Long skippedTasks;
     private List<LocalDate> completedTasksList;
     private List<DailyProgressDTO> dailyProgresses;
+    private Long coinEarn;
 }

@@ -94,6 +94,7 @@ public class HomeController {
                         .title(userChallenge.getChallenge().getTitle())
                         .progress(userChallenge.getProgress())
                         .status(userChallenge.getStatus())
+                        .coinEarn(userChallenge.getCoinEarn())
                         .build()
                 )
                 .collect(Collectors.toList()));

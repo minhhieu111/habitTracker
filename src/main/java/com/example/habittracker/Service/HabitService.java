@@ -19,8 +19,9 @@ public class HabitService {
     private final ChallengeRepository challengeRepository;
     private final UserChallengeRepository userChallengeRepository;
     private final ChallengeProgressService challengeProgressService;
+    private final CoinCalculationService coinCalculationService;
 
-    public HabitService(HabitRepository habitRepository, UserService userService, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, ChallengeRepository challengeRepository, UserChallengeRepository userChallengeRepository, ChallengeProgressService challengeProgressService) {
+    public HabitService(HabitRepository habitRepository, UserService userService, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, ChallengeRepository challengeRepository, UserChallengeRepository userChallengeRepository, ChallengeProgressService challengeProgressService, CoinCalculationService coinCalculationService) {
         this.habitRepository = habitRepository;
         this.userService = userService;
         this.userHabitRepository = userHabitRepository;
@@ -28,6 +29,7 @@ public class HabitService {
         this.challengeRepository = challengeRepository;
         this.userChallengeRepository = userChallengeRepository;
         this.challengeProgressService = challengeProgressService;
+        this.coinCalculationService = coinCalculationService;
     }
 
 
@@ -95,7 +97,7 @@ public class HabitService {
                     .isCompleted(userHabit.isCompleted())
                     .positiveCount(0L)
                     .negativeCount(0L)
-                    .expEarned(0L)
+                    .coinEarned(0L)
                     .build();
             this.habitHistoryRepository.save(initialHistory);
         };
@@ -161,7 +163,7 @@ public class HabitService {
                 initialNegativeHistory.setCompleted(userHabit.isCompleted());
                 initialNegativeHistory.setPositiveCount(0L);
                 initialNegativeHistory.setNegativeCount(0L);
-                initialNegativeHistory.setExpEarned(0L);
+                initialNegativeHistory.setCoinEarned(0L);
                 this.habitHistoryRepository.save(initialNegativeHistory);
             } else if (newType == Habit.HabitType.POSITIVE) {
                 userHabit.setNegativeCount(0L);
@@ -233,6 +235,7 @@ public class HabitService {
                         .negativeCount(userHabit.getNegativeCount())
                         .positiveCount(userHabit.getPositiveCount())
                         .date(today)
+                        .coinEarned(0L)
                         .build()
         );
 
@@ -246,11 +249,25 @@ public class HabitService {
             userHabit.setCompleted(true);
             habitHistory.setCompleted(true);
             habitDTO.setCompleted(true);
+
+            if(!(habit.getType().name().equals("NEGATIVE"))){
+                Long coinEarn = this.coinCalculationService.calculatePositiveHabitCoins(habit, habit.getChallenge() != null);
+                habitHistory.setCoinEarned(coinEarn);
+                String message = this.userService.getCoinComplete(userHabit.getUser(),coinEarn);
+                habitDTO.setUserCoinMessage(message);
+            }
         }
         else{
             userHabit.setCompleted(false);
             habitHistory.setCompleted(false);
             habitDTO.setCompleted(false);
+
+            if(habitHistory.getCoinEarned()>0){
+                Long coinBack = this.habitHistoryRepository.findCoinEarnByUserHabitAndDate(userHabit,today);
+                String message = this.userService.getCoinComplete(userHabit.getUser(),-coinBack);
+                habitDTO.setUserCoinMessage(message);
+                habitHistory.setCoinEarned(0L);
+            }
         }
         this.userHabitRepository.save(userHabit);
         this.habitHistoryRepository.save(habitHistory);
@@ -283,8 +300,16 @@ public class HabitService {
                             .negativeCount(userHabit.getNegativeCount())
                             .positiveCount(userHabit.getPositiveCount())
                             .date(today)
+                            .coinEarned(0L)
                             .build()
                     );
+
+            Long coinEarn = 0L;
+            if(userHabit.getHabit().getType().name().equals("NEGATIVE")){
+                coinEarn = this.coinCalculationService.calculateNegativeHabitCoins(userHabit.getHabit(),userHabit.getNegativeCount(), userHabit.getHabit().getChallenge() != null);
+                this.userService.getCoinComplete(userHabit.getUser(),coinEarn);
+                habitHistory.setCoinEarned(coinEarn);
+            }
             habitHistoryRepository.save(habitHistory);
 
             userHabit.setNegativeCount(0L);
@@ -306,6 +331,7 @@ public class HabitService {
                             .positiveCount(userHabit.getPositiveCount())
                             .date(today)
                             .isCompleted(userHabit.isCompleted())
+                            .coinEarned(0L)
                             .build()
                     );
             habitHistoryRepository.save(habitHistory);

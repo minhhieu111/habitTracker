@@ -24,6 +24,10 @@ body {
     font-family: "Nunito", sans-serif;
 }
 
+.coin-icon {
+    width: 20px;
+    height: 20px;
+}
 
 /* Main content area */
 #content {

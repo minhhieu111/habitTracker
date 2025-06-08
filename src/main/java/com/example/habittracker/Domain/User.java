@@ -29,9 +29,8 @@ public class User {
     private String email;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private Long exp;
     private Long coins;
-    private Long level;
+    private Long limitCoinsEarnedPerDay = 0L;
 
     private String token;
 

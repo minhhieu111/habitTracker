@@ -65,4 +65,24 @@ public class UserService {
     public List<UserChallengeStats> getUsersAndCompletedChallenges() {
         return this.userRepository.findAllUsersOrderedByCompletedChallenges();
     }
+
+    @Transactional
+    public String getCoinComplete(User user, Long coinEarn) {
+        String message = "";
+        if(user.getCoins() >= 0 && coinEarn > 0){
+            if(user.getLimitCoinsEarnedPerDay() < 500){
+                user.setCoins(user.getCoins()+coinEarn);
+                user.setLimitCoinsEarnedPerDay(user.getLimitCoinsEarnedPerDay()+coinEarn);
+                message = "+"+coinEarn;
+            }else{
+                message = "Bạn đã đạt giới hạn nhận xu ngày hôm này là 500 xu";
+            }
+        }else{
+            user.setCoins(user.getCoins()+coinEarn);
+            user.setLimitCoinsEarnedPerDay(user.getLimitCoinsEarnedPerDay()+coinEarn);
+            message = ""+coinEarn;
+        }
+        this.userRepository.save(user);
+        return message;
+    }
 }

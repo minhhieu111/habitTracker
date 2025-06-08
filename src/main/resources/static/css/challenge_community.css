@@ -81,6 +81,35 @@ body {
     color: white;
 }
 
+/* Search bar */
+.search-container {
+    padding: 15px;
+}
+
+.search-bar {
+    position: relative;
+    width: 25%;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 15px;
+    padding-right: 40px;
+    border: none;
+    border-radius: 20px;
+    background-color: #f2f2f2;
+}
+
+.search-button {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
 /* Content area */
 .content-area {
     padding: 30px;
@@ -186,6 +215,7 @@ body {
     text-align: center;
     padding: 60px 20px;
     color: #666;
+    width: 50%;
 }
 
 .empty-state i {

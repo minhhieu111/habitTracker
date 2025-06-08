@@ -24,6 +24,7 @@ public class HabitDTO {
     private boolean isCompleted =false;
     private boolean isPublic;
     private boolean isInChallenge;
+    private String userCoinMessage;
 
     private final Habit.Difficulty[] habitDifficultiesOption = Habit.Difficulty.values();
     private final Habit.HabitType[] habitTypesOption = Habit.HabitType.values();

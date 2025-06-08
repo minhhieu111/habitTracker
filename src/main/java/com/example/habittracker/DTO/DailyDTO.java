@@ -28,6 +28,7 @@ public class DailyDTO {
     private boolean isCompleted;
     private boolean isPublic;
     private boolean isInChallenge;
+    private String userCoinMessage;
 
     private final Daily.Difficulty[] difficultyOptions = Daily.Difficulty.values();
     private final Daily.RepeatFrequency[] repeatFrequencyOptions = Daily.RepeatFrequency.values();

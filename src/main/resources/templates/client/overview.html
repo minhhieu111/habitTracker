@@ -99,7 +99,7 @@
 
                     <div th:id="habit-task-content-+${habit.getHabit().getHabitId()}" th:class="  ${habit.isCompleted()} ? 'task-content completed' : 'task-content'">
                         <button class="task-detail" th:onclick="|openHabitUpdateModal(${habit.getHabit().getHabitId()})|">
-                            <div class="fw-bold mb-1" th:text="${habit.getHabit().getTitle()}">Uống nước</div>
+                            <div class="fw-bold mb-1 habit-title" th:text="${habit.getHabit().getTitle()}">Uống nước</div>
                             <div class="task-description" th:text="${habit.getHabit().getDescription()}">Uống nước mỗi 1 giờ</div>
                         </button>
                         <div class="task-count d-flex justify-content-end"><span th:id="habit-+${habit.getHabit().getHabitId()}" th:text="'+'+${habit.positiveCount}+'|'+${habit.negativeCount}+'-'">+11 | 2-</span></div>
@@ -236,7 +236,7 @@
                         </div>
                         <div th:class="${userDaily.isCompleted}?'task-content completed':'task-content'" th:id="daily-task-+${userDaily.getDaily().getDailyId()}">
                             <button class="task-detail" th:onclick="|openDailyUpdateModal(${userDaily.getDaily().getDailyId()})|">
-                                <div class="fw-bold mb-1" th:text="${userDaily.getDaily().getTitle()}">Ngủ trước 10 giờ</div>
+                                <div class="fw-bold mb-1 daily-title" th:text="${userDaily.getDaily().getTitle()}">Ngủ trước 10 giờ</div>
                                 <div class="task-description" th:text="${userDaily.getDaily().getDescription()}">Uống nước mỗi 1 giờ</div>
                             </button>
                             <div class="w-100 d-flex justify-content-end">
@@ -407,7 +407,7 @@
                     <div style="height: auto;" th:class="${todo.isCompleted}?'task-content completed':'task-content'" th:id="todo-task-+${todo.todoId}">
                         <div class="todo-card-header">
                             <button class="task-detail" th:onclick="|openTodoUpdateModal(${todo.todoId})|">
-                                <div class="fw-bold mb-1" th:text="${todo.title}">Dọn nhà</div>
+                                <div class="fw-bold mb-1 todo-title" th:text="${todo.title}">Dọn nhà</div>
                                 <div class="task-description" th:text="${todo.description}">Dọn nhà</div>
                             </button>
                         </div>
@@ -457,6 +457,11 @@
                                 <select class="form-control" id="todoDifficulty" th:field="*{difficulty}">
                                     <option th:each="difficult : ${newTodo.todoDifficultOption}" th:value="${difficult}" th:text="${difficult}">Dễ</option>
                                 </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="executionDate" class="form-label">Thực hiện trước</label>
+                                <input type="date" class="form-control" id="executionDate" th:field="*{executionDate}">
                             </div>
 
                             <!-- Subtasks -->
@@ -592,6 +597,53 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function (){
+
+        let debounceTimeout;
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    const searchTerm = searchInput.value.toLowerCase();
+                    // Lọc habits
+                    const habitItems = document.querySelectorAll('.task-item');
+                    habitItems.forEach(function (item) {
+                        const habitTitleElem = item.querySelector('.habit-title');
+                        const habitTitle = habitTitleElem ? habitTitleElem.textContent.toLowerCase() : "";
+                        if (habitTitle.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // Lọc dailies
+                    const dailyItems = document.querySelectorAll('.checkbox-item');
+                    dailyItems.forEach(function (item) {
+                        const dailyTitleElem = item.querySelector('.daily-title');
+                        const dailyTitle = dailyTitleElem ? dailyTitleElem.textContent.toLowerCase() : "";
+                        if (dailyTitle.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // Lọc todos
+                    const todoItems = document.querySelectorAll('.todo-card');
+                    todoItems.forEach(function (item) {
+                        const todoTitleElem = item.querySelector('.todo-title');
+                        const todoTitle = todoTitleElem ? todoTitleElem.textContent.toLowerCase() : "";
+                        if (todoTitle.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }, 300);
+
+            });
+        }
 
         const habitInputId = document.getElementById("habitId")
         const habitTitle = document.getElementById("habitTitle")
@@ -731,6 +783,10 @@
                         taskComplete.classList.add("completed");
                     }else {
                         taskComplete.classList.remove("completed");
+                    }
+
+                    if(data.userCoinMessage != null){
+                        showResponseToast(data.userCoinMessage, 'completeTask');
                     }
                 })
                 .catch(error=>{
@@ -971,6 +1027,10 @@
                     }else{
                         dailycheckbox.innerHTML = '';
                     }
+
+                    if(data.userCoinMessage != null){
+                        showResponseToast(data.userCoinMessage, 'completeTask');
+                    }
                 })
                 .catch(error => {
                     console.error("Lỗi:",error)
@@ -1096,6 +1156,17 @@
                         dailycheckbox.innerHTML = '<i class="fas fa-check"></i>';
                     }else{
                         dailycheckbox.innerHTML = '';
+                    }
+
+                    if (data.todoSubtasks != null) {
+                        data.todoSubtasks.forEach(taskComplete => {
+                            const checkbox = document.getElementById(`subtask-${taskComplete.todoSubtaskId}`);
+                            checkbox.checked = taskComplete.completed;
+                        });
+                    }
+
+                    if(data.userCoinMessage != null){
+                        showResponseToast(data.userCoinMessage, 'completeTask');
                     }
                 })
                 .catch(error => {

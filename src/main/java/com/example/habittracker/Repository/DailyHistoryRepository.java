@@ -35,4 +35,7 @@ public interface DailyHistoryRepository extends JpaRepository<DailyHistory, Long
 
     @Query("SELECT COUNT(dh) FROM DailyHistory dh WHERE dh.userDaily=:userDaily AND dh.date BETWEEN :start AND :end AND dh.isCompleted=true")
     Long countByUserDailyAndDateBetweenAndIsCompletedTrue(@Param("userDaily")UserDaily userDaily, @Param("start")LocalDate startDate, @Param("end")LocalDate endDate);
+
+    @Query("SELECT dh.coinEarned FROM DailyHistory dh WHERE dh.userDaily = :userDaily AND dh.date = :today")
+    Long findCoinEarnedByUserDailyAndUser(@Param("userDaily")UserDaily userDaily,@Param("today")LocalDate today);
 }

@@ -18,7 +18,7 @@ public class TodoHistory {
     private Long todoHistoryId;
     private LocalDate date;
     private boolean isCompleted;
-    private Long expEarned;
+    private Long coinEarned = 0L;
 
     @ManyToOne()
     @JoinColumn(name = "todo_id")

@@ -20,8 +20,9 @@ public class DailyService {
     private final ChallengeRepository challengeRepository;
     private final ChallengeProgressService challengeProgressService;
     private final UserChallengeRepository userChallengeRepository;
+    private final CoinCalculationService coinCalculationService;
 
-    public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository, DailyHistoryRepository dailyHistoryRepository, ChallengeRepository challengeRepository, ChallengeProgressService challengeProgressService, UserChallengeRepository userChallengeRepository) {
+    public DailyService(DailyRepository dailyRepository, UserService userService, UserDailyRepository userDailyRepository, DailyHistoryRepository dailyHistoryRepository, ChallengeRepository challengeRepository, ChallengeProgressService challengeProgressService, UserChallengeRepository userChallengeRepository, CoinCalculationService coinCalculationService) {
         this.dailyRepository = dailyRepository;
         this.userService = userService;
         this.userDailyRepository = userDailyRepository;
@@ -29,6 +30,7 @@ public class DailyService {
         this.challengeRepository = challengeRepository;
         this.challengeProgressService = challengeProgressService;
         this.userChallengeRepository = userChallengeRepository;
+        this.coinCalculationService = coinCalculationService;
     }
 
     public List<UserDaily> getUserDaily(User user){
@@ -207,16 +209,27 @@ public class DailyService {
                         .date(today)
                         .streak(userDaily.getStreak())
                         .isCompleted(false)
+                        .coinEarned(0L)
                         .build());
 
         if ("checked".equals(status)) {
             userDaily.setCompleted(true);
             dailyHistory.setCompleted(true);
             userDaily.setStreak(userDaily.getStreak() + 1);
+
+            Long coinEarn = this.coinCalculationService.calculateDailyCoins(userDaily,daily.getChallenge() != null && userDaily.isUnavailable());
+            dailyHistory.setCoinEarned(coinEarn);
+            String message = this.userService.getCoinComplete(user,coinEarn);
+            dailyDTO.setUserCoinMessage(message);
         } else if ("unchecked".equals(status)) {
             userDaily.setCompleted(false);
             dailyHistory.setCompleted(false);
             userDaily.setStreak(userDaily.getStreak() - 1);
+
+            Long coinBack = this.dailyHistoryRepository.findCoinEarnedByUserDailyAndUser(userDaily,today);
+            String message = this.userService.getCoinComplete(user,-coinBack);
+            dailyDTO.setUserCoinMessage(message);
+            dailyHistory.setCoinEarned(0L);
         }
 
         this.userDailyRepository.save(userDaily);
@@ -236,20 +249,6 @@ public class DailyService {
         dailyDTO.setCompleted(userDaily.isCompleted());
 
         return dailyDTO;
-    }
-
-    @Transactional
-    public void streakCalculator(UserDaily userDaily,LocalDate today){
-        DailyHistory newDailyHistory = this.dailyHistoryRepository.findDailyHistory(userDaily,today).get();
-
-        if(newDailyHistory.isCompleted()){
-            userDaily.setStreak(userDaily.getStreak() + 1);
-        }else{
-            userDaily.setStreak(userDaily.getStreak() - 1);
-        }
-        this.userDailyRepository.save(userDaily);
-        newDailyHistory.setStreak(userDaily.getStreak());
-        this.dailyHistoryRepository.save(newDailyHistory);
     }
 
     @Transactional
@@ -303,6 +302,7 @@ public class DailyService {
                                 .date(today)
                                 .streak(0L)
                                 .isCompleted(false)
+                                .coinEarned(0L)
                                 .build());
 
                 this.dailyHistoryRepository.save(dailyHistory);

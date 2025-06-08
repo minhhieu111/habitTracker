@@ -19,7 +19,7 @@ public class HabitHistory {
     private boolean isCompleted;
     private Long negativeCount;
     private Long positiveCount;
-    private Long expEarned;
+    private Long coinEarned;
 
     @ManyToOne
     @JoinColumn(name = "user_habit_id")

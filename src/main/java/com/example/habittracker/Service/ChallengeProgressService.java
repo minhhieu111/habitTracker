@@ -19,8 +19,10 @@ public class ChallengeProgressService {
     private final UserChallengeDPRepository userChallengeDPRepository;
     private final UserChallengeRepository userChallengeRepository;
     private final EmailService emailService;
+    private final UserService userService;
+    private final CoinCalculationService coinCalculationService;
 
-    public ChallengeProgressService(UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, UserChallengeDPRepository userChallengeDPRepository, UserChallengeRepository userChallengeRepository, EmailService emailService) {
+    public ChallengeProgressService(UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, UserChallengeDPRepository userChallengeDPRepository, UserChallengeRepository userChallengeRepository, EmailService emailService, UserService userService, CoinCalculationService coinCalculationService) {
         this.userDailyRepository = userDailyRepository;
         this.userHabitRepository = userHabitRepository;
         this.habitHistoryRepository = habitHistoryRepository;
@@ -28,6 +30,8 @@ public class ChallengeProgressService {
         this.userChallengeDPRepository = userChallengeDPRepository;
         this.userChallengeRepository = userChallengeRepository;
         this.emailService = emailService;
+        this.userService = userService;
+        this.coinCalculationService = coinCalculationService;
     }
 
     @Transactional
@@ -289,8 +293,12 @@ public class ChallengeProgressService {
                 userChallenge.setNotificationShown(false);
             }
             userChallenge.setStatus(UserChallenge.Status.COMPLETE);
-            this.emailService.sendEmailCompleteChallenge(userChallenge);
+            Long coinEarn = this.coinCalculationService.calculateChallengeCompletionReward(userChallenge.getChallenge(),userChallenge,false);
+            this.userService.getCoinComplete(userChallenge.getUser(),coinEarn);
+            userChallenge.setCoinEarn(coinEarn);
             userChallengeRepository.save(userChallenge);
+
+            this.emailService.sendEmailCompleteChallenge(userChallenge);
 
 //sẽ thực hiện sau khi hoàn thành
 
@@ -307,6 +315,7 @@ public class ChallengeProgressService {
                 userDailyRepository.save(userDaily);
             });
         }else{
+            if(userChallenge.getStatus() == UserChallenge.Status.COMPLETE){this.userService.getCoinComplete(userChallenge.getUser(),-userChallenge.getCoinEarn());}
             userChallenge.setStatus(UserChallenge.Status.ACTIVE);
             userChallenge.setNotificationShown(true);
             userChallengeRepository.save(userChallenge);
