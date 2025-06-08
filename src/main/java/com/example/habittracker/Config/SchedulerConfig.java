@@ -16,30 +16,27 @@ public class SchedulerConfig {
     private final HabitService habitService;
     private final DailyService dailyService;
     private final ChallengeService challengeService;
-    private final ChallengeProgressService challengeProgressService;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final UserService userService;
 
-    public SchedulerConfig(HabitService habitService, DailyService dailyService, ChallengeService challengeService, ChallengeProgressService challengeProgressService, UserRepository userRepository, EmailService emailService) {
+    public SchedulerConfig(HabitService habitService, DailyService dailyService, ChallengeService challengeService, UserRepository userRepository, EmailService emailService, UserService userService) {
         this.habitService = habitService;
         this.dailyService = dailyService;
         this.challengeService = challengeService;
-        this.challengeProgressService = challengeProgressService;
         this.userRepository = userRepository;
         this.emailService = emailService;
+        this.userService = userService;
     }
 
 
 //@Scheduled(cron = "*/5 * * * * *")
     @Scheduled(cron ="58 59 23 * * *")
-    public void ResetHabitCount(){
-        this.habitService.resetHabit();
-    }
-
-    @Scheduled(cron ="58 59 23 * * *")
-    public void ResetDaily(){
+    public void ResetHabitCountAndDailyAndLimitCoinsEarned() {
         this.dailyService.resetDaily();
-   }
+        this.habitService.resetHabit();
+        this.userService.resetLimitCoin();
+    }
 
    @Scheduled(cron="0 59 23 * * *")
     public void calChallengeProgress(){

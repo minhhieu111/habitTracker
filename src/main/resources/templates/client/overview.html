@@ -700,7 +700,7 @@
                     habitDifficulty.value=habit.difficulty;
                     habitType.value = habit.type;
                     habitTarget.value = habit.targetCount;
-                    habitUpdateChallenge.value = habit.challengeId === null ? '' : habit.challengeId;
+
 
                     deleteHabit.setAttribute("href","/habits/delete/"+habitId);
 
@@ -712,12 +712,14 @@
                         habitUpdateChallenge.disabled = false
                         document.getElementById("habitCreateChallengeField").setAttribute("style","display: none")
                         document.getElementById("habitUpdateChallengeField").setAttribute("style","display: block")
+                        habitUpdateChallenge.value = habit.challengeId === null ? '' : habit.challengeId;
                     }else{
                         deleteHabitButton.style.display='block';
                         habitCreateChallenge.disabled = false
                         habitUpdateChallenge.disabled = true
                         document.getElementById("habitCreateChallengeField").setAttribute("style","display: block")
                         document.getElementById("habitUpdateChallengeField").setAttribute("style","display: none")
+                        habitCreateChallenge.value = habit.challengeId === null ? '' : habit.challengeId;
                     }
 
                     if(habit.public){
@@ -785,8 +787,14 @@
                         taskComplete.classList.remove("completed");
                     }
 
-                    if(data.userCoinMessage != null){
+                    if (data.userCoinMessage != null) {
                         showResponseToast(data.userCoinMessage, 'completeTask');
+                        let currentCoins = parseInt(document.querySelector(".user-coin").nextElementSibling.textContent);
+                        if (data.completed) {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
+                        } else {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins - data.coinEarned;
+                        }
                     }
                 })
                 .catch(error=>{
@@ -869,12 +877,14 @@
                         dailyInputUpdateChallenge.disabled = false
                         document.getElementById("dailyCreateChallengeField").setAttribute("style", "display: none;");
                         document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: block;");
+                        dailyInputUpdateChallenge.value = daily.challengeId || '';
                     }else{
                         deleteDailyButton.style.display='block'
                         dailyInputCreateChallenge.disabled = false
                         dailyInputUpdateChallenge.disabled = true
                         document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: none;");
                         document.getElementById("dailyCreateChallengeField").setAttribute("style", "display: block;");
+                        dailyInputCreateChallenge.value = daily.challengeId || '';
                     }
 
                     deleteDaily.setAttribute("href","dailies/delete/"+dailyId);
@@ -887,7 +897,7 @@
                         checkbox.checked = daily.repeatMonthDays.includes(Number(checkbox.value));
                     });
 
-                    dailyInputUpdateChallenge.value = daily.challengeId || '';
+
 
                     if(daily.public){
                         dailyInput.readOnly = true
@@ -1010,7 +1020,6 @@
                     return response.json()
                 })
                 .then(data=>{
-
                     const dailystreak = document.querySelector(`#daily-streak-${dailyId}`)
                     const dailycheckbox = document.querySelector(`#daily-checkbox-${dailyId}`)
 
@@ -1028,8 +1037,14 @@
                         dailycheckbox.innerHTML = '';
                     }
 
-                    if(data.userCoinMessage != null){
+                    if (data.userCoinMessage != null) {
                         showResponseToast(data.userCoinMessage, 'completeTask');
+                        let currentCoins = parseInt(document.querySelector(".user-coin").nextElementSibling.textContent);
+                        if (data.completed) {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
+                        } else {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins - data.coinEarned;
+                        }
                     }
                 })
                 .catch(error => {
@@ -1044,6 +1059,7 @@
             document.getElementById("todoDescription").value = '';
             document.getElementById("todoDifficulty").value = 'EASY';
             document.getElementById("subtasksContainer").innerHTML = '';
+            document.getElementById("executionDate").value = '';
 
             document.getElementById("deleteTodoButton").style.display = 'none';
 
@@ -1066,11 +1082,12 @@
                     return response.json();
                 })
                 .then(todo => {
-                    console.log(todoId)
+                    console.log(todo)
                     document.getElementById("todoId").value = todoId;
                     document.getElementById("todoTitle").value = todo.title;
                     document.getElementById("todoDescription").value = todo.description;
                     document.getElementById("todoDifficulty").value = todo.difficulty;
+                    document.getElementById("executionDate").value = todo.executionDate;
 
                     // Load subtasks
                     const subtasksContainer = document.getElementById("subtasksContainer");
@@ -1165,8 +1182,14 @@
                         });
                     }
 
-                    if(data.userCoinMessage != null){
+                    if (data.userCoinMessage != null) {
                         showResponseToast(data.userCoinMessage, 'completeTask');
+                        let currentCoins = parseInt(document.querySelector(".user-coin").nextElementSibling.textContent);
+                        if (data.completed) {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
+                        } else {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins - data.coinEarned;
+                        }
                     }
                 })
                 .catch(error => {

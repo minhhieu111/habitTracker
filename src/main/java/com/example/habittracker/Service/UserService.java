@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -47,6 +48,7 @@ public class UserService {
                 .password(passwordEncoder.encode(defaultPassAuth))
                 .role(User.Role.USER)
                 .coins(0L)
+                .limitCoinsEarnedPerDay(0L)
                 .build();
 
         if (avatar != null && !avatar.isEmpty()) {
@@ -84,5 +86,15 @@ public class UserService {
         }
         this.userRepository.save(user);
         return message;
+    }
+
+    public void resetLimitCoin() {
+        List<User> users = this.userRepository.findAll().stream().map(user -> {
+            user.setLimitCoinsEarnedPerDay(0L);
+            return user;
+        }).collect(Collectors.toList());
+
+        this.userRepository.saveAll(users);
+
     }
 }

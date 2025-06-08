@@ -152,12 +152,14 @@ public class TodoService {
                 todoHistory.setCoinEarned(coinEarned);
                 String message = this.userService.getCoinComplete(user,coinEarned);
                 todoDTO.setUserCoinMessage(message);
+                todoDTO.setCoinEarned(coinEarned);
             }else{
                 for (TodoSubtask subtask : todo.getTodoSubTasks()) {
                     subtask.setCompleted(false);
                     this.todoSubTaskRepository.save(subtask);
                 }
                 Long coinBack = this.todoHistoryRepository.findCoinEarnedByTodoAndToday(todo,today);
+                todoDTO.setCoinEarned(coinBack);
                 todoHistory.setCoinEarned(0L);
                 String message = this.userService.getCoinComplete(user,-coinBack);
                 todoDTO.setUserCoinMessage(message);
@@ -175,12 +177,22 @@ public class TodoService {
         } else {
             boolean allCompleted = todo.isAllSubtasksCompleted();
             todo.setCompleted(allCompleted);
-            todoHistory.setCompleted(allCompleted);
 
-            Long coinEarned = this.coinCalculationService.calculateTodoCoins(todo);
-            todoHistory.setCoinEarned(coinEarned);
-            String message = this.userService.getCoinComplete(user,coinEarned);
-            todoDTO.setUserCoinMessage(message);
+
+            if(allCompleted && !todoHistory.isCompleted()){
+                Long coinEarned = this.coinCalculationService.calculateTodoCoins(todo);
+                todoHistory.setCoinEarned(coinEarned);
+                String message = this.userService.getCoinComplete(user,coinEarned);
+                todoDTO.setUserCoinMessage(message);
+                todoDTO.setCoinEarned(coinEarned);
+            } else if (!allCompleted && todoHistory.isCompleted()) {
+                Long coinBack = this.todoHistoryRepository.findCoinEarnedByTodoAndToday(todo,today);
+                todoDTO.setCoinEarned(coinBack);
+                todoHistory.setCoinEarned(0L);
+                String message = this.userService.getCoinComplete(user,-coinBack);
+                todoDTO.setUserCoinMessage(message);
+            }
+            todoHistory.setCompleted(allCompleted);
         }
         todoHistoryRepository.save(todoHistory);
         todoRepository.save(todo);

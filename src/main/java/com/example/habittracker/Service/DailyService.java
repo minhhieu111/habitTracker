@@ -221,12 +221,14 @@ public class DailyService {
             dailyHistory.setCoinEarned(coinEarn);
             String message = this.userService.getCoinComplete(user,coinEarn);
             dailyDTO.setUserCoinMessage(message);
+            dailyDTO.setCoinEarned(coinEarn);
         } else if ("unchecked".equals(status)) {
             userDaily.setCompleted(false);
             dailyHistory.setCompleted(false);
             userDaily.setStreak(userDaily.getStreak() - 1);
 
             Long coinBack = this.dailyHistoryRepository.findCoinEarnedByUserDailyAndUser(userDaily,today);
+            dailyDTO.setCoinEarned(coinBack);
             String message = this.userService.getCoinComplete(user,-coinBack);
             dailyDTO.setUserCoinMessage(message);
             dailyHistory.setCoinEarned(0L);

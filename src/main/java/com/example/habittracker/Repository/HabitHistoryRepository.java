@@ -34,5 +34,5 @@ public interface HabitHistoryRepository extends JpaRepository<HabitHistory, Long
     Optional<HabitHistory> findDailyHistory(@Param("userHabit")UserHabit userHabit, @Param("date")LocalDate date);
 
     @Query("SELECT hh.coinEarned FROM HabitHistory hh WHERE hh.userHabit = :userHabit AND hh.date = :today")
-    Long findCoinEarnByUserHabitAndDate(@Param("userHabit")UserHabit userHabit, @Param("date")LocalDate date);
+    Long findCoinEarnByUserHabitAndDate(@Param("userHabit")UserHabit userHabit, @Param("today")LocalDate date);
 }
