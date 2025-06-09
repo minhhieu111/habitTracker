@@ -1,9 +1,6 @@
 package com.example.habittracker.Repository;
 
-import com.example.habittracker.Domain.Challenge;
-import com.example.habittracker.Domain.Daily;
-import com.example.habittracker.Domain.Habit;
-import com.example.habittracker.Domain.UserChallenge;
+import com.example.habittracker.Domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,7 +23,10 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("SELECT uc FROM UserChallenge uc WHERE uc.challenge.creatorId = :userId AND uc.status = 'ACTIVE'")
     Optional<List<UserChallenge>> findUserChallengeOwner(@Param("userId")Long userId);
 
-    @Query("SELECT uc FROM UserChallenge uc WHERE uc.user.userId = :userId ")
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.user.userId = :userId AND uc.status = 'ACTIVE'")
     Optional<List<UserChallenge>> findUnCompleteChallengeByUsers_Username(@Param("userId") Long userId);
+
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.user.userId = :user")
+    List<UserChallenge> findAllByUser(@Param("user") Long userId);
 
 }

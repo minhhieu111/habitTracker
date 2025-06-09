@@ -2,15 +2,23 @@ package com.example.habittracker.Controller.client;
 
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
+import com.example.habittracker.DTO.UserDTO;
+import com.example.habittracker.Domain.Diary;
 import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.UserChallenge;
+import com.example.habittracker.Service.ChallengeService;
+import com.example.habittracker.Service.DiaryService;
 import com.example.habittracker.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -19,42 +27,57 @@ public class ProfileController {
     private final UserService userService;
     private final TokenUtil tokenUtil;
     private final JwtUtil jwtUtil;
+    private final ChallengeService challengeService;
+    private final DiaryService diaryService;
 
-    public ProfileController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil) {
+    public ProfileController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, DiaryService diaryService) {
         this.userService = userService;
         this.tokenUtil = tokenUtil;
         this.jwtUtil = jwtUtil;
+        this.challengeService = challengeService;
+        this.diaryService = diaryService;
     }
 
     @GetMapping("")
     public String profile(HttpServletRequest request,Model model) {
         User user = getUserFromRequest(request);
         model.addAttribute("user", user);
-        // User profile data
-        model.addAttribute("username", "user");
-        model.addAttribute("title", "Người mới bắt đầu");
-        model.addAttribute("email", "User@gmail.com");
-        model.addAttribute("gold", 100);
-        model.addAttribute("avatar", "😀");
+        model.addAttribute("newUser", new UserDTO());
 
-        // User statistics
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("participatingChallenges", 12);
-        stats.put("longestStreak", 20);
-        stats.put("longestStreakChallenge", "thay đổi");
-        stats.put("journalEntries", 12);
-        stats.put("leaderboardRank", 12);
-        stats.put("completedTasks", 120);
-        stats.put("completedChallenges", 5);
+        List<UserChallenge> getParticipateChallenge = this.challengeService.getChallenges(user.getUserId());
+        model.addAttribute("participatingChallenges",getParticipateChallenge);
 
-        model.addAttribute("stats", stats);
+        UserChallenge longestStreakChallenge = this.challengeService.getLongestStreakUserChallenges(user.getUserId());
+        model.addAttribute("longestStreakChallenge",longestStreakChallenge);
 
-        // Additional profile data
-        model.addAttribute("joinDate", "Tháng 3, 2024");
-        model.addAttribute("totalDaysActive", 45);
-        model.addAttribute("favoriteCategory", "Thể thao");
+        List<Diary> journalEntries = this.diaryService.getDiariesByUser(user);
+        model.addAttribute("journalEntries",journalEntries);
+
+        List<UserChallenge>completedChallenges = this.challengeService.getAllCompleteChallenge(user);
+        model.addAttribute("completedChallenges",completedChallenges);
+
+        Integer rankUser = this.userService.getUserRank(user.getUserId());
+        model.addAttribute("rankUser",rankUser);
+
+        long completedTask = this.userService.getTaskComplete(user);
+        model.addAttribute("completedTask",completedTask);
+
         return "client/profile";
     }
+
+    @PostMapping("/update")
+    public String updateProfile(HttpServletRequest request, @ModelAttribute("newUser") UserDTO userDTO, @RequestParam("image") MultipartFile image, RedirectAttributes redirectAttributes) {
+        try{
+            this.userService.updateUser(userDTO,image);
+            redirectAttributes.addFlashAttribute("success", "Cập nhật thành công!");
+        }catch (Exception e){
+            redirectAttributes.addFlashAttribute("failed", "Cập nhật thất bại"+e.getMessage());
+            return "redirect:/profile";
+        }
+        return "redirect:/profile";
+    }
+
+
 
     private User getUserFromRequest(HttpServletRequest request) {
         String token = tokenUtil.getTokenFromCookies(request);

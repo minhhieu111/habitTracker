@@ -201,6 +201,13 @@ body {
     font-size: 1.5rem;
 }
 
+.edit-profile-input{
+    background-color: #e9ecef;
+    border: none;
+    padding: 12px 15px;
+    border-radius: 8px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     #sidebar {

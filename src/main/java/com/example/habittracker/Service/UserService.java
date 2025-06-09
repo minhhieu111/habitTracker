@@ -1,11 +1,16 @@
 package com.example.habittracker.Service;
 
 import com.example.habittracker.DTO.UserChallengeStats;
+import com.example.habittracker.DTO.UserDTO;
+import com.example.habittracker.Domain.Todo;
 import com.example.habittracker.Domain.User;
-import com.example.habittracker.Repository.UserRepository;
+import com.example.habittracker.Domain.UserDaily;
+import com.example.habittracker.Domain.UserHabit;
+import com.example.habittracker.Repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,11 +23,23 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private String folder = "user_avatar";
     private String defaultPassAuth = "oauth2_user_password";
+    private final HabitHistoryRepository habitHistoryRepository;
+    private final DailyHistoryRepository dailyHistoryRepository;
+    private final TodoHistoryRepository todoHistoryRepository;
+    private final UserDailyRepository userDailyRepository;
+    private final UserHabitRepository userHabitRepository;
+    private final TodoRepository todoRepository;
 
-    public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, TodoRepository todoRepository) {
         this.userRepository = userRepository;
         this.imageService = imageService;
         this.passwordEncoder = passwordEncoder;
+        this.habitHistoryRepository = habitHistoryRepository;
+        this.dailyHistoryRepository = dailyHistoryRepository;
+        this.todoHistoryRepository = todoHistoryRepository;
+        this.userDailyRepository = userDailyRepository;
+        this.userHabitRepository = userHabitRepository;
+        this.todoRepository = todoRepository;
     }
 
     @Transactional
@@ -96,5 +113,55 @@ public class UserService {
 
         this.userRepository.saveAll(users);
 
+    }
+
+    public Integer getUserRank(Long userId) {
+        List<UserChallengeStats> usersStats = userRepository.findAllUsersOrderedByCompletedChallenges();
+        for (int i = 0; i < usersStats.size(); i++) {
+            UserChallengeStats stats = usersStats.get(i);
+            if (stats.getUser().getUserId().equals(userId)) {
+                return i + 1;
+            }
+        }
+        return null;
+    }
+
+    public long getTaskComplete(User user){
+        List<Todo> todos = this.todoRepository.findAllByUser(user);
+        List<UserDaily> userDailies = this.userDailyRepository.findByUserId(user.getUserId());
+        List<UserHabit> userHabits = this.userHabitRepository.findHabitsForUser(user.getUserId());
+
+        long totalCompleteTask = 0;
+        for (Todo todo : todos) {
+            totalCompleteTask += this.todoHistoryRepository.getCompleteTask(todo);
+        }
+
+        for (UserDaily userDaily : userDailies) {
+            totalCompleteTask += this.dailyHistoryRepository.countCompleteDaily(userDaily);
+        }
+
+        for (UserHabit userHabit : userHabits) {
+            totalCompleteTask += this.habitHistoryRepository.countCompleteHabit(userHabit);
+        }
+
+        return totalCompleteTask;
+    }
+
+    public void updateUser(UserDTO userDTO, MultipartFile image) {
+        User user = this.userRepository.findById(userDTO.getUserId()).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
+        User userUpdate = User.builder()
+                .userName(userDTO.getUsername())
+                .build();
+
+        if (image != null && !image.isEmpty()) {
+            try {
+                String filePath = imageService.saveImage(image, folder);
+                user.setAvatar(filePath);
+            } catch (IOException e) {
+                throw new RuntimeException("Lỗi khi lưu ảnh: " + e.getMessage(), e);
+            }
+        }
+
+        this.userRepository.save(userUpdate);
     }
 }

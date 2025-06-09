@@ -17,7 +17,10 @@ public class Achievement {
     private Long achievementId;
     private String title;
     private String description;
-    private Long requiredLevel;
+    private Long requiredTask;
+    private Long requiredChallenge;
+    private Long taskBonus;
+    private Long challengeBonus;
 
     @OneToMany(mappedBy = "achievement")
     List<UserAchievement> userAchievements;

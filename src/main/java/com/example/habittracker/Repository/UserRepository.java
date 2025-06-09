@@ -21,6 +21,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     User findByEmail(@NotBlank(message = "Nhập email") String email);
 
-@Query("SELECT u AS user,COUNT(uc) AS completedChallengesCount FROM User u LEFT JOIN u.userChallenges uc WHERE uc.status = 'COMPLETE' GROUP BY u ORDER BY COUNT(uc) DESC")
+    @Query("SELECT u AS user,COUNT(uc) AS completedChallengesCount FROM User u LEFT JOIN u.userChallenges uc WHERE uc.status = 'COMPLETE' GROUP BY u ORDER BY COUNT(uc) DESC")
     List<UserChallengeStats> findAllUsersOrderedByCompletedChallenges();
 }

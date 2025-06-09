@@ -60,42 +60,42 @@
             <!-- Participating Challenges -->
             <div class="stat-card">
                 <div class="stat-title">Thử Thách Đang Tham gia</div>
-                <div class="stat-value" th:text="${stats.participatingChallenges}">12</div>
+                <div class="stat-value" th:text="${participatingChallenges.size()}">12</div>
             </div>
 
             <!-- Longest Streak -->
             <div class="stat-card">
                 <div class="stat-title">Streak dài nhất</div>
-                <div class="stat-value" th:text="${stats.longestStreak}">20</div>
-                <div class="stat-subtitle" th:text="'Cùng thử thách \'' + ${stats.longestStreakChallenge} + '\''">
-                    Cùng thử thách "thay đổi"
-                </div>
+                <div class="stat-value" th:text="${longestStreakChallenge != null && longestStreakChallenge.bestStreak != null ? longestStreakChallenge.bestStreak : 0}">20</div>
+
+                <div class="stat-subtitle" th:text="${longestStreakChallenge != null ? 'Của thử thách ' + longestStreakChallenge.challenge.title : ''}"></div>
+
             </div>
 
             <!-- Journal Entries -->
             <div class="stat-card">
                 <div class="stat-title">Nhật ký</div>
-                <div class="stat-value" th:text="${stats.journalEntries}">12</div>
+                <div class="stat-value" th:text="${journalEntries.size()}">12</div>
                 <div class="stat-subtitle">Bài viết</div>
             </div>
 
             <!-- Leaderboard Rank -->
             <div class="stat-card rank-card">
                 <div class="stat-title">Thứ tự trên bảng xếp hạng</div>
-                <div class="stat-value" th:text="${stats.leaderboardRank}">12</div>
-                <div class="stat-subtitle">Cùng bảng xếp hạng các thử thách đã hoàn thành</div>
+                <div class="stat-value" th:text="${rankUser != null ? rankUser:'Chưa xếp hạng'}">12</div>
+                <div class="stat-subtitle">Bảng xếp hạng các thử thách đã hoàn thành</div>
             </div>
 
             <!-- Completed Tasks -->
             <div class="stat-card">
                 <div class="stat-title">Task đã hoàn thành từ khi tham gia</div>
-                <div class="stat-value" th:text="${stats.completedTasks}">120</div>
+                <div class="stat-value" th:text="${completedTask}">120</div>
             </div>
 
             <!-- Completed Challenges -->
             <div class="stat-card">
                 <div class="stat-title">Thử Thách Đã hoàn thành</div>
-                <div class="stat-value" th:text="${stats.completedChallenges}">5</div>
+                <div class="stat-value" th:text="${completedChallenges.size()}">5</div>
             </div>
         </div>
     </div>
@@ -106,209 +106,134 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius: 15px; border: none;">
             <div class="modal-header" style="background-color: #f8f9fa; border-bottom: none; padding: 25px 30px 15px;">
-                <h4 class="modal-title fw-bold" id="editProfileModalLabel" style="color: #333;">My Profile</h4>
+                <h4 class="modal-title fw-bold" id="editProfileModalLabel" style="color: #333;">Thông tin</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem;"></button>
             </div>
             <div class="modal-body" style="padding: 20px 30px 30px; background-color: #f8f9fa;">
                 <!-- Profile Photo Section -->
-                <div class="text-center mb-4">
-                    <div class="profile-photo-container position-relative d-inline-block">
-                        <div class="profile-photo" style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white; margin: 0 auto;" th:text="${avatar}">😀</div>
-                    </div>
-                    <div class="mt-3">
-                        <button class="btn btn-success" style="background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); border: none; border-radius: 25px; padding: 10px 25px; font-weight: 500;">
-                            Connect to LinkedIn
-                        </button>
-                    </div>
-                    <div class="mt-2">
-                        <a href="#" class="text-muted" style="font-size: 0.9rem; text-decoration: none;">
-                            <i class="fas fa-edit me-1"></i> Edit
-                        </a>
-                    </div>
-                </div>
 
-                <form id="editProfileForm">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="editFirstName" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">First Name</label>
-                            <input type="text" class="form-control" id="editFirstName" value="Andrew" style="background-color: #e9ecef; border: none; padding: 12px 15px; border-radius: 8px;" required>
+                <form id="editProfileForm" th:action="@{/profile/update}" method="post" th:object="${newUser}" enctype="multipart/form-data">
+                    <div class="text-center mb-4">
+                        <div class="profile-photo-container position-relative d-inline-block">
+                            <div class="profile-avatar">
+                                <img th:src="${user.avatar}" alt="Avatar" id="avatarImg">
+                            </div>
+                            <!-- Input file để chọn ảnh -->
+                            <input type="file" id="fileInput" style="display: none;" accept="image/*">
                         </div>
-                        <div class="col-md-6">
-                            <label for="editLastName" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Last Name</label>
-                            <input type="text" class="form-control" id="editLastName" value="Turing" style="background-color: #e9ecef; border: none; padding: 12px 15px; border-radius: 8px;" required>
+                        <div class="mt-2">
+                            <a href="#" class="text-muted" style="font-size: 0.9rem; text-decoration: none;" onclick="document.getElementById('fileInput').click();">
+                                <i class="fas fa-edit me-1"></i> Thay đổi
+                            </a>
                         </div>
                     </div>
-
                     <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="editTimeZone" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Time Zone</label>
-                            <select class="form-select" id="editTimeZone" style="background-color: #e9ecef; border: none; padding: 12px 15px; border-radius: 8px;">
-                                <option value="+5">+5 GMT</option>
-                                <option value="+0">+0 GMT</option>
-                                <option value="+1">+1 GMT</option>
-                                <option value="+2">+2 GMT</option>
-                                <option value="+3">+3 GMT</option>
-                                <option value="+4">+4 GMT</option>
-                                <option value="+6">+6 GMT</option>
-                                <option value="+7">+7 GMT</option>
-                                <option value="+8">+8 GMT</option>
-                                <option value="+9">+9 GMT</option>
-                                <option value="+10">+10 GMT</option>
-                            </select>
+                        <div class="col-md-12">
+                            <input type="text" style="display: none" class="form-control edit-profile-input" id="userId" th:value="${user.userId}" th:field="*{userId}" required>
+                            <label for="editFirstName" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Người dùng</label>
+                            <input type="text" class="form-control edit-profile-input" id="editFirstName" th:value="${user.userName}" th:field="*{username}" required>
                         </div>
-                        <div class="col-md-6">
-                            <label for="editPhone" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Phone</label>
-                            <input type="tel" class="form-control" id="editPhone" value="555-237-2384" style="background-color: #e9ecef; border: none; padding: 12px 15px; border-radius: 8px;">
-                        </div>
+<!--                        <div class="col-md-6">-->
+<!--                            <label for="editLastName" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Last Name</label>-->
+<!--                            <input type="text" class="form-control edit-profile-input" id="editLastName" th:text="${user.}"  required>-->
+<!--                        </div>-->
                     </div>
 
                     <div class="mb-4">
-                        <label for="editEmailAddress" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Email Address</label>
-                        <input type="email" class="form-control" id="editEmailAddress" th:value="${email}" style="background-color: #e9ecef; border: none; padding: 12px 15px; border-radius: 8px;" required>
+                        <label for="editEmailAddress" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Địa chỉ Email</label>
+                        <input type="email" readonly class="form-control edit-profile-input" id="editEmailAddress" th:value="${user.email}" th:field="*{email}"  required>
                     </div>
 
-                    <!-- Authentication Section -->
-                    <div class="mb-4">
-                        <h5 class="fw-bold mb-3" style="color: #333; font-size: 1.1rem;">Authentication</h5>
-
-                        <div class="mb-3">
-                            <label class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">SAML ID</label>
-                            <div class="form-control" style="background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 12px 15px; border-radius: 8px; color: #6c757d;">
-                                andrew.turing@cryptographyinc.com
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">SAML Details</label>
-                            <div class="form-control" style="background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 12px 15px; border-radius: 8px;">
-                                <a href="#" class="text-primary" style="text-decoration: none; font-size: 0.9rem;">
-                                    https://cryptographyinc.com/login/secure/kQ28new99
-                                </a>
-                            </div>
-                        </div>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer" style="background-color: #f8f9fa; border-top: none; padding: 20px 30px 30px; justify-content: center; gap: 15px;">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="background-color: white; border: 1px solid #dee2e6; color: #6c757d; padding: 12px 30px; border-radius: 25px; font-weight: 500; min-width: 120px;">
-                    <i class="fas fa-times me-2"></i>Cancel
+                    <i class="fas fa-times me-2"></i>Hủy
                 </button>
-                <button type="button" class="btn btn-success" id="saveProfile" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; padding: 12px 30px; border-radius: 25px; font-weight: 500; min-width: 120px;">
-                    <i class="fas fa-check me-2"></i>Save
+                <button type="submit" class="btn btn-success" id="saveProfile" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; padding: 12px 30px; border-radius: 25px; font-weight: 500; min-width: 120px;">
+                    <i class="fas fa-check me-2"></i>Lưu
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
-    $(document).ready(function() {
-
+    document.addEventListener('DOMContentLoaded', function() {
         // Edit profile button
-        $('#editProfile').on('click', function() {
+        document.getElementById('editProfile').addEventListener('click', function() {
             const editProfileModal = new bootstrap.Modal(document.getElementById('editProfileModal'));
             editProfileModal.show();
         });
 
-        // Save profile changes
-        $('#saveProfile').on('click', function() {
-            const form = document.getElementById('editProfileForm');
-            if (form.checkValidity()) {
-                const profileData = {
-                    firstName: $('#editFirstName').val(),
-                    lastName: $('#editLastName').val(),
-                    timeZone: $('#editTimeZone').val(),
-                    phone: $('#editPhone').val(),
-                    email: $('#editEmailAddress').val()
-                };
-
-                // Update profile display
-                updateProfileDisplay(profileData);
-
-                // Close modal
-                bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
-
-                // Show success message
-                showToast('Hồ sơ đã được cập nhật thành công!', 'success');
-            } else {
-                form.reportValidity();
-            }
-        });
-
-        // Function to update profile display
-        function updateProfileDisplay(data) {
-            $('.profile-username').text('Người dùng: ' + data.firstName + ' ' + data.lastName);
-            $('.profile-email').text('Email: ' + data.email);
-        }
-
-        // Function to show toast notifications
-        function showToast(message, type = 'info') {
-            const toastId = 'toast-' + Date.now();
-            const toastHtml = `
-                    <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0"
-                         id="${toastId}" role="alert" aria-live="assertive" aria-atomic="true"
-                         style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
-                        <div class="d-flex">
-                            <div class="toast-body">
-                                ${message}
-                            </div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                        </div>
-                    </div>
-                `;
-
-            $('body').append(toastHtml);
-
-            const toast = new bootstrap.Toast(document.getElementById(toastId));
-            toast.show();
-
-            // Remove toast element after it's hidden
-            document.getElementById(toastId).addEventListener('hidden.bs.toast', function() {
-                this.remove();
+        // Open file input when 'Thay đổi' is clicked
+        const changeAvatarButton = document.getElementById('changeAvatarButton');
+        if (changeAvatarButton) {
+            changeAvatarButton.addEventListener('click', function() {
+                document.getElementById('fileInput').click(); // Kích hoạt input file
             });
         }
 
-        // Add hover effects to stat cards
-        $('.stat-card').hover(
-            function() {
-                $(this).find('.stat-value').css('color', '#007bff');
-            },
-            function() {
-                if (!$(this).hasClass('rank-card')) {
-                    $(this).find('.stat-value').css('color', '#333');
-                }
+        // Lắng nghe sự kiện khi người dùng chọn ảnh
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+            fileInput.addEventListener('change', function(event) {
+                previewImage(event);
+            });
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];  // Lấy file đầu tiên từ danh sách file người dùng đã chọn
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Cập nhật ảnh lên thẻ <img> với ID avatarImg
+                    document.getElementById('avatarImg').src = e.target.result;
+                };
+                reader.readAsDataURL(file);  // Chuyển file thành URL dữ liệu để hiển thị ảnh
             }
-        );
+        }
+
+        // Add hover effects to stat cards
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const statValue = card.querySelector('.stat-value');
+                statValue.style.color = '#007bff';
+            });
+            card.addEventListener('mouseleave', function() {
+                const statValue = card.querySelector('.stat-value');
+                if (!card.classList.contains('rank-card')) {
+                    statValue.style.color = '#333';
+                }
+            });
+        });
 
         // Animate numbers on page load
         animateNumbers();
 
         function animateNumbers() {
-            $('.stat-value').each(function() {
-                const $this = $(this);
-                const text = $this.text();
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(statValue => {
+                const text = statValue.textContent;
                 const number = parseInt(text.replace(/\D/g, ''));
 
                 if (!isNaN(number)) {
-                    $this.text('0');
-                    $({ counter: 0 }).animate({ counter: number }, {
-                        duration: 1500,
-                        easing: 'swing',
-                        step: function() {
-                            if ($this.hasClass('rank-card')) {
-                                $this.text(Math.ceil(this.counter));
-                            } else {
-                                $this.text(Math.ceil(this.counter));
-                            }
+                    statValue.textContent = '0';
+                    let currentNumber = 0;
+
+                    const interval = setInterval(() => {
+                        currentNumber += Math.ceil(number / 150);
+                        statValue.textContent = currentNumber;
+                        if (currentNumber >= number) {
+                            clearInterval(interval);
                         }
-                    });
+                    }, 10); // Adjust timing for smooth animation
                 }
             });
         }
     });
+
 </script>
 </body>
 </html>

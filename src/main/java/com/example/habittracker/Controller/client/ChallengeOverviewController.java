@@ -37,7 +37,7 @@ public class ChallengeOverviewController {
         this.challengeService = challengeService;
     }
 
-    @GetMapping
+    @GetMapping()
     public String challenges(HttpServletRequest request, Model model) {
 
         User user = getUserFromRequest(request);

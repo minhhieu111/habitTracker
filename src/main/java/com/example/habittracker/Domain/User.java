@@ -17,24 +17,24 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-
     @NotBlank(message = "Nhập tên người dùng")
     private String userName;
-
     @NotBlank(message = "Nhập mật khẩu")
     private String password;
     private String avatar;
-
     @NotBlank(message = "Nhập email")
     private String email;
     @Enumerated(EnumType.STRING)
     private Role role;
     private Long coins;
     private Long limitCoinsEarnedPerDay = 0L;
-
     private String token;
-
+    //kiểm tra chưa đăng nhập gửi email
     private LocalDateTime lastLogin;
+
+    private Long challengeLimit;
+    private Long taskLimit;
+    private String achieveTitle;
 
     @OneToMany(mappedBy = "user")
     List<UserHabit> userHabits;

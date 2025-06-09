@@ -1,9 +1,6 @@
 package com.example.habittracker.Repository;
 
-import com.example.habittracker.Domain.DailyHistory;
-import com.example.habittracker.Domain.HabitHistory;
-import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserDaily;
+import com.example.habittracker.Domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,4 +35,7 @@ public interface DailyHistoryRepository extends JpaRepository<DailyHistory, Long
 
     @Query("SELECT dh.coinEarned FROM DailyHistory dh WHERE dh.userDaily = :userDaily AND dh.date = :today")
     Long findCoinEarnedByUserDailyAndUser(@Param("userDaily")UserDaily userDaily,@Param("today")LocalDate today);
+
+    @Query("SELECT COUNT(*) FROM DailyHistory dh WHERE dh.userDaily = :userDaily")
+    Long countCompleteDaily(@Param("userDaily") UserDaily userDaily);
 }

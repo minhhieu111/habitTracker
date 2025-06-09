@@ -45,8 +45,8 @@ public class ChallengeService {
     }
 
     @Transactional
-    public List<UserChallenge> getUnCompleteChallenges(Long userId) {
-        return this.challengeRepository.findChallengeByUsers_Username(userId).get();
+    public UserChallenge getLongestStreakUserChallenges(Long userId) {
+        return this.challengeRepository.findAllByUser(userId).stream().max(Comparator.comparing(UserChallenge::getBestStreak)).orElse(null);
     }
 
     @Transactional
@@ -131,8 +131,6 @@ public class ChallengeService {
                 .dailies(dailies)
                 .build();
     }
-
-
 
     @Transactional
     public void createChallenge(ChallengeDTO challengeDTO, User creator) {
@@ -305,6 +303,11 @@ public class ChallengeService {
     @Transactional
     public List<UserChallenge> getUserCompleteChallenge(User user){
         return this.userChallengeRepository.findByUserAndCompleted(user);
+    }
+
+    @Transactional
+    public List<UserChallenge> getAllCompleteChallenge(User user){
+        return this.userChallengeRepository.findAllByUserAndCompleted(user);
     }
 
     @Transactional
