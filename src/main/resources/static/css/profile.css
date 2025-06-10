@@ -208,6 +208,122 @@ body {
     border-radius: 8px;
 }
 
+/* Modal customizations */
+.modal-content {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/*Modal challenge*/
+.modal-header{
+    background: #4900F2;
+    border: none;
+    border-radius: 0px 0px 50px 50px;
+    box-shadow: 0px 6px 8px 0px #a8a8a8;
+}
+.challenge-modal-descrip{
+    background-color: #5ca3ff4f;
+    border: none;
+    width: 80%;
+    color: #a0a0a0;;
+}
+
+/*participate*/
+.challenge-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+}
+.challenge-contain{
+    height: calc(3 * 148px);
+    overflow-y: auto;
+}
+.challenge-contain::-webkit-scrollbar {
+    width: 8px;
+}
+
+.challenge-contain::-webkit-scrollbar-thumb {
+    background-color: #d3d3d3;
+    border-radius: 4px;
+}
+
+.challenge-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 5px 0px rgb(41 80 255 / 73%);
+}
+
+.challenge-card.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.participants{
+    background-color: #5e00ffcf;
+    border-radius: 10px;
+}
+
+#challenge-contain::-webkit-scrollbar-thumb {
+    background-color: #d3d3d3;
+    border-radius: 4px;
+}
+
+.challenge-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 5px 0px rgb(41 80 255 / 73%);
+}
+
+.card-content .challenge-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.challenge-card-content .challenge-desc {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.challenge-card-content .challenge-duration {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/*diary*/
+/* Journal section */
+.journal-day {
+    background-color: #bdbdbd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.diary-task{
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+    border: none;
+    text-align: left;
+}
+
+.column-footer {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 15px;
+    padding: 0px 50px;
+    position: absolute;
+    bottom: 10px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     #sidebar {
