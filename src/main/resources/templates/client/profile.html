@@ -143,12 +143,54 @@
                         <label for="editEmailAddress" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Địa chỉ Email</label>
                         <input type="email" readonly class="form-control edit-profile-input" id="editEmailAddress" th:field="*{email}"  required>
                     </div>
+                    <div style="width: 100%;text-align: center;">
+                        <a href="#" class="text-change-password" style="  font-size: 0.9rem; " data-bs-toggle="modal" data-bs-target="#changePassword">Thay đổi mật khẩu</a>
+                    </div>
 
                     <div class="modal-footer" style="background-color: #f8f9fa; border-top: none; padding: 20px 30px 30px; justify-content: center; gap: 15px;">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="background-color: white; border: 1px solid #dee2e6; color: #6c757d; padding: 12px 30px; border-radius: 25px; font-weight: 500; min-width: 120px;">
                             <i class="fas fa-times me-2"></i>Hủy
                         </button>
                         <button type="submit" class="btn btn-success" id="saveProfile" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; padding: 12px 30px; border-radius: 25px; font-weight: 500; min-width: 120px;">
+                            <i class="fas fa-check me-2"></i>Lưu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="changePassword" tabindex="-1" aria-labelledby="changePasswordLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 15px; border: none;">
+            <div class="modal-header" style="background-color: #f8f9fa; border-bottom: none; padding: 25px 30px 15px;">
+                <h4 class="modal-title fw-bold" id="changePasswordLabel" style="color: #333;">Thay đổi mật khẩu</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem;"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px 30px 30px; background-color: #f8f9fa;">
+                <div id="error-message" class="alert alert-danger" style="display: none;">
+                    <strong>Thất bại!</strong> Mật khẩu không hợp lệ hoặc có lỗi xảy ra. Vui lòng thử lại.
+                </div>
+
+                <form id="changePasswordForm" th:action="@{/change_password}" method="post" th:object="${changePassword}">
+                    <input type="text" style="display: none" class="form-control edit-profile-input" id="userChangePassId" th:field="*{userId}" required>
+                    <div class="mb-4" th:if="*{!isJustLoginWithGoogle()}">
+                        <label for="OldPassword" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Mật khẩu cũ</label>
+                        <input type="text" class="form-control edit-profile-input" id="OldPassword" th:field="*{oldPassword}">
+                    </div>
+                    <div class="mb-4">
+                        <label for="newPassword" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Mật khẩu mới</label>
+                        <input type="text" class="form-control edit-profile-input" id="newPassword" th:field="*{password}"  >
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="confirmPassword" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Xác nhận mật khẩu</label>
+                        <input type="text" class="form-control edit-profile-input" id="confirmPassword" th:field="*{confirmPassword}"  >
+                    </div>
+
+                    <div class="modal-footer" style="background-color: #f8f9fa; border-top: none; padding: 20px 30px 30px; justify-content: center; gap: 15px;">
+                        <button type="submit" class="btn btn-success" id="save" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; padding: 12px 30px; border-radius: 25px; font-weight: 500; min-width: 120px;">
                             <i class="fas fa-check me-2"></i>Lưu
                         </button>
                     </div>
@@ -193,6 +235,63 @@
                 reader.readAsDataURL(file);  // Chuyển file thành URL dữ liệu để hiển thị ảnh
             }
         }
+
+        document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Ngừng gửi form theo cách mặc định
+
+            const oldPasswordField = document.getElementById('OldPassword');
+            const newPasswordField = document.getElementById('newPassword');
+            const confirmPasswordField = document.getElementById('confirmPassword');
+
+            // Kiểm tra mật khẩu cũ
+            // if (oldPasswordField.value.trim() === "") {
+            //     document.getElementById('error-message').textContent = "Mật khẩu cũ không được để trống.";
+            //     document.getElementById('error-message').style.display = 'block';
+            //     return;
+            // }
+
+            // Kiểm tra mật khẩu mới
+            if (!newPasswordField.value || newPasswordField.value.trim() === "") {
+                document.getElementById('error-message').textContent = "Mật khẩu mới không được để trống.";
+                document.getElementById('error-message').style.display = 'block';
+                return;
+            }
+
+            // Kiểm tra xác nhận mật khẩu
+            if (!confirmPasswordField.value || confirmPasswordField.value.trim() === "") {
+                document.getElementById('error-message').textContent = "Xác nhận mật khẩu không được để trống.";
+                document.getElementById('error-message').style.display = 'block';
+                return;
+            }
+
+            const formData = new FormData(document.getElementById('changePasswordForm')); // Lấy dữ liệu từ form
+
+            fetch('/profile/change_password', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.type == "success") {
+                        document.getElementById('error-message').style.display = 'none';
+
+                        // Đóng modal sau khi thành công
+                        bootstrap.Modal.getInstance(document.getElementById('changePassword')).hide();
+
+                        // Hiển thị thông báo thành công
+                        showResponseToast('Mật khẩu đã được thay đổi thành công!', 'success');
+                    } else {
+                        // Hiển thị thông báo lỗi
+                        document.getElementById('error-message').textContent = `Lỗi: ${data.message || 'Mật khẩu không hợp lệ.'}`;
+                        document.getElementById('error-message').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    // Hiển thị thông báo lỗi nếu có sự cố trong quá trình gửi yêu cầu AJAX
+                    document.getElementById('error-message').textContent = `Có lỗi xảy ra: ${error.message}`;
+                    document.getElementById('error-message').style.display = 'block';
+                });
+        });
 
         // Add hover effects to stat cards
         const statCards = document.querySelectorAll('.stat-card');

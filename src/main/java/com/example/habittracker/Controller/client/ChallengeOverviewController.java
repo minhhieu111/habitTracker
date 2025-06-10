@@ -65,8 +65,8 @@ public class ChallengeOverviewController {
 
     private User getUserFromRequest(HttpServletRequest request) {
         String token = tokenUtil.getTokenFromCookies(request);
-        String username =  this.jwtUtil.getUserNameFromToken(token);
-        return this.userService.getUser(username);
+        String email =  this.jwtUtil.getEmailFromToken(token);
+        return this.userService.getUser(email);
     }
 }
 

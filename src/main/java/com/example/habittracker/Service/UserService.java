@@ -22,7 +22,7 @@ public class UserService {
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private String folder = "user_avatar";
-    private String defaultPassAuth = "oauth2_user_password";
+    private final AuthService authService;
     private final HabitHistoryRepository habitHistoryRepository;
     private final DailyHistoryRepository dailyHistoryRepository;
     private final TodoHistoryRepository todoHistoryRepository;
@@ -30,10 +30,11 @@ public class UserService {
     private final UserHabitRepository userHabitRepository;
     private final TodoRepository todoRepository;
 
-    public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, TodoRepository todoRepository) {
+    public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder, AuthService authService, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, TodoRepository todoRepository) {
         this.userRepository = userRepository;
         this.imageService = imageService;
         this.passwordEncoder = passwordEncoder;
+        this.authService = authService;
         this.habitHistoryRepository = habitHistoryRepository;
         this.dailyHistoryRepository = dailyHistoryRepository;
         this.todoHistoryRepository = todoHistoryRepository;
@@ -43,8 +44,8 @@ public class UserService {
     }
 
     @Transactional
-    public User getUser(String username) {
-        return this.userRepository.findUserByUserName(username).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
+    public User getUser(String email) {
+        return this.userRepository.findByEmail(email);
     }
 
     @Transactional
@@ -57,28 +58,7 @@ public class UserService {
         return this.userRepository.findByEmail(email);
     }
 
-    @Transactional
-    public User createOAuth2User(String username, String email, String avatar){
-        User user = User.builder()
-                .userName(username)
-                .email(email)
-                .password(passwordEncoder.encode(defaultPassAuth))
-                .role(User.Role.USER)
-                .coins(0L)
-                .limitCoinsEarnedPerDay(0L)
-                .build();
 
-        if (avatar != null && !avatar.isEmpty()) {
-            try {
-                String filePath = imageService.saveImageFromUrl(avatar, folder);
-                user.setAvatar(filePath);
-            } catch (IOException e) {
-                throw new RuntimeException("Lỗi khi lưu ảnh: " + e.getMessage(), e);
-            }
-        }
-        this.userRepository.save(user);
-        return user;
-    }
 
     @Transactional
     public List<UserChallengeStats> getUsersAndCompletedChallenges() {
@@ -161,6 +141,35 @@ public class UserService {
             }
         }
 
+        this.userRepository.save(user);
+    }
+
+    public UserDTO UserChangePassword(User user) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUserId(user.getUserId());
+        userDTO.setJustLoginWithGoogle(user.getPassword() != null && passwordEncoder.matches(AuthService.defaultPassAuth,user.getPassword()));
+        return userDTO;
+    }
+
+    public void changePassword(UserDTO userDTO) {
+        User user = this.userRepository.findById(userDTO.getUserId()).get();
+
+        //lỗi khi người dùng tạo tk bằng gg xog đổi mật khẩu thành công mà không load lại trang thì chỉ hiển thị 2 input
+        if(passwordEncoder.matches(AuthService.defaultPassAuth,user.getPassword())){
+            if(userDTO.getPassword().equals(userDTO.getConfirmPassword())){
+                user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            }else{
+                throw new RuntimeException("Mật khẩu và mật khẩu xác nhận không khớp!");
+            }
+        } else if (userDTO.getOldPassword()!=null && passwordEncoder.matches(userDTO.getOldPassword(),user.getPassword())) {
+            if(userDTO.getPassword().equals(userDTO.getConfirmPassword())){
+                user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            }else{
+                throw new RuntimeException("Mật khẩu và mật khẩu xác nhận không khớp!");
+            }
+        }else {
+            throw new RuntimeException("Mật khẩu cũ không khớp!");
+        }
         this.userRepository.save(user);
     }
 }

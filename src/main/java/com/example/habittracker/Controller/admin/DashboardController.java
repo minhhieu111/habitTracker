@@ -27,9 +27,9 @@ public class DashboardController {
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpServletRequest request) {
         String token = tokenUtil.getTokenFromCookies(request);
-        String userName = jwtUtil.getUserNameFromToken(token);
+        String email = jwtUtil.getEmailFromToken(token);
 
-        User userAdmin = this.userService.getUser(userName);
+        User userAdmin = this.userService.getUser(email);
         model.addAttribute("userAdmin", userAdmin);
 
         return "admin/dashboard";

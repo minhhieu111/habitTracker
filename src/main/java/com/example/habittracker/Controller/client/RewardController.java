@@ -35,8 +35,8 @@ public class RewardController {
     public String createReward(HttpServletRequest request, Model model,@ModelAttribute("newReward") Reward reward, RedirectAttributes redirectAttributes) {
         try{
             String token = tokenUtil.getTokenFromCookies(request);
-            String userName = jwtUtil.getUserNameFromToken(token);
-            this.rewardService.save(reward, userName);
+            String email = jwtUtil.getEmailFromToken(token);
+            this.rewardService.save(reward, email);
             redirectAttributes.addFlashAttribute("success", "Thêm thành công");
         }catch (RuntimeException e){
             redirectAttributes.addFlashAttribute("failed", e.getMessage());
@@ -80,8 +80,8 @@ public class RewardController {
     @GetMapping("exchange/{rewardId}")
     public ResponseEntity<RewardResponse> exchangeReward(HttpServletRequest request, @PathVariable Long rewardId, Model model, RedirectAttributes redirectAttributes) {
         String token = tokenUtil.getTokenFromCookies(request);
-        String userName = jwtUtil.getUserNameFromToken(token);
-        User user = this.userService.getUser(userName);
+        String email = jwtUtil.getEmailFromToken(token);
+        User user = this.userService.getUser(email);
         Reward reward = this.rewardService.getRewardById(rewardId);
         try{
             Long exchangeCost = this.rewardService.exchangeReward(user,reward);

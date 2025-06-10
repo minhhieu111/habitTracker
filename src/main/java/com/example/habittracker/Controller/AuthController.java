@@ -105,9 +105,9 @@ public class AuthController {
 
             User user = this.userService.findUserByEmail(email);
             if(user == null) {
-                user = this.userService.createOAuth2User(username,email,avatar);
+                user = this.authService.createOAuth2User(username,email,avatar);
             }
-            String token = jwtUtil.generateToken(user.getUserName(), user.getRole().toString());
+            String token = jwtUtil.generateToken(user.getEmail(), user.getRole().toString());
             user.setToken(token);
             user.setLastLogin(LocalDateTime.now());
             this.userRepository.save(user);

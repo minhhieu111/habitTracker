@@ -43,8 +43,8 @@ public class OverviewController {
     public String overview(HttpServletRequest request,Model model) {
         // User data
         String token = this.tokenUtil.getTokenFromCookies(request);
-        String userName = this.jwtUtil.getUserNameFromToken(token);
-        User user = this.userService.getUser(userName);
+        String email = this.jwtUtil.getEmailFromToken(token);
+        User user = this.userService.getUser(email);
 
 
 

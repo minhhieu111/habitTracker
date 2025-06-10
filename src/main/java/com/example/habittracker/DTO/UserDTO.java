@@ -15,4 +15,8 @@ public class UserDTO {
     private String email;
     private String achieveTitle;
     private MultipartFile image;
+    private String oldPassword;
+    private String password;
+    private String confirmPassword;
+    private boolean justLoginWithGoogle;
 }

@@ -81,6 +81,6 @@ public class HabitController {
 
     private String getUserNameFromRequest(HttpServletRequest request) {
         String token = tokenUtil.getTokenFromCookies(request);
-        return jwtUtil.getUserNameFromToken(token);
+        return jwtUtil.getEmailFromToken(token);
     }
 }

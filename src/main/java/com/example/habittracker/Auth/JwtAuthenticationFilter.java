@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = tokenUtil.getTokenFromCookies(request);
-        String userName = null;
+        String email = null;
 
         // Nếu không có token, chuyển hướng về /login
         if (token == null) {
@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Kiểm tra token
         try {
-            userName = jwtUtil.getUserNameFromToken(token);
+            email = jwtUtil.getEmailFromToken(token);
         } catch (RuntimeException e) {
             // Token hết hạn hoặc không hợp lệ, chuyển hướng về /login
             response.sendRedirect("/login");
@@ -64,8 +64,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // Nếu token hợp lệ và chưa có Authentication trong SecurityContext
-        if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             if (jwtUtil.validateToken(token)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,

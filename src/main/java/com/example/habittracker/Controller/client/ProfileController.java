@@ -2,6 +2,7 @@ package com.example.habittracker.Controller.client;
 
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
+import com.example.habittracker.DTO.MessageResponse;
 import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.Diary;
 import com.example.habittracker.Domain.User;
@@ -10,6 +11,7 @@ import com.example.habittracker.Service.ChallengeService;
 import com.example.habittracker.Service.DiaryService;
 import com.example.habittracker.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +45,8 @@ public class ProfileController {
         User user = getUserFromRequest(request);
         model.addAttribute("user", user);
         model.addAttribute("newUser", user);
+        UserDTO userDTO = this.userService.UserChangePassword(user);
+        model.addAttribute("changePassword", userDTO);
 
         List<UserChallenge> getParticipateChallenge = this.challengeService.getChallenges(user.getUserId());
         model.addAttribute("participatingChallenges",getParticipateChallenge);
@@ -77,11 +81,23 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
-
+    @PostMapping("/change_password")
+    public ResponseEntity<MessageResponse> changePassword(@ModelAttribute UserDTO userDTO) {
+        MessageResponse messageResponse = new MessageResponse();
+        try{
+            this.userService.changePassword(userDTO);
+            messageResponse.setMessage("Thay đổi mật khẩu thành công!");
+            messageResponse.setType("success");
+        }catch(RuntimeException e){
+            messageResponse.setMessage(e.getMessage());
+            messageResponse.setType("fail");
+        }
+        return ResponseEntity.ok().body(messageResponse);
+    }
 
     private User getUserFromRequest(HttpServletRequest request) {
         String token = tokenUtil.getTokenFromCookies(request);
-        String username =  this.jwtUtil.getUserNameFromToken(token);
-        return this.userService.getUser(username);
+        String email =  this.jwtUtil.getEmailFromToken(token);
+        return this.userService.getUser(email);
     }
 }
