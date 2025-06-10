@@ -42,7 +42,7 @@ public class ProfileController {
     public String profile(HttpServletRequest request,Model model) {
         User user = getUserFromRequest(request);
         model.addAttribute("user", user);
-        model.addAttribute("newUser", new UserDTO());
+        model.addAttribute("newUser", user);
 
         List<UserChallenge> getParticipateChallenge = this.challengeService.getChallenges(user.getUserId());
         model.addAttribute("participatingChallenges",getParticipateChallenge);
@@ -66,12 +66,12 @@ public class ProfileController {
     }
 
     @PostMapping("/update")
-    public String updateProfile(HttpServletRequest request, @ModelAttribute("newUser") UserDTO userDTO, @RequestParam("image") MultipartFile image, RedirectAttributes redirectAttributes) {
+    public String updateProfile(@ModelAttribute("newUser") User user, @RequestParam("image") MultipartFile image, RedirectAttributes redirectAttributes) {
         try{
-            this.userService.updateUser(userDTO,image);
+            this.userService.updateUser(user,image);
             redirectAttributes.addFlashAttribute("success", "Cập nhật thành công!");
         }catch (Exception e){
-            redirectAttributes.addFlashAttribute("failed", "Cập nhật thất bại"+e.getMessage());
+            redirectAttributes.addFlashAttribute("fail", "Cập nhật thất bại"+e.getMessage());
             return "redirect:/profile";
         }
         return "redirect:/profile";

@@ -119,7 +119,7 @@
                                 <img th:src="${user.avatar}" alt="Avatar" id="avatarImg">
                             </div>
                             <!-- Input file để chọn ảnh -->
-                            <input type="file" id="fileInput" style="display: none;" accept="image/*">
+                            <input type="file" id="fileInput" style="display: none;" name="image" accept="image/*">
                         </div>
                         <div class="mt-2">
                             <a href="#" class="text-muted" style="font-size: 0.9rem; text-decoration: none;" onclick="document.getElementById('fileInput').click();">
@@ -129,9 +129,9 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <input type="text" style="display: none" class="form-control edit-profile-input" id="userId" th:value="${user.userId}" th:field="*{userId}" required>
+                            <input type="text" style="display: none" class="form-control edit-profile-input" id="userId" th:field="*{userId}" required>
                             <label for="editFirstName" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Người dùng</label>
-                            <input type="text" class="form-control edit-profile-input" id="editFirstName" th:value="${user.userName}" th:field="*{username}" required>
+                            <input type="text" class="form-control edit-profile-input" id="editFirstName" th:field="*{userName}" required>
                         </div>
 <!--                        <div class="col-md-6">-->
 <!--                            <label for="editLastName" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Last Name</label>-->
@@ -141,18 +141,18 @@
 
                     <div class="mb-4">
                         <label for="editEmailAddress" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Địa chỉ Email</label>
-                        <input type="email" readonly class="form-control edit-profile-input" id="editEmailAddress" th:value="${user.email}" th:field="*{email}"  required>
+                        <input type="email" readonly class="form-control edit-profile-input" id="editEmailAddress" th:field="*{email}"  required>
                     </div>
 
+                    <div class="modal-footer" style="background-color: #f8f9fa; border-top: none; padding: 20px 30px 30px; justify-content: center; gap: 15px;">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="background-color: white; border: 1px solid #dee2e6; color: #6c757d; padding: 12px 30px; border-radius: 25px; font-weight: 500; min-width: 120px;">
+                            <i class="fas fa-times me-2"></i>Hủy
+                        </button>
+                        <button type="submit" class="btn btn-success" id="saveProfile" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; padding: 12px 30px; border-radius: 25px; font-weight: 500; min-width: 120px;">
+                            <i class="fas fa-check me-2"></i>Lưu
+                        </button>
+                    </div>
                 </form>
-            </div>
-            <div class="modal-footer" style="background-color: #f8f9fa; border-top: none; padding: 20px 30px 30px; justify-content: center; gap: 15px;">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="background-color: white; border: 1px solid #dee2e6; color: #6c757d; padding: 12px 30px; border-radius: 25px; font-weight: 500; min-width: 120px;">
-                    <i class="fas fa-times me-2"></i>Hủy
-                </button>
-                <button type="submit" class="btn btn-success" id="saveProfile" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; padding: 12px 30px; border-radius: 25px; font-weight: 500; min-width: 120px;">
-                    <i class="fas fa-check me-2"></i>Lưu
-                </button>
             </div>
         </div>
     </div>

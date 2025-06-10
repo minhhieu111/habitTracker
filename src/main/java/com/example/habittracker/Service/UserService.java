@@ -147,11 +147,10 @@ public class UserService {
         return totalCompleteTask;
     }
 
-    public void updateUser(UserDTO userDTO, MultipartFile image) {
-        User user = this.userRepository.findById(userDTO.getUserId()).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
-        User userUpdate = User.builder()
-                .userName(userDTO.getUsername())
-                .build();
+    public void updateUser(User userUpdateInfo, MultipartFile image) {
+        User user = this.userRepository.findById(userUpdateInfo.getUserId()).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
+
+        user.setUserName(userUpdateInfo.getUserName());
 
         if (image != null && !image.isEmpty()) {
             try {
@@ -162,6 +161,6 @@ public class UserService {
             }
         }
 
-        this.userRepository.save(userUpdate);
+        this.userRepository.save(user);
     }
 }
