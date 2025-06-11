@@ -105,9 +105,8 @@
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius: 15px; border: none;">
-            <div class="modal-header" style="background-color: #f8f9fa; border-bottom: none; padding: 25px 30px 15px;">
+            <div style="background-color: #f8f9fa; border-bottom: none; padding: 25px 30px 15px;">
                 <h4 class="modal-title fw-bold" id="editProfileModalLabel" style="color: #333;">Thông tin</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem;"></button>
             </div>
             <div class="modal-body" style="padding: 20px 30px 30px; background-color: #f8f9fa;">
                 <!-- Profile Photo Section -->
@@ -165,9 +164,8 @@
 <div class="modal fade" id="changePassword" tabindex="-1" aria-labelledby="changePasswordLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius: 15px; border: none;">
-            <div class="modal-header" style="background-color: #f8f9fa; border-bottom: none; padding: 25px 30px 15px;">
+            <div style="background-color: #f8f9fa; border-bottom: none; padding: 25px 30px 15px;">
                 <h4 class="modal-title fw-bold" id="changePasswordLabel" style="color: #333;">Thay đổi mật khẩu</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.2rem;"></button>
             </div>
             <div class="modal-body" style="padding: 20px 30px 30px; background-color: #f8f9fa;">
                 <div id="error-message" class="alert alert-danger" style="display: none;">
@@ -290,39 +288,36 @@
     </div>
 </div>
 
-<!--best streak challenge-->
+<!--best streak challenge modal-->
 <div class="modal fade" id="challengeStatsModal" tabindex="-1" aria-labelledby="challengeStatsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px; overflow: hidden;">
             <!-- Modal Header -->
             <div class="modal-header text-white p-4" style="background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%); border: none;">
-                <h5 class="modal-title w-100 text-center fw-bold" id="challengeStatsModalLabel">
-                    Chi tiết Thử thách <span id="challengeNameStats">Thaydoi</span>
-                </h5>
+                <h5 class="modal-title w-100 text-center fw-bold" id="challengeStatsModalLabel" th:text="${longestStreakChallenge !=null?'Chi tiết Thử thách '+longestStreakChallenge.challenge.title:''}"></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body p-4" style="background-color: #f5f5f5;">
+            <div class="modal-body p-4" style="background-color: #f5f5f5;" th:if="${longestStreakChallenge!=null}">
                 <!-- Main Stats Card -->
                 <div class="card mb-4" style="border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                     <div class="card-body text-center p-4">
                         <!-- Streak Number -->
                         <div class="mb-3">
-                            <h1 class="display-3 fw-bold text-danger mb-0" id="streakNumber">11</h1>
+                            <h1 class="display-3 fw-bold text-danger mb-0" id="streakNumber" th:text="${longestStreakChallenge.bestStreak}">11</h1>
                             <p class="text-muted mb-3">Streak dài nhất</p>
                         </div>
 
                         <!-- Circular Progress -->
                         <div class="d-flex justify-content-center mb-3">
                             <div class="position-relative" style="width: 120px; height: 120px;">
-                                <svg width="120" height="120" class="position-absolute">
+                                <svg width="120" height="120" >
                                     <!-- Background circle -->
                                     <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="8"></circle>
                                     <!-- Progress circle -->
                                     <circle cx="60" cy="60" r="50" fill="none" stroke="#ff4757" stroke-width="8"
-                                            stroke-linecap="round" stroke-dasharray="314"
-                                            stroke-dashoffset="85" id="progressCircle"
-                                            style="transform: rotate(-90deg); transform-origin: 60px 60px; transition: stroke-dashoffset 0.5s ease;"></circle>
+                                            stroke-linecap="round" id="progressCircle"
+                                            th:style="'--progress: ' + ${longestStreakChallenge.progress}"></circle>
                                 </svg>
                                 <div class="position-absolute top-50 start-50 translate-middle">
                                     <h3 class="fw-bold text-danger mb-0" id="progressPercentage">73%</h3>
@@ -351,8 +346,8 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h5 class="fw-bold mb-0" id="completedTasks">42</h5>
-                                    <small class="text-muted">Nhiệm vụ hoàn thành</small>
+                                    <h5 class="fw-bold mb-0" id="completedTasks" th:text="${longestStreakChallenge.completedTasks}">42</h5>
+                                    <small class="text-muted">Thói quen hoàn thành</small>
                                 </div>
                             </div>
                         </div>
@@ -369,7 +364,7 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h5 class="fw-bold mb-0" id="totalTasks">58</h5>
+                                    <h5 class="fw-bold mb-0" id="totalTasks" th:text="${longestStreakChallenge.totalExpectedTasks}">58</h5>
                                     <small class="text-muted">Tổng nhiệm vụ</small>
                                 </div>
                             </div>
@@ -387,7 +382,7 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h5 class="fw-bold mb-0" id="skippedTasks">5</h5>
+                                    <h5 class="fw-bold mb-0" id="skippedTasks" th:text="${longestStreakChallenge.skippedTasks}">5</h5>
                                     <small class="text-muted">Nhiệm vụ bỏ qua</small>
                                 </div>
                             </div>
@@ -405,12 +400,20 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h5 class="fw-bold mb-0 text-success" id="challengeStatus">ACTIVE</h5>
+                                    <h5 class="fw-bold mb-0 text-success" id="challengeStatus" th:text="${longestStreakChallenge.status}">ACTIVE</h5>
                                     <small class="text-muted">Trạng thái</small>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="modal-body p-4 d-flex justify-content-center" style="background-color: #f5f5f5;" th:if="${longestStreakChallenge==null}">
+                <div id="emptyState" class="empty-state">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                    <h4>Chưa có thử thách nào</h4>
+                    <p>Hãy tạo cho bạn 1 thử thách để trở nên tốt hơn!</p>
                 </div>
             </div>
         </div>
