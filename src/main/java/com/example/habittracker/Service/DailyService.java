@@ -56,6 +56,11 @@ public class DailyService {
     }
 
     @Transactional
+    public List<UserDaily> getUserDailyChallenge(User user, Challenge challenge){
+        return this.userDailyRepository.findByUserAndDailyChallengeAndUnavailableFalse(user, challenge);
+    }
+
+    @Transactional
     public void createDaily(DailyDTO dailyDTO, String username) {
         User creator = userService.getUser(username);
         Challenge challenge = challengeRepository.findById(dailyDTO.getChallengeId()).get();

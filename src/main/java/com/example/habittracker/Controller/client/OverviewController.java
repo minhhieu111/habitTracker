@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -42,11 +43,7 @@ public class OverviewController {
     @GetMapping("")
     public String overview(HttpServletRequest request,Model model) {
         // User data
-        String token = this.tokenUtil.getTokenFromCookies(request);
-        String email = this.jwtUtil.getEmailFromToken(token);
-        User user = this.userService.getUser(email);
-
-
+        User user = getUserFromRequest(request);
 
         model.addAttribute("user", user);
 
@@ -56,17 +53,6 @@ public class OverviewController {
 
         List<UserChallenge> userChallengeOwner = this.challengeService.getChallengesOwner(user.getUserId());
         model.addAttribute("userChallengeOwner", userChallengeOwner);
-
-        model.addAttribute("challengeName", "Lối Sống");
-        model.addAttribute("challengeDay", 24);
-        model.addAttribute("challengeTotalDays", 30);
-        model.addAttribute("streak", 5);
-
-        // Progress data
-        model.addAttribute("streakCount", 5);
-        model.addAttribute("maxStreak", 15);
-        model.addAttribute("weeklyProgress", 5);
-        model.addAttribute("weeklyTotal", 7);
 
         // Habits
         model.addAttribute("newHabit",new HabitDTO());
@@ -90,5 +76,51 @@ public class OverviewController {
 
 
         return "client/overview";
+    }
+
+    @GetMapping("/detail")
+    public String overviewChallengeDetail(HttpServletRequest request, Model model, @RequestParam("challenge")Long challengeId) {
+        User user = getUserFromRequest(request);
+
+        Challenge challenge = this.challengeService.getChallengeById(challengeId);
+
+        model.addAttribute("user", user);
+        //challenge
+        UserChallenge userChallenge = this.challengeService.getUserChallenge(user,challenge);
+        model.addAttribute("userChallenge", userChallenge);
+
+        // Challenge data
+        List<UserChallenge> userChallenges  = this.challengeService.getChallenges(user.getUserId());
+        model.addAttribute("userChallenges", userChallenges);
+
+        List<UserChallenge> userChallengeOwner = this.challengeService.getChallengesOwner(user.getUserId());
+        model.addAttribute("userChallengeOwner", userChallengeOwner);
+
+        // Habits
+        model.addAttribute("newHabit",new HabitDTO());
+        List<UserHabit> userhabit = this.habitService.getUserHabitsChallenge(user,challenge);
+        model.addAttribute("userHabits",userhabit);
+
+        // Dailies
+        model.addAttribute("newDaily",new DailyDTO());
+        List<UserDaily> userdaily = this.dailyService.getUserDailyChallenge(user,challenge);
+        model.addAttribute("userDailies",userdaily);
+
+        //Todos
+        model.addAttribute("newTodo", new TodoDTO());
+        List<Todo> activeTodos = this.todoService.getActiveTodos(user);
+        model.addAttribute("activeTodos", activeTodos);
+
+        //Diary
+        model.addAttribute("newDiary", new DiaryDTO());
+        List<Diary> diaries = diaryService.getDiariesByUser(user);
+        model.addAttribute("diaries", diaries);
+        return "client/overview";
+    }
+
+    private User getUserFromRequest(HttpServletRequest request) {
+        String token = tokenUtil.getTokenFromCookies(request);
+        String email =  this.jwtUtil.getEmailFromToken(token);
+        return this.userService.getUser(email);
     }
 }

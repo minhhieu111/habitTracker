@@ -31,23 +31,23 @@
             <!-- Include user information from existing template -->
             <div th:replace="layout/userinformation.html :: user(user=${user})"></div>
             <!-- Progress Section -->
-            <div class="progress-section">
+            <div class="progress-section" th:if="${userChallenge!=null}">
                 <div class="progress-title">Tiến độ</div>
                 <div class="progress-row">
                     <div class="d-flex justify-content-between">
-                        <div class="progress-label">Chuỗi: <span th:text="${streakCount}">5</span></div>
-                        <div class="progress-value" th:text="'Chuỗi cao nhất:' + ${maxStreak}"> 15</div>
+                        <div class="progress-label">Chuỗi: <span th:text="${userChallenge.streak}">5</span></div>
+                        <div class="progress-value" th:text="'Chuỗi cao nhất:' + ${userChallenge.bestStreak}"> 15</div>
                     </div>
                     <div class="progress-bar-container mb-3">
-                        <div class="progress-bar-fill" th:style="'width: ' + (${streakCount} * 100 / ${maxStreak}) + '%'"></div>
+                        <div class="progress-bar-fill" th:style="'width: ' + (100 -(${userChallenge.streak} * 100 / ${userChallenge.bestStreak})) + '%'"></div>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <div class="progress-label">Tuần này</div>
-                        <div class="progress-value" th:text="${weeklyProgress} + '/' + ${weeklyTotal}">5/7</div>
+                        <div class="progress-label">Thực hiện/Tổng thói quen trong thử thách</div>
+                        <div class="progress-value" th:text="${userChallenge.totalCompletedTasks} + '/' + ${userChallenge.totalExpectedTasks}">5/7</div>
                     </div>
 
                     <div class="progress-bar-container">
-                        <div class="progress-bar-fill" th:style="'width: ' + (${weeklyProgress} * 100 / ${weeklyTotal}) + '%'"></div>
+                        <div class="progress-bar-fill" th:style="'width: ' + (100 - (${userChallenge.totalCompletedTasks} * 100 / ${userChallenge.totalExpectedTasks})) + '%'"></div>
                     </div>
                 </div>
 
@@ -56,15 +56,45 @@
 
         <div class="col-md-4 d-flex flex-column justify-content-center">
             <!-- Challenge Card -->
-            <div class="challenge-card">
-                <div class="challenge-title">Thử thách</div>
-                <div class="challenge-subtitle" th:text="${challengeName}">Lối Sống</div>
-                <div class="challenge-progress" th:text="'Ngày ' + ${challengeDay} + '/' + ${challengeTotalDays}">Ngày 24/30</div>
-                <div class="challenge-streak">
-                    <span th:text="'Chuỗi: ' + ${streak} + ' ngày liên tiếp'">Chuỗi: 5 ngày liên tiếp</span>
-                    <i class="fas fa-fire"></i>
+            <div class="challenge-card" id="challengeCard">
+                <div th:if="${userChallenge!=null}">
+                    <div class="challenge-title" th:text="'Thử thách: '+${userChallenge.challenge.title}">Thử thách</div>
+                    <div class="challenge-subtitle" th:text="${userChallenge.challenge.description}">Lối Sống</div>
+                    <div class="challenge-progress" th:text="'Ngày ' +${userChallenge.daysSinceStart}+ '/' +${userChallenge.challenge.day}">Ngày 24/30</div>
+                    <div class="challenge-streak">
+                        <span th:text="'Chuỗi: ' +${userChallenge.streak}+' ngày liên tiếp'">Chuỗi: 5 ngày liên tiếp</span>
+                        <i class="fas fa-fire"></i>
+                    </div>
+                </div>
+                <div th:if="${userChallenge==null}">
+                    <div class="challenge-title">Tất cả thử thách</div>
+                </div>
+
+                <!-- Dropdown -->
+                <div class="challenge-dropdown" id="challengeDropdown">
+                    <div class="dropdown-header">
+                        Danh sách thử thách của bạn
+                    </div>
+                    <div class="dropdown-content" id="dropdownContent">
+                        <a href="/overview" class="dropdown-item">
+                            <div class="item-title" >Tất cả</div>
+                        </a>
+
+                        <a th:href="'/overview/detail?challenge='+${challenge.getChallenge().getChallengeId()}" class="dropdown-item" th:each="challenge:${userChallenges}">
+                            <div class="item-title" th:text="${challenge.challenge.title}"></div>
+                            <div class="item-stats">
+                                <div class="item-progress" th:text="${challenge.daysSinceStart}+ '/' +${challenge.challenge.day}+ ' Ngày'"></div>
+                                <div class="item-streak" >
+                                    <span th:text="'Streak: ' +${challenge.streak}"></span>
+                                    <i class="fas fa-fire"></i>
+                                </div>
+
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -597,6 +627,40 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function (){
+
+        const challengeCard = document.getElementById('challengeCard');
+        const challengeDropdown = document.getElementById('challengeDropdown');
+
+        // Toggle dropdown
+        challengeCard.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+
+        // Đóng dropdown khi click bên ngoài
+        document.addEventListener('click', function(e) {
+            if (!challengeCard.contains(e.target) && !challengeDropdown.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        function toggleDropdown() {
+            if (challengeDropdown.classList.contains('show')) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        }
+
+        function openDropdown() {
+            challengeCard.classList.add('active');
+            challengeDropdown.classList.add('show');
+        }
+
+        function closeDropdown() {
+            challengeCard.classList.remove('active');
+            challengeDropdown.classList.remove('show');
+        }
 
         let debounceTimeout;
         const searchInput = document.querySelector('.search-input');

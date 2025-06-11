@@ -55,6 +55,10 @@ public class HabitService {
                 .collect(Collectors.toList());
     }
 
+    public List<UserHabit> getUserHabitsChallenge(User user, Challenge challenge){
+        return this.userHabitRepository.findByUserAndHabitChallengeAndUnavailableFalse(user, challenge);
+    }
+
     @Transactional
     public void save(HabitDTO habitDTO, String username) {
         User user = this.userService.getUser(username);

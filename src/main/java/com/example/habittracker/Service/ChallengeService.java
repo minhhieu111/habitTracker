@@ -60,6 +60,11 @@ public class ChallengeService {
     }
 
     @Transactional
+    public UserChallenge getUserChallenge(User user, Challenge challenge){
+        return this.userChallengeRepository.findByUserAndChallenge(user,challenge).orElseThrow(()->new RuntimeException("Không tìm thấy dữ liệu thử thách!"));
+    }
+
+    @Transactional
     public List<UserChallenge> getValidChallenges(Long userId) {
         List<UserChallenge> userChallenges = this.challengeRepository.findChallengeByUsers_Username(userId).get();
         LocalDate today = LocalDate.now();

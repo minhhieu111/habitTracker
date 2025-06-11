@@ -64,13 +64,15 @@ body {
 }
 
 .progress-label {
-    width: 120px;
+    width: 50%;
     font-size: 14px;
 }
 
 .progress-bar-container {
     flex: 1;
-    background-color: #e0e0e0;
+    display: flex;
+    justify-content: end;
+    background: linear-gradient(135deg, #fbce00, #f43a00);
     height: 8px;
     border-radius: 4px;
     overflow: hidden;
@@ -78,7 +80,8 @@ body {
 
 .progress-bar-fill {
     height: 100%;
-    background-color: #3298dc;
+    background-color: #e0e0e0;
+    align-content: end;
 }
 
 .progress-value {
@@ -96,6 +99,10 @@ body {
     margin: 15px;
     text-align: center;
     color: black;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    z-index: 99999;
 }
 
 .challenge-title {
@@ -121,6 +128,138 @@ body {
 
 .challenge-streak i {
     color: #ff3860;
+}
+
+.challenge-card.active {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+
+}
+
+.container{
+    position: relative;
+}
+
+/* Dropdown Styles */
+.challenge-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.challenge-dropdown.show {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Custom Scrollbar */
+.challenge-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.challenge-dropdown::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.challenge-dropdown::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #fbce00, #f57953);
+    border-radius: 10px;
+}
+
+.challenge-dropdown::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #fbce00, #f57953);
+}
+
+.dropdown-header {
+    background: linear-gradient(135deg, #fbce00, #f57953);
+    color: white;
+    padding: 15px 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-header i {
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+.dropdown-content {
+    padding: 10px 10px;
+}
+
+.dropdown-item {
+    padding: 15px 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    border-bottom: 1px solid #00000017;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.item-title {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-category {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.item-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.item-progress {
+    background: #ecf0f1;
+    border-radius: 10px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.item-streak {
+    display: flex;
+    align-items: center;
+    color: #e74c3c;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.item-streak i {
+    margin-left: 5px;
+    color: #e67e22;
+    font-size: 0.9rem;
 }
 
 /* Search bar */

@@ -320,7 +320,7 @@
                                             th:style="'--progress: ' + ${longestStreakChallenge.progress}"></circle>
                                 </svg>
                                 <div class="position-absolute top-50 start-50 translate-middle">
-                                    <h3 class="fw-bold text-danger mb-0" id="progressPercentage">73%</h3>
+                                    <h3 class="fw-bold text-danger mb-0" id="progressPercentage" th:text="${longestStreakChallenge.progress}+'%'">73%</h3>
                                 </div>
                             </div>
                         </div>

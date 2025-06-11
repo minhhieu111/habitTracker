@@ -47,19 +47,19 @@
                             <li>Uống 1 cốc nước</li>
                             <li>Ngủ trước 10h</li>
                         </ul>
-                        <a href="#" class="text-primary">Xem chi tiết</a>
+                        <a href="/overview" class="text-primary">Xem chi tiết</a>
                     </div>
                 </div>
 
                 <!-- challenge Section -->
-                <a href="" class="habits-section">
+                <div class="habits-section">
                     <div class="row">
-                        <div th:each="challenge : ${userChallenges}" class="col-md-6 mb-3">
+                        <a th:href="'/overview/detail?challenge='+${challenge.challenge.getChallengeId()}" th:each="challenge : ${userChallenges}" class="col-md-6 mb-3 text-decoration-none">
                             <div class="habit-card">
                                 <div class="habit-progress">
-                                    <svg viewBox="0 0 100 100">
-                                        <circle class="background" cx="50" cy="50" r="40"></circle>
-                                        <circle class="progress" cx="50" cy="50" r="40"
+                                    <svg viewBox="0 0 110 110">
+                                        <circle class="background" cx="50" cy="50" r="50"></circle>
+                                        <circle class="progress" cx="50" cy="50" r="50"
                                                 th:style="'--progress: ' + ${challenge.progress}"></circle>
                                     </svg>
                                     <div class="habit-progress-text" th:text="${challenge.progress} + '%'">50%</div>
@@ -71,9 +71,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
-                </a>
+                </div>
             </div>
 
             <!-- Right Column: Calendar and Rewards Section -->
