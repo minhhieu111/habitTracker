@@ -13,6 +13,7 @@
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 <body>
 
 <div th:replace="layout/toastnotification.html :: toast(failed=${failed}, success=${success})"></div>
@@ -20,6 +21,9 @@
 <div th:replace="layout/toastresponse.html :: toastresponse"></div>
 
 <div th:replace="layout/sidebar.html"></div>
+
+<!--check login-->
+<div th:replace="layout/checklogin.html"></div>
 
 <!-- Page Content -->
 <div id="content">
@@ -143,6 +147,11 @@
                                     <div id="habitsList"></div>
                                 </div>
                             </div>
+
+                            <div id="tasksError" class="text-danger mt-1" style="display: none;">
+                                Vui lòng thêm ít nhất một Daily Task hoặc Habit.
+                            </div>
+
                         </div>
                     </form>
                 </div>
@@ -156,7 +165,6 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button type="button" class="btn btn-primary" id="saveChallengeBtn">Lưu</button>
                     </div>
-                    <button type="button" class="btn btn-success" id="shareChallengeBtn" style="display: none;">Chia sẻ thử thách</button>
                 </div>
             </div>
         </div>
@@ -230,7 +238,7 @@
                             <label class="form-label">Lặp lại vào ngày</label>
                             <div class="d-flex flex-wrap gap-2" style="max-height: 150px; width: 100%; overflow-y: auto;">
                                 <div th:each="day : ${#numbers.sequence(1, 31)}" class="form-check form-check-inline" style="width: 14%" th:data-day="${day}">
-                                    <input class="form-check-input" type="checkbox" value="${day}" th:id="|month-day-${day}|" />
+                                    <input class="form-check-input" type="checkbox" th:value="${day}" th:id="|month-day-${day}|" />
                                     <label class="form-check-label" th:for="|month-day-${day}|" th:text="${day}">1</label>
                                 </div>
                             </div>
@@ -374,7 +382,7 @@
                                 <div class="chart-container" style="position: relative; height:250px;">
                                     <canvas id="habitCompletionChart"></canvas>
                                 </div>
-                                <p class="text-center mt-2">Biểu đồ hoàn thiện các thói quen</p>
+                                <p class="text-center mt-2 fw-bold">Biểu đồ hoàn thiện các thói quen</p>
                             </div>
                         </div>
 
@@ -384,17 +392,17 @@
                                 <div class="chart-container" style="position: relative; height:250px;">
                                     <canvas id="habitProgressChart"></canvas>
                                 </div>
-                                <div class="d-flex justify-content-center mt-2">
+                                <div class="d-flex justify-content-center mt-3 mb-3">
                                     <div class="me-3">
                                         <span class="badge rounded-pill" style="background-color: #0066ff;">&nbsp;</span>
-                                        <span>Bỏ qua</span>
+                                        <span>Chưa Hoàn Thành</span>
                                     </div>
                                     <div>
                                         <span class="badge rounded-pill" style="background-color: #05ff12;">&nbsp;</span>
                                         <span>Hoàn Thành</span>
                                     </div>
                                 </div>
-                                <p class="text-center">Biểu đồ về tiến độ thói quen</p>
+                                <p class="text-center fw-bold">Biểu đồ về tiến độ thói quen</p>
                             </div>
 
                             <div class="col-md-6 d-flex justify-content-between">
@@ -455,6 +463,8 @@
             document.getElementById("challengeDuration").value = '1';
             document.getElementById("dailyTasksList").innerHTML = '';
             document.getElementById("habitsList").innerHTML = '';
+            document.getElementById("habitsField").value = '';
+            document.getElementById("dailiesField").value = '';
 
             document.getElementById("deleteChallengeButton").style.display = "none";
 
@@ -478,7 +488,6 @@
                     return response.json();
                 })
                 .then(challenge => {
-                    console.log(challenge)
                     document.getElementById("challengeId").value = challenge.challengeId;
                     document.getElementById("challengeTitle").value = challenge.title;
                     document.getElementById("challengeDescription").value = challenge.description;
@@ -551,6 +560,7 @@
         const saveChallengeBtn = document.getElementById("saveChallengeBtn");
         const shareChallengeBtn = document.getElementById("shareChallengeBtn");
         const challengeDurationError = document.getElementById("challengeDurationError")
+        const tasksError = document.getElementById("tasksError");
 
         let habitsList = [];
         let dailiesList = [];
@@ -710,7 +720,9 @@
                 const repeatFrequency = document.getElementById("repeatFrequency").value;
                 const repeatEvery = document.getElementById("repeatEvery").value;
                 const repeatDays = Array.from(document.querySelectorAll("#repeatDaysSection input:checked")).map(input => input.value);
-                const repeatMonthDays = Array.from(document.querySelectorAll("#repeatMonthDaysSection input:checked")).map(input => parseInt(input.value));
+                const repeatMonthDays = Array.from(document.querySelectorAll("#repeatMonthDaysSection input:checked")).map(input => {console.log(input.value);
+                    return parseInt(input.value);});
+                console.log(repeatMonthDays)
 
                 if (!title || title.trim() === "") {
                     document.getElementById("dailyTitleError").style.display = 'block';
@@ -756,6 +768,7 @@
             };
         });
 
+        // validate challenge
         saveChallengeBtn.addEventListener("click", function() {
             let valid = true;
             if (challengeTitleInput.value.trim() === "") {
@@ -780,91 +793,17 @@
                 challengeDurationError.style.display = "none";
             }
 
+            if (dailiesList.length === 0 && habitsList.length === 0) {
+                tasksError.style.display = "block";
+                valid = false;
+            } else {
+                tasksError.style.display = "none";
+            }
+
             if (!valid) return;
 
             document.getElementById("ChallengeForm").submit();
         });
-
-        // shareChallengeBtn.addEventListener("click", function() {
-        //     const challengeId = document.getElementById("challengeId").value;
-        //     if (!challengeId) {
-        //         alert("Vui lòng chọn một thử thách để chia sẻ!");
-        //         return;
-        //     }
-        //
-        //     fetch(`/challenges/complete/${challengeId}`, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         }
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.success) {
-        //                 alert(data.message);
-        //                 $('#ChallengeModal').modal('hide');
-        //                 loadCompletedChallenges();
-        //             } else {
-        //                 alert("Lỗi: " + data.message);
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.error('Error:', error);
-        //             alert("Đã có lỗi xảy ra!");
-        //         });
-        // });
-        //
-        // function loadCompletedChallenges() {
-        //     fetch('/challenges/completed', {
-        //         method: 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         }
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data) {
-        //                 console.log("Completed Challenges:", data);
-        //                 displayCompletedChallenges(data);
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.error('Error:', error);
-        //         });
-        // }
-
-        function displayCompletedChallenges(challenges) {
-            const container = document.getElementById("completedChallengesList") || document.createElement("div");
-            container.id = "completedChallengesList";
-            container.innerHTML = "";
-            challenges.forEach(challenge => {
-                const div = document.createElement("div");
-                div.className = "challenge-card mb-2 p-2 border";
-                div.innerHTML = `<span>${challenge.title} (Hoàn thành: ${challenge.endDate})</span>`;
-                container.appendChild(div);
-            });
-            document.body.appendChild(container);
-        }
-
-        function checkChallengeCompletion() {
-            const challengeId = document.getElementById("challengeId").value;
-            if (challengeId) {
-                fetch(`/challenges/complete/check/${challengeId}`, {
-                    method: 'GET'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.completed) {
-                            shareChallengeBtn.style.display = "block";
-                        } else {
-                            shareChallengeBtn.style.display = "none";
-                        }
-                    });
-            }
-        }
-
-        $('#ChallengeModal').on('shown.bs.modal', checkChallengeCompletion);
-
 
         const searchInput = document.querySelector('.search-input');
         if (searchInput) {
@@ -892,24 +831,31 @@
 
         let completedDates = [];
         function showChallengeDetails(challengeId) {
-        // Fetch challenge data from API
         fetch(`/challenges/detail/challenge/${challengeId}`)
-            .then(response => response.json())
+            .then(response=>{
+                if(response.url.includes("/login")){
+                    window.location.href="/login"
+                    return;
+                }
+                return response.json()
+            })
             .then(data => {
-                console.log(data)
+                console.log(data.title)
+                console.log(data.description)
+
                 // Update modal with challenge data
-                $('#challengeTitle').text(data.name);
-                $('#challengeDescription').text(data.description);
-                $('#bestStreak').text(data.bestStreak);
-                $('#completionRate').text(data.completionRate + '%');
-                $('#totalHabits').text(data.totalHabitsCompleted);
+                document.getElementById('challengeOverviewTitle').textContent = data.title;
+                document.getElementById('challengeOverviewDescription').textContent = data.description;
+                document.getElementById('bestStreak').textContent = data.bestStreak;
+                document.getElementById('completionRate').textContent = data.progress + '%';
+                document.getElementById('totalHabits').textContent = data.totalCompletedTasks;
 
                 // Initialize charts
-                initLineChart(data.lineChartData);
-                initDonutChart(data.donutChartData);
+                initLineChart(data.dailyProgresses);
+                initDonutChart(data);
 
                 // Initialize calendar
-                completedDates = data.completedDates || [];
+                completedDates = data.completedTasksList || [];
                 initCalendar();
 
                 // Show the modal
@@ -917,7 +863,8 @@
                 challengeModal.show();
             })
             .catch(error => {
-                console.error('Error fetching challenge details:', error);
+                console.error('Lỗi khi lấy dữ liệu thử thách:', error);
+                alert('Không thể lấy dữ liệu thử thách. Do phiên đăng nhập hết hạn! Mời đăng nhập lại');
             });
         }
 
@@ -937,7 +884,7 @@
                 labels: data.map(item => item.date),
                 datasets: [{
                     label: 'Tỷ lệ hoàn thành (%)',
-                    data: data.map(item => item.value),
+                    data: data.map(item => item.completionPercentage),
                     fill: {
                         target: 'origin',
                         above: 'rgba(200, 220, 255, 0.5)',
@@ -965,6 +912,21 @@
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'x',
+                        },
+                        pan: {
+                            enabled: true,
+                            mode: 'x',
+                        }
                     }
                 }
             }
@@ -984,9 +946,9 @@
         window.habitProgressChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Bỏ qua', 'Hoàn Thành'],
+                labels: ['Chưa Hoàn Thành', 'Hoàn Thành'],
                 datasets: [{
-                    data: [data.remaining,data.completed],
+                    data: [data.skippedTasks,data.completedTasks],
                     backgroundColor: ['#0066ff', '#05ff12'],
                     borderWidth: 0
                 }]
@@ -1011,8 +973,8 @@
             const currentMonth = now.getMonth() + 1;
 
             // Update dropdowns
-            $('#calendar__month').val(currentMonth);
-            $('#calendar__year').val(currentYear);
+            document.getElementById('calendar__month').value = currentMonth;
+            document.getElementById('calendar__year').value = currentYear;
 
             // Generate calendar for current month
             generateCalendar(currentYear, currentMonth);
@@ -1076,10 +1038,12 @@
         }
 
         // Month and year change handlers
-        $('#calendar__month, #calendar__year').on('change', function () {
-            const selectedMonth = parseInt($('#calendar__month').val());
-            const selectedYear = parseInt($('#calendar__year').val());
-            generateCalendar(selectedYear, selectedMonth);
+        document.querySelectorAll('#calendar__month, #calendar__year').forEach(element => {
+            element.addEventListener('change', function() {
+                const selectedMonth = parseInt(document.getElementById('calendar__month').value, 10);
+                const selectedYear = parseInt(document.getElementById('calendar__year').value, 10);
+                generateCalendar(selectedYear, selectedMonth);
+            });
         });
 
     });

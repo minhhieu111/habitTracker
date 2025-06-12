@@ -12,7 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Register {
-    private Long id;
     @NotBlank(message = "yêu cầu tên người dùng")
     private String username;
     @NotBlank(message = "yêu cầu mật khẩu")

@@ -26,9 +26,11 @@ public class DiaryService {
     private final UserHabitRepository userHabitRepository;
     private final UserDailyRepository userDailyRepository;
     private final TodoRepository todoRepository;
+    private final UserService userService;
+    private final CoinCalculationService coinCalculationService;
 
 
-    public DiaryService(DiaryRepository diaryRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, ImageService imageService, UserHabitRepository userHabitRepository, UserDailyRepository userDailyRepository, TodoRepository todoRepository) {
+    public DiaryService(DiaryRepository diaryRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, ImageService imageService, UserHabitRepository userHabitRepository, UserDailyRepository userDailyRepository, TodoRepository todoRepository, UserService userService, CoinCalculationService coinCalculationService) {
         this.diaryRepository = diaryRepository;
         this.habitHistoryRepository = habitHistoryRepository;
         this.dailyHistoryRepository = dailyHistoryRepository;
@@ -37,12 +39,14 @@ public class DiaryService {
         this.userHabitRepository = userHabitRepository;
         this.userDailyRepository = userDailyRepository;
         this.todoRepository = todoRepository;
+        this.userService = userService;
+        this.coinCalculationService = coinCalculationService;
     }
-
+    @Transactional
     public List<Diary> getDiariesByUser(User user) {
         return diaryRepository.findByUser(user);
     }
-
+    @Transactional
     public DiaryDTO getDiaryDTO(Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new RuntimeException("Nhật ký không tìm thấy"));
@@ -81,7 +85,7 @@ public class DiaryService {
     }
 
     @Transactional
-    public void saveDiary(DiaryDTO diaryDTO, MultipartFile image, User user) {
+    public String saveDiary(DiaryDTO diaryDTO, MultipartFile image, User user) {
         LocalDate today = LocalDate.now();
         Diary diary = Diary.builder()
                 .date(today)
@@ -94,7 +98,7 @@ public class DiaryService {
 
         if (image != null && !image.isEmpty()) {
             try {
-                String filePath = imageService.saveImage(image, photoFolder); // Sử dụng saveDiaryImage
+                String filePath = imageService.saveImage(image, photoFolder);
                 diary.setImageUrl(filePath);
             } catch (IOException e) {
                 throw new RuntimeException("Lỗi khi lưu ảnh: " + e.getMessage(), e);
@@ -114,7 +118,12 @@ public class DiaryService {
         diary.getUserDailyList().addAll(completedDailies);
         diary.getTodoList().addAll(completedTodos);
 
+        Long coinEarned = this.coinCalculationService.calculateDiaryCoins(diary);
+        String message = this.userService.getCoinComplete(user, coinEarned);
+
         diaryRepository.save(diary);
+
+        return message;
     }
 
     @Transactional
@@ -191,7 +200,7 @@ public class DiaryService {
         return getDiaryDTO(diaryId);
     }
 
-
+    @Transactional
     public List<TaskDTO> getCompletedTasks(User user) {
         LocalDate today = LocalDate.now();
 

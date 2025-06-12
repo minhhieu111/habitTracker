@@ -19,4 +19,24 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
 
     @Query("SELECT uc FROM UserChallenge uc WHERE uc.challenge= :challenge")
     Optional<UserChallenge> findByChallenge(@Param("challenge") Challenge challenge);
+
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.status = :status")
+    List<UserChallenge> findByStatus(@Param("status") UserChallenge.Status status);
+
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.status = :status AND uc.user=:user AND uc.isNotificationShown=false")
+    List<UserChallenge> findByUserAndStatusAndIsNotificationShownFalse(@Param("user")User user,@Param("status") UserChallenge.Status status);
+
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.challenge.isPublic = 'PUBLIC' AND uc.challenge.creatorId = uc.user.userId ORDER BY uc.endDate DESC")
+    List<UserChallenge> findByChallengePublic();
+
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.user = :user AND uc.status = 'COMPLETE' AND uc.challenge.isPublic = 'PRIVATE'")
+    List<UserChallenge> findByUserAndCompleted(@Param("user")User user);
+
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.user = :user AND uc.status = 'COMPLETE'")
+    List<UserChallenge> findAllByUserAndCompleted(@Param("user")User user);
+
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.user = :user AND uc.status ='ACTIVE'")
+    List<UserChallenge> findByUserAndChallengeIsActive(@Param("user")User user);
+
+
 }

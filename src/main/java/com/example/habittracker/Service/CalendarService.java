@@ -4,6 +4,7 @@ import com.example.habittracker.DTO.*;
 import com.example.habittracker.Domain.*;
 import com.example.habittracker.Repository.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -26,7 +27,7 @@ public class CalendarService {
         this.todoRepository = todoRepository;
         this.diaryRepository = diaryRepository;
     }
-
+    @Transactional
     public CalendarDTO calendarResponse(User user, String date) {
 
         LocalDate selectedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));

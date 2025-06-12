@@ -21,31 +21,33 @@
 <!-- Include sidebar from existing template -->
 <div th:replace="layout/sidebar.html"></div>
 
+<!--check login-->
+<div th:replace="layout/checklogin.html"></div>
+
 <!-- Main Content -->
 <div id="content">
-    <!-- Main content matching the image -->
     <div class="row mx-0">
         <div class="col-md-8 head-content">
             <!-- Include user information from existing template -->
             <div th:replace="layout/userinformation.html :: user(user=${user})"></div>
             <!-- Progress Section -->
-            <div class="progress-section">
+            <div class="progress-section" th:if="${userChallenge!=null}">
                 <div class="progress-title">Tiến độ</div>
                 <div class="progress-row">
                     <div class="d-flex justify-content-between">
-                        <div class="progress-label">Chuỗi: <span th:text="${streakCount}">5</span></div>
-                        <div class="progress-value" th:text="'Chuỗi cao nhất:' + ${maxStreak}"> 15</div>
+                        <div class="progress-label">Chuỗi: <span th:text="${userChallenge.streak}">5</span></div>
+                        <div class="progress-value" th:text="'Chuỗi cao nhất:' + ${userChallenge.bestStreak}"> 15</div>
                     </div>
                     <div class="progress-bar-container mb-3">
-                        <div class="progress-bar-fill" th:style="'width: ' + (${streakCount} * 100 / ${maxStreak}) + '%'"></div>
+                        <div class="progress-bar-fill" th:style="'width: ' + (100 -(${userChallenge.streak} * 100 / ${userChallenge.bestStreak})) + '%'"></div>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <div class="progress-label">Tuần này</div>
-                        <div class="progress-value" th:text="${weeklyProgress} + '/' + ${weeklyTotal}">5/7</div>
+                        <div class="progress-label">Thực hiện/Tổng thói quen trong thử thách</div>
+                        <div class="progress-value" th:text="${userChallenge.totalCompletedTasks} + '/' + ${userChallenge.totalExpectedTasks}">5/7</div>
                     </div>
 
                     <div class="progress-bar-container">
-                        <div class="progress-bar-fill" th:style="'width: ' + (${weeklyProgress} * 100 / ${weeklyTotal}) + '%'"></div>
+                        <div class="progress-bar-fill" th:style="'width: ' + (100 - (${userChallenge.totalCompletedTasks} * 100 / ${userChallenge.totalExpectedTasks})) + '%'"></div>
                     </div>
                 </div>
 
@@ -54,15 +56,45 @@
 
         <div class="col-md-4 d-flex flex-column justify-content-center">
             <!-- Challenge Card -->
-            <div class="challenge-card">
-                <div class="challenge-title">Thử thách</div>
-                <div class="challenge-subtitle" th:text="${challengeName}">Lối Sống</div>
-                <div class="challenge-progress" th:text="'Ngày ' + ${challengeDay} + '/' + ${challengeTotalDays}">Ngày 24/30</div>
-                <div class="challenge-streak">
-                    <span th:text="'Chuỗi: ' + ${streak} + ' ngày liên tiếp'">Chuỗi: 5 ngày liên tiếp</span>
-                    <i class="fas fa-fire"></i>
+            <div class="challenge-card" id="challengeCard">
+                <div th:if="${userChallenge!=null}">
+                    <div class="challenge-title" th:text="'Thử thách: '+${userChallenge.challenge.title}">Thử thách</div>
+                    <div class="challenge-subtitle" th:text="${userChallenge.challenge.description}">Lối Sống</div>
+                    <div class="challenge-progress" th:text="'Ngày ' +${userChallenge.daysSinceStart}+ '/' +${userChallenge.challenge.day}">Ngày 24/30</div>
+                    <div class="challenge-streak">
+                        <span th:text="'Chuỗi: ' +${userChallenge.streak}+' ngày liên tiếp'">Chuỗi: 5 ngày liên tiếp</span>
+                        <i class="fas fa-fire"></i>
+                    </div>
+                </div>
+                <div th:if="${userChallenge==null}">
+                    <div class="challenge-title">Tất cả thử thách</div>
+                </div>
+
+                <!-- Dropdown -->
+                <div class="challenge-dropdown" id="challengeDropdown">
+                    <div class="dropdown-header">
+                        Danh sách thử thách của bạn
+                    </div>
+                    <div class="dropdown-content" id="dropdownContent">
+                        <a href="/overview" class="dropdown-item">
+                            <div class="item-title" >Tất cả</div>
+                        </a>
+
+                        <a th:href="'/overview/detail?challenge='+${challenge.getChallenge().getChallengeId()}" class="dropdown-item" th:each="challenge:${userChallenges}">
+                            <div class="item-title" th:text="${challenge.challenge.title}"></div>
+                            <div class="item-stats">
+                                <div class="item-progress" th:text="${challenge.daysSinceStart}+ '/' +${challenge.challenge.day}+ ' Ngày'"></div>
+                                <div class="item-streak" >
+                                    <span th:text="'Streak: ' +${challenge.streak}"></span>
+                                    <i class="fas fa-fire"></i>
+                                </div>
+
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -97,7 +129,7 @@
 
                     <div th:id="habit-task-content-+${habit.getHabit().getHabitId()}" th:class="  ${habit.isCompleted()} ? 'task-content completed' : 'task-content'">
                         <button class="task-detail" th:onclick="|openHabitUpdateModal(${habit.getHabit().getHabitId()})|">
-                            <div class="fw-bold mb-1" th:text="${habit.getHabit().getTitle()}">Uống nước</div>
+                            <div class="fw-bold mb-1 habit-title" th:text="${habit.getHabit().getTitle()}">Uống nước</div>
                             <div class="task-description" th:text="${habit.getHabit().getDescription()}">Uống nước mỗi 1 giờ</div>
                         </button>
                         <div class="task-count d-flex justify-content-end"><span th:id="habit-+${habit.getHabit().getHabitId()}" th:text="'+'+${habit.positiveCount}+'|'+${habit.negativeCount}+'-'">+11 | 2-</span></div>
@@ -157,9 +189,17 @@
                                 <div id="habitTargetError" class="text-danger mt-1" style="display: none;">Vui lòng chọn mục tiêu >1</div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="habitChallenge"  class="form-label">Thử thách</label>
-                                <select class="form-control"  id="habitChallenge" th:field="*{challengeId}">
+                            <div class="mb-3" id="habitCreateChallengeField">
+                                <label for="habitCreateChallenge"  class="form-label">Thử thách</label>
+                                <select class="form-control"  id="habitCreateChallenge" th:field="*{challengeId}">
+                                    <option th:value="${null}" selected>Không có</option>
+                                    <option th:each="challenge : ${userChallengeOwner}" th:value="${challenge.getChallenge().getChallengeId()}" th:text="${challenge.getChallenge().getTitle()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" id="habitUpdateChallengeField">
+                                <label for="habitUpdateChallenge"  class="form-label">Thử thách</label>
+                                <select class="form-control"  id="habitUpdateChallenge" th:field="*{challengeId}">
                                     <option th:value="${null}" selected>Không có</option>
                                     <option th:each="challenge : ${userChallenges}" th:value="${challenge.getChallenge().getChallengeId()}" th:text="${challenge.getChallenge().getTitle()}"></option>
                                 </select>
@@ -226,7 +266,7 @@
                         </div>
                         <div th:class="${userDaily.isCompleted}?'task-content completed':'task-content'" th:id="daily-task-+${userDaily.getDaily().getDailyId()}">
                             <button class="task-detail" th:onclick="|openDailyUpdateModal(${userDaily.getDaily().getDailyId()})|">
-                                <div class="fw-bold mb-1" th:text="${userDaily.getDaily().getTitle()}">Ngủ trước 10 giờ</div>
+                                <div class="fw-bold mb-1 daily-title" th:text="${userDaily.getDaily().getTitle()}">Ngủ trước 10 giờ</div>
                                 <div class="task-description" th:text="${userDaily.getDaily().getDescription()}">Uống nước mỗi 1 giờ</div>
                             </button>
                             <div class="w-100 d-flex justify-content-end">
@@ -322,9 +362,19 @@
                                 <div id="repeatMonthDaysError" class="text-danger mt-1" style="display: none;">Vui lòng chọn ít nhất 1 ngày trong tháng.</div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="dailyChallenge" class="form-label">Thử thách</label>
-                                <select class="form-control" id="dailyChallenge" th:field="*{challengeId}">
+                            <div class="mb-3" id="dailyCreateChallengeField">
+                                <label for="dailCreateChallenge" class="form-label">Thử thách</label>
+                                <select class="form-control" id="dailCreateChallenge" th:field="*{challengeId}">
+                                    <option th:value="${null}" selected>Không có</option>
+                                    <option th:each="challenge : ${userChallengeOwner}"
+                                            th:value="${challenge.getChallenge().getChallengeId()}"
+                                            th:text="${challenge.getChallenge().getTitle()}"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" id="dailyUpdateChallengeField">
+                                <label for="dailyUpdateChallenge" class="form-label">Thử thách</label>
+                                <select class="form-control" id="dailyUpdateChallenge" th:field="*{challengeId}">
                                     <option th:value="${null}" selected>Không có</option>
                                     <option th:each="challenge : ${userChallenges}"
                                             th:value="${challenge.getChallenge().getChallengeId()}"
@@ -387,7 +437,7 @@
                     <div style="height: auto;" th:class="${todo.isCompleted}?'task-content completed':'task-content'" th:id="todo-task-+${todo.todoId}">
                         <div class="todo-card-header">
                             <button class="task-detail" th:onclick="|openTodoUpdateModal(${todo.todoId})|">
-                                <div class="fw-bold mb-1" th:text="${todo.title}">Dọn nhà</div>
+                                <div class="fw-bold mb-1 todo-title" th:text="${todo.title}">Dọn nhà</div>
                                 <div class="task-description" th:text="${todo.description}">Dọn nhà</div>
                             </button>
                         </div>
@@ -437,6 +487,11 @@
                                 <select class="form-control" id="todoDifficulty" th:field="*{difficulty}">
                                     <option th:each="difficult : ${newTodo.todoDifficultOption}" th:value="${difficult}" th:text="${difficult}">Dễ</option>
                                 </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="executionDate" class="form-label">Thực hiện trước</label>
+                                <input type="date" class="form-control" id="executionDate" th:field="*{executionDate}">
                             </div>
 
                             <!-- Subtasks -->
@@ -573,17 +628,120 @@
 <script>
     document.addEventListener("DOMContentLoaded", function (){
 
-        //Open create habit modal
-        window.openHabitCreateModal = ()=>{
-            document.getElementById("habitId").value=''
-            document.getElementById("habitTitle").value='';
-            document.getElementById("habitDescription").value='';
-            document.getElementById("habitDifficulty").value='EASY';
-            document.getElementById("habitType").value = 'BOTH';
-            document.getElementById("habitTarget").value = 1;
-            document.getElementById("habitChallenge").value = '';
+        const challengeCard = document.getElementById('challengeCard');
+        const challengeDropdown = document.getElementById('challengeDropdown');
 
-            document.getElementById("deleteHabitButton").style.display='none';
+        // Toggle dropdown
+        challengeCard.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+
+        // Đóng dropdown khi click bên ngoài
+        document.addEventListener('click', function(e) {
+            if (!challengeCard.contains(e.target) && !challengeDropdown.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        function toggleDropdown() {
+            if (challengeDropdown.classList.contains('show')) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        }
+
+        function openDropdown() {
+            challengeCard.classList.add('active');
+            challengeDropdown.classList.add('show');
+        }
+
+        function closeDropdown() {
+            challengeCard.classList.remove('active');
+            challengeDropdown.classList.remove('show');
+        }
+
+        let debounceTimeout;
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    const searchTerm = searchInput.value.toLowerCase();
+                    // Lọc habits
+                    const habitItems = document.querySelectorAll('.task-item');
+                    habitItems.forEach(function (item) {
+                        const habitTitleElem = item.querySelector('.habit-title');
+                        const habitTitle = habitTitleElem ? habitTitleElem.textContent.toLowerCase() : "";
+                        if (habitTitle.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // Lọc dailies
+                    const dailyItems = document.querySelectorAll('.checkbox-item');
+                    dailyItems.forEach(function (item) {
+                        const dailyTitleElem = item.querySelector('.daily-title');
+                        const dailyTitle = dailyTitleElem ? dailyTitleElem.textContent.toLowerCase() : "";
+                        if (dailyTitle.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // Lọc todos
+                    const todoItems = document.querySelectorAll('.todo-card');
+                    todoItems.forEach(function (item) {
+                        const todoTitleElem = item.querySelector('.todo-title');
+                        const todoTitle = todoTitleElem ? todoTitleElem.textContent.toLowerCase() : "";
+                        if (todoTitle.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }, 300);
+
+            });
+        }
+
+        const habitInputId = document.getElementById("habitId")
+        const habitTitle = document.getElementById("habitTitle")
+        const habitDescription = document.getElementById("habitDescription")
+        const habitDifficulty = document.getElementById("habitDifficulty")
+        const habitType = document.getElementById("habitType")
+        const habitTarget = document.getElementById("habitTarget")
+        const habitCreateChallenge = document.getElementById("habitCreateChallenge")
+        const habitUpdateChallenge = document.getElementById("habitUpdateChallenge")
+        const deleteHabitButton = document.getElementById("deleteHabitButton")
+        const deleteHabit = document.getElementById("deleteHabit")
+
+            //Open create habit modal
+        window.openHabitCreateModal = ()=>{
+            habitInputId.value=''
+            habitTitle.value='';
+            habitDescription.value='';
+            habitDifficulty.value='EASY';
+            habitType.value = 'BOTH';
+            habitTarget.value = 1;
+            habitCreateChallenge.value = '';
+
+            deleteHabitButton.style.display='none';
+
+            habitTitle.readOnly = false;
+            habitDescription.readOnly = false;
+            habitDifficulty.readOnly = false;
+            habitType.readOnly = false;
+            habitCreateChallenge.removeEventListener("mousedown",null);
+
+            habitCreateChallenge.disabled = false
+            habitUpdateChallenge.disabled = true
+            document.getElementById("habitCreateChallengeField").setAttribute("style","display: block")
+            document.getElementById("habitUpdateChallengeField").setAttribute("style","display: none")
 
             const modalHabit = new bootstrap.Modal(document.getElementById("modalHabit"))
             modalHabit.show()
@@ -599,16 +757,42 @@
                     }
                     return response.json()})
                 .then(habit =>{
-                    document.getElementById("habitId").value=habitId
-                    document.getElementById("habitTitle").value=habit.title;
-                    document.getElementById("habitDescription").value=habit.description;
-                    document.getElementById("habitDifficulty").value=habit.difficulty;
-                    document.getElementById("habitType").value = habit.type;
-                    document.getElementById("habitTarget").value = habit.targetCount;
-                    document.getElementById("habitChallenge").value =habit.challengeId === null ? '' : habit.challengeId;
-                    document.getElementById("deleteHabit").setAttribute("href","/habits/delete/"+habitId);
+                    console.log(habit)
+                    habitInputId.value=habit.habitId
+                    habitTitle.value=habit.title;
+                    habitDescription.value=habit.description;
+                    habitDifficulty.value=habit.difficulty;
+                    habitType.value = habit.type;
+                    habitTarget.value = habit.targetCount;
 
-                    document.getElementById("deleteHabitButton").style.display='block';
+
+                    deleteHabit.setAttribute("href","/habits/delete/"+habitId);
+
+
+
+                    if(habit.inChallenge){
+                        deleteHabitButton.style.display='none';
+                        habitCreateChallenge.disabled = true
+                        habitUpdateChallenge.disabled = false
+                        document.getElementById("habitCreateChallengeField").setAttribute("style","display: none")
+                        document.getElementById("habitUpdateChallengeField").setAttribute("style","display: block")
+                        habitUpdateChallenge.value = habit.challengeId === null ? '' : habit.challengeId;
+                    }else{
+                        deleteHabitButton.style.display='block';
+                        habitCreateChallenge.disabled = false
+                        habitUpdateChallenge.disabled = true
+                        document.getElementById("habitCreateChallengeField").setAttribute("style","display: block")
+                        document.getElementById("habitUpdateChallengeField").setAttribute("style","display: none")
+                        habitCreateChallenge.value = habit.challengeId === null ? '' : habit.challengeId;
+                    }
+
+                    if(habit.public){
+                        habitTitle.readOnly = true;
+                        habitDescription.readOnly = true;
+                        habitDifficulty.readOnly = true;
+                        habitType.readOnly = true;
+                        habitUpdateChallenge.addEventListener('mousedown', function(event) {event.preventDefault();});
+                    }
 
                     const form = document.getElementById('habitForm');
                     const modalTitle = document.getElementById('habitContent');
@@ -628,7 +812,7 @@
         const habitForm = document.getElementById("habitForm");
         const habitTitleInput = document.getElementById("habitTitle");
         const habitTitleError = document.getElementById("habitTitleError");
-        const habitTarget = document.getElementById("habitTarget")
+
         const habitTargetError = document.getElementById("habitTargetError")
         habitForm.addEventListener("submit", (e) => {
             let valid = true;
@@ -666,6 +850,16 @@
                     }else {
                         taskComplete.classList.remove("completed");
                     }
+
+                    if (data.userCoinMessage != null) {
+                        showResponseToast(data.userCoinMessage, 'completeTask');
+                        let currentCoins = parseInt(document.querySelector(".user-coin").nextElementSibling.textContent);
+                        if (data.completed) {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
+                        } else {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins - data.coinEarned;
+                        }
+                    }
                 })
                 .catch(error=>{
                     console.error("Lỗi:", error);
@@ -674,25 +868,50 @@
         }
 
         // Daily
+
+        const dailyInput = document.getElementById('dailyTitle');
+        const dailyDes = document.getElementById('dailyDes')
+        const dailyInputCreateChallenge = document.getElementById('dailCreateChallenge')
+        const dailyInputUpdateChallenge = document.getElementById('dailyUpdateChallenge')
+        const dailyDifficult = document.getElementById('dailyDifficulty')
+
+        const dailyInputId = document.getElementById('dailyId')
+        const dailyRepeatFrequency = document.getElementById('repeatFrequency')
+        const repeatEvery = document.getElementById('repeatEvery')
+        const deleteDailyButton = document.getElementById("deleteDailyButton")
+        const deleteDaily = document.getElementById("deleteDaily")
+        const repeatDaysSection = document.querySelectorAll('#repeatDaysSection input[type="checkbox"]')
+        const repeatMonthDaysSection = document.querySelectorAll('#repeatMonthDaysSection input[type="checkbox"]')
+
         window.openDailyCreateModal= ()=>{
-            document.getElementById('dailyId').value = '';
-            document.getElementById('dailyTitle').value = '';
-            document.getElementById('dailyDes').value = '';
-            document.getElementById('dailyDifficulty').value = 'EASY';
-            document.getElementById('repeatFrequency').value = 'DAILY';
+            dailyInputId.value = '';
+            dailyInput.value = '';
+            dailyDes.value = '';
+            dailyDifficult.value = 'EASY';
+            dailyRepeatFrequency.value = 'DAILY';
             toggleRepeatOptions();
-            document.getElementById('repeatEvery').value = 1;
-            document.getElementById("deleteDailyButton").style.display='none'
+            repeatEvery.value = 1;
+            deleteDailyButton.style.display='none'
 
-            document.querySelectorAll('#repeatDaysSection input[type="checkbox"]').forEach(checkbox => {
+            repeatDaysSection.forEach(checkbox => {
                 checkbox.checked = false;
             });
 
-            document.querySelectorAll('#repeatMonthDaysSection input[type="checkbox"]').forEach(checkbox => {
+            repeatMonthDaysSection.forEach(checkbox => {
                 checkbox.checked = false;
             });
 
-            document.getElementById('dailyChallenge').value = '';
+            dailyInputCreateChallenge.value = '';
+
+            dailyInput.readOnly = false
+            dailyDes.readOnly = false
+            dailyInputCreateChallenge.removeEventListener("mousedown",null);
+            dailyDifficult.readOnly = false
+
+            dailyInputCreateChallenge.disabled = false
+            dailyInputUpdateChallenge.disabled = true
+            document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: none;");
+            document.getElementById("dailyCreateChallengeField").setAttribute("style", "display: block;");
 
             const modal = new bootstrap.Modal(document.getElementById('modalDaily'));
             modal.show();
@@ -707,26 +926,49 @@
                     }
                     return response.json()})
                 .then(daily => {
-                    document.getElementById('dailyId').value = dailyId || '';
-                    document.getElementById('dailyTitle').value = daily.title || '';
-                    document.getElementById('dailyDes').value = daily.description || '';
-                    document.getElementById('dailyDifficulty').value = daily.difficulty || '';
-                    document.getElementById('repeatFrequency').value = daily.repeatFrequency || 'DAILY';
+                    console.log(daily)
+                    dailyInputId.value = daily.dailyId || '';
+                    dailyInput.value = daily.title || '';
+                    dailyDes.value = daily.description || '';
+                    dailyDifficult.value = daily.difficulty || '';
+                    dailyRepeatFrequency.value = daily.repeatFrequency || 'DAILY';
                     toggleRepeatOptions();
-                    document.getElementById('repeatEvery').value = daily.repeatEvery || 1;
-                    document.getElementById("deleteDailyButton").style.display='block'
-                    document.getElementById("deleteDaily").setAttribute("href","dailies/delete/"+dailyId);
+                    repeatEvery.value = daily.repeatEvery || 1;
 
-                    document.querySelectorAll('#repeatDaysSection input[type="checkbox"]').forEach(checkbox => {
+                    if(daily.inChallenge){
+                        deleteDailyButton.style.display='none'
+                        dailyInputCreateChallenge.disabled = true
+                        dailyInputUpdateChallenge.disabled = false
+                        document.getElementById("dailyCreateChallengeField").setAttribute("style", "display: none;");
+                        document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: block;");
+                        dailyInputUpdateChallenge.value = daily.challengeId || '';
+                    }else{
+                        deleteDailyButton.style.display='block'
+                        dailyInputCreateChallenge.disabled = false
+                        dailyInputUpdateChallenge.disabled = true
+                        document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: none;");
+                        document.getElementById("dailyCreateChallengeField").setAttribute("style", "display: block;");
+                        dailyInputCreateChallenge.value = daily.challengeId || '';
+                    }
+
+                    deleteDaily.setAttribute("href","dailies/delete/"+dailyId);
+
+                    repeatDaysSection.forEach(checkbox => {
                         checkbox.checked = daily.repeatDays.includes(checkbox.value);
                     });
 
-                    document.querySelectorAll('#repeatMonthDaysSection input[type="checkbox"]').forEach(checkbox => {
-                        console.log(daily.repeatMonthDays)
+                    repeatMonthDaysSection.forEach(checkbox => {
                         checkbox.checked = daily.repeatMonthDays.includes(Number(checkbox.value));
                     });
 
-                    document.getElementById('dailyChallenge').value = daily.challengeId || '';
+
+
+                    if(daily.public){
+                        dailyInput.readOnly = true
+                        dailyDes.readOnly = true
+                        dailyInputUpdateChallenge.addEventListener('mousedown', function(event) {event.preventDefault();});
+                        dailyDifficult.readOnly = true
+                    }
 
                     const form = document.getElementById('dailyForm');
                     const modalTitle = document.getElementById('DailyModalTitle');
@@ -842,7 +1084,6 @@
                     return response.json()
                 })
                 .then(data=>{
-
                     const dailystreak = document.querySelector(`#daily-streak-${dailyId}`)
                     const dailycheckbox = document.querySelector(`#daily-checkbox-${dailyId}`)
 
@@ -859,6 +1100,16 @@
                     }else{
                         dailycheckbox.innerHTML = '';
                     }
+
+                    if (data.userCoinMessage != null) {
+                        showResponseToast(data.userCoinMessage, 'completeTask');
+                        let currentCoins = parseInt(document.querySelector(".user-coin").nextElementSibling.textContent);
+                        if (data.completed) {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
+                        } else {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins - data.coinEarned;
+                        }
+                    }
                 })
                 .catch(error => {
                     console.error("Lỗi:",error)
@@ -872,6 +1123,7 @@
             document.getElementById("todoDescription").value = '';
             document.getElementById("todoDifficulty").value = 'EASY';
             document.getElementById("subtasksContainer").innerHTML = '';
+            document.getElementById("executionDate").value = '';
 
             document.getElementById("deleteTodoButton").style.display = 'none';
 
@@ -894,11 +1146,12 @@
                     return response.json();
                 })
                 .then(todo => {
-                    console.log(todoId)
+                    console.log(todo)
                     document.getElementById("todoId").value = todoId;
                     document.getElementById("todoTitle").value = todo.title;
                     document.getElementById("todoDescription").value = todo.description;
                     document.getElementById("todoDifficulty").value = todo.difficulty;
+                    document.getElementById("executionDate").value = todo.executionDate;
 
                     // Load subtasks
                     const subtasksContainer = document.getElementById("subtasksContainer");
@@ -984,6 +1237,23 @@
                         dailycheckbox.innerHTML = '<i class="fas fa-check"></i>';
                     }else{
                         dailycheckbox.innerHTML = '';
+                    }
+
+                    if (data.todoSubtasks != null) {
+                        data.todoSubtasks.forEach(taskComplete => {
+                            const checkbox = document.getElementById(`subtask-${taskComplete.todoSubtaskId}`);
+                            checkbox.checked = taskComplete.completed;
+                        });
+                    }
+
+                    if (data.userCoinMessage != null) {
+                        showResponseToast(data.userCoinMessage, 'completeTask');
+                        let currentCoins = parseInt(document.querySelector(".user-coin").nextElementSibling.textContent);
+                        if (data.completed) {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
+                        } else {
+                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins - data.coinEarned;
+                        }
                     }
                 })
                 .catch(error => {

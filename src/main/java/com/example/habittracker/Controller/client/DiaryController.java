@@ -42,10 +42,10 @@ public class DiaryController {
     public String saveDiary(@ModelAttribute("newDiary") DiaryDTO diaryDTO, HttpServletRequest request, @RequestParam("image") MultipartFile image, RedirectAttributes redirectAttributes) {
         User user = getUserFromRequest(request);
         try{
-            diaryService.saveDiary(diaryDTO, image, user);
-            redirectAttributes.addFlashAttribute("success", "Tạo nhật ký thành công!");
+            String createComplete = diaryService.saveDiary(diaryDTO, image, user);
+            redirectAttributes.addFlashAttribute("success", "Tạo nhật ký thành công! "+createComplete+" xu");
         }catch (Exception e){
-            redirectAttributes.addFlashAttribute("failed", "Tạo nhật ký thất bại!");
+            redirectAttributes.addFlashAttribute("failed", "Tạo nhật ký thất bại!"+ e.getMessage());
             return "redirect:/overview";
         }
         return "redirect:/overview";
@@ -91,7 +91,7 @@ public class DiaryController {
 
     private User getUserFromRequest(HttpServletRequest request) {
         String token = tokenUtil.getTokenFromCookies(request);
-        String username =  this.jwtUtil.getUserNameFromToken(token);
-        return this.userService.getUser(username);
+        String email =  this.jwtUtil.getEmailFromToken(token);
+        return this.userService.getUser(email);
     }
 }

@@ -17,7 +17,7 @@ public class DailyHistory {
     private Long historyDailyId;
     private LocalDate date;
     private boolean isCompleted;
-    private Long expEarned;
+    private Long coinEarned = 0L;
     private Long streak;
 
     @ManyToOne()

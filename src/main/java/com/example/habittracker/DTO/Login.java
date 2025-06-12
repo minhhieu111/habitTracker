@@ -11,8 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Login {
-    @NotBlank(message = "Yêu cầu tên đăng nhập")
     private String userName;
+    @NotBlank(message = "Yêu cầu Email")
+    private String email;
     @NotBlank(message = "Yêu cầu mật khẩu")
     private String password;
 }

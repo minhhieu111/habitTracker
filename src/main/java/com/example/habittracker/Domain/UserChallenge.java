@@ -16,19 +16,33 @@ public class UserChallenge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userChallengeId;
-    private Double progress;
     private LocalDate startDate;
     private LocalDate endDate;
     @Enumerated(EnumType.STRING)
     private Status status;
-    private Long streak;
-    private Long bestStreak;
-    private Long daysSinceStart;
+    private Long streak = 0L;
+    private Long daysSinceStart = 0L;
 
-    private Long totalCompletedTasks;
-    private Long totalExpectedTasks;
-    private Long completedTasks;
-    private Long skippedTasks;
+    private Double progress;
+    private Long bestStreak = 0L;
+    private Long totalCompletedTasks = 0L;
+    private Long totalExpectedTasks = 0L;
+    private Long completedTasks = 0L;
+    private Long skippedTasks = 0L;
+
+//   để tính streak
+    private boolean completedToday;
+
+//    thông báo hoàn thành challenge hay chưa
+    private boolean isNotificationShown = false;
+
+    private Long coinEarn;
+
+    @ElementCollection
+    @CollectionTable(name = "user_challenge_completed_dates",
+            joinColumns = @JoinColumn(name = "user_challenge_id"))
+    @Column(name = "completed_date")
+    private List<LocalDate> completedTasksList;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")

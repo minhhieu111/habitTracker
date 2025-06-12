@@ -170,8 +170,6 @@ select {
 /* Habit cards */
 .habits-section {
     margin-bottom: 20px;
-    text-decoration: none;
-    color: #1a1a1a;
 }
 
 .habit-card {
@@ -184,6 +182,7 @@ select {
     align-items: center;
     cursor: pointer;
     transition: transform 0.2s;
+    color: #1a1a1a;
 }
 
 .habit-card:hover {
@@ -215,8 +214,8 @@ select {
 
 .habit-progress svg circle.progress {
     stroke: var(--primary-color);
-    stroke-dasharray: 251.2;
-    stroke-dashoffset: calc(251.2 - (251.2 * var(--progress)) / 100);
+    stroke-dasharray: 314.16;
+    stroke-dashoffset: calc(314.16 - (314.16 * var(--progress)) / 100);
     transition: stroke-dashoffset 0.5s ease;
 }
 

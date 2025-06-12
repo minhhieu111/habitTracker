@@ -33,9 +33,9 @@
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
                     </span>
-                <input type="text" class="form-control" name="username" placeholder="Tên đăng nhập" th:field="*{userName}">
+                <input type="text" class="form-control" name="email" placeholder="Email" th:field="*{email}">
             </div>
-            <div class="error" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"></div>
+            <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
 
             <div class="input-group">
                     <span class="input-group-text">
@@ -48,10 +48,15 @@
             </div>
             <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
 
-            <button type="submit" class="btn btn-primary login-button w-100">Đăng Nhập</button>
+            <button type="submit" class="btn btn-primary login-button">Đăng Nhập</button>
+
+            <a href="/oauth2/authorization/google" class="google-login-button">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png" alt="Google logo">
+                Đăng nhập bằng Google
+            </a>
         </form>
 
-        <a href="#" class="forgot-password" th:href="@{/forgot-password}">Quên mật khẩu?</a>
+<!--        <a href="#" class="forgot-password" th:href="@{/forgot-password}">Quên mật khẩu?</a>-->
 
         <div>
             <span>Chưa có tài khoản </span>

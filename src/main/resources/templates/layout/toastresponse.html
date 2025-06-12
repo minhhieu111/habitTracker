@@ -20,7 +20,11 @@
                 document.querySelector('.coin-exchange span').textContent = `-${message}`;
                 document.querySelector('.coin-exchange').style.display = 'block';
                 toastBody.classList.add('text-bg-warning');
-            } else {
+            } else if(type === 'completeTask'){
+                document.querySelector('.coin-exchange span').textContent = `${message}`;
+                document.querySelector('.coin-exchange').style.display = 'block';
+                toastBody.classList.add('text-bg-warning');
+            }else {
                 toastBody.textContent = message;
                 toastBody.classList.add('text-bg-danger');
             }

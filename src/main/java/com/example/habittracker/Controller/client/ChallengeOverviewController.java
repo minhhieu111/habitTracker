@@ -37,7 +37,7 @@ public class ChallengeOverviewController {
         this.challengeService = challengeService;
     }
 
-    @GetMapping
+    @GetMapping()
     public String challenges(HttpServletRequest request, Model model) {
 
         User user = getUserFromRequest(request);
@@ -53,7 +53,7 @@ public class ChallengeOverviewController {
         model.addAttribute("months", new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
 
 
-        List<UserChallenge> userChallenges  = this.challengeService.getChallenges(user.getUserId());
+        List<UserChallenge> userChallenges  = this.challengeService.getValidChallenges(user.getUserId());
         model.addAttribute("challenges", userChallenges);
         model.addAttribute("newChallenge", new ChallengeDTO());
         model.addAttribute("daysOfWeek", List.of("SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"));
@@ -65,8 +65,8 @@ public class ChallengeOverviewController {
 
     private User getUserFromRequest(HttpServletRequest request) {
         String token = tokenUtil.getTokenFromCookies(request);
-        String username =  this.jwtUtil.getUserNameFromToken(token);
-        return this.userService.getUser(username);
+        String email =  this.jwtUtil.getEmailFromToken(token);
+        return this.userService.getUser(email);
     }
 }
 
