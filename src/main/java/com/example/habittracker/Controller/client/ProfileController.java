@@ -6,7 +6,9 @@ import com.example.habittracker.DTO.MessageResponse;
 import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.Diary;
 import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.UserAchievement;
 import com.example.habittracker.Domain.UserChallenge;
+import com.example.habittracker.Service.AchievementService;
 import com.example.habittracker.Service.ChallengeService;
 import com.example.habittracker.Service.DiaryService;
 import com.example.habittracker.Service.UserService;
@@ -31,13 +33,15 @@ public class ProfileController {
     private final JwtUtil jwtUtil;
     private final ChallengeService challengeService;
     private final DiaryService diaryService;
+    private final AchievementService achievementService;
 
-    public ProfileController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, DiaryService diaryService) {
+    public ProfileController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, DiaryService diaryService, AchievementService achievementService) {
         this.userService = userService;
         this.tokenUtil = tokenUtil;
         this.jwtUtil = jwtUtil;
         this.challengeService = challengeService;
         this.diaryService = diaryService;
+        this.achievementService = achievementService;
     }
 
     @GetMapping("")
@@ -47,6 +51,8 @@ public class ProfileController {
         model.addAttribute("newUser", user);
         UserDTO userDTO = this.userService.UserChangePassword(user);
         model.addAttribute("changePassword", userDTO);
+        List<UserAchievement> userAchievements = this.achievementService.getUserAchievementReceive(user);
+        model.addAttribute("achievements", userAchievements);
 
         List<UserChallenge> getParticipateChallenge = this.challengeService.getChallenges(user.getUserId());
         model.addAttribute("participatingChallenges",getParticipateChallenge);
@@ -63,7 +69,7 @@ public class ProfileController {
         Integer rankUser = this.userService.getUserRank(user.getUserId());
         model.addAttribute("rankUser",rankUser);
 
-        long completedTask = this.userService.getTaskComplete(user);
+        long completedTask = this.userService.getTaskComplete(user,true);
         model.addAttribute("completedTask",completedTask);
 
         return "client/profile";

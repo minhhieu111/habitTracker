@@ -24,13 +24,15 @@ public class TodoService {
     private final TodoHistoryRepository todoHistoryRepository;
     private final UserService userService;
     private final CoinCalculationService coinCalculationService;
+    private final ChallengeProgressService challengeProgressService;
 
-    public TodoService(TodoRepository todoRepository, TodoSubTaskRepository todoSubTaskRepository, TodoHistoryRepository todoHistoryRepository, UserService userService, CoinCalculationService coinCalculationService) {
+    public TodoService(TodoRepository todoRepository, TodoSubTaskRepository todoSubTaskRepository, TodoHistoryRepository todoHistoryRepository, UserService userService, CoinCalculationService coinCalculationService, ChallengeProgressService challengeProgressService) {
         this.todoRepository = todoRepository;
         this.todoSubTaskRepository = todoSubTaskRepository;
         this.todoHistoryRepository = todoHistoryRepository;
         this.userService = userService;
         this.coinCalculationService = coinCalculationService;
+        this.challengeProgressService = challengeProgressService;
     }
 
     @Transactional
@@ -60,6 +62,11 @@ public class TodoService {
     }
     @Transactional
     public void saveTodo(TodoDTO todoDTO, User user) {
+
+        if(this.challengeProgressService.totalTaskPresent(user)>=user.getTaskLimit()){
+            throw new RuntimeException("Không thể tạo thêm bạn đã đạt giới hạn! giới hạn cho các task của bạn là: "+user.getTaskLimit());
+        }
+
         Todo todo = Todo.builder()
                 .title(todoDTO.getTitle())
                 .description(todoDTO.getDescription())

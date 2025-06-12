@@ -1,11 +1,10 @@
 package com.example.habittracker.Service;
 
-import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserChallenge;
-import com.example.habittracker.Domain.UserDaily;
-import com.example.habittracker.Domain.UserHabit;
+import com.example.habittracker.Domain.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,6 +15,8 @@ import java.util.List;
 @Service
 public class EmailService {
     private final JavaMailSender mailSender;
+    @Value("${SPRING_MAIL_USERNAME}")
+    private String senderEmail;
 
     public EmailService(JavaMailSender mailSender1) {
         this.mailSender = mailSender1;
@@ -38,7 +39,7 @@ public class EmailService {
                 + "Bebet";
 
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("bebet.habittracker@gmail.com");
+        message.setFrom(senderEmail);
         message.setTo(recipientEmail);
         message.setSubject(emailSubject);
         message.setText(emailBody);
@@ -58,7 +59,7 @@ public class EmailService {
                 + "Đội ngũ ứng dụng của bạn\n"
                 + "Bebet";
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("bebet.habittracker@gmail.com");
+        message.setFrom(senderEmail);
         message.setTo(userChallenge.getUser().getEmail());
         message.setSubject(subject);
         message.setText(body);
@@ -106,11 +107,52 @@ public class EmailService {
                 .append("Bebet");
 
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("bebet.habittracker@gmail.com");
+        message.setFrom(senderEmail);
         message.setTo(recipientEmail);
         message.setSubject(subject);
         message.setText(body.toString());
 
         mailSender.send(message);
+    }
+
+    @Async
+    public void sendEmailReceiveAchievement(UserAchievement userAchievement) {
+        String recipientEmail = userAchievement.getUser().getEmail();
+
+        String subject = "Bạn đã nhận được Thành tựu mới!";
+        StringBuilder body = new StringBuilder();
+
+        body.append("Chào ").append(userAchievement.getUser().getUserName()).append(",\n\n");
+        body.append("Tuyệt vời!\n");
+        body.append("Chúng tôi rất vui mừng thông báo rằng bạn vừa mở khóa một thành tựu mới: **\"").append(userAchievement.getAchievement().getTitle()).append("\"**.\n\n");
+
+        // Thêm phần mô tả về thành tựu (nếu Achievement có trường description)
+        // if (achievement.getDescription() != null && !achievement.getDescription().isEmpty()) {
+        //     body.append(achievement.getDescription()).append("\n\n");
+        // }
+
+        body.append("Để vinh danh thành tích xuất sắc này, bạn nhận được:\n");
+        if (userAchievement.getAchievement().getChallengeBonus() != null && userAchievement.getAchievement().getChallengeBonus() > 0) {
+            body.append("- Thêm ").append(userAchievement.getAchievement().getChallengeBonus()).append(" lượt tạo thử thách mới (challenge limit).\n");
+        }
+        if (userAchievement.getAchievement().getTaskBonus() != null && userAchievement.getAchievement().getTaskBonus() > 0) {
+            body.append("- Thêm ").append(userAchievement.getAchievement().getTaskBonus()).append(" lượt tạo nhiệm vụ mới (task limit).\n");
+        }
+//        Thêm phần thưởng xu (nếu achievement có bonusCoins)
+        if (userAchievement.getAchievement().getCoinBonus() != null && userAchievement.getAchievement().getCoinBonus() > 0) {
+            body.append("- ").append(userAchievement.getAchievement().getCoinBonus()).append(" xu vào tài khoản của bạn.\n");
+        }
+
+
+        body.append("\n");
+        body.append("Hãy tiếp tục hành trình rèn luyện thói quen và chinh phục những đỉnh cao mới nhé!\n\n");
+        body.append("Trân trọng,\n");
+        body.append("Đội ngũ ứng dụng Bebet");
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderEmail);
+        message.setTo(recipientEmail);
+        message.setSubject(subject);
+        message.setText(body.toString());
     }
 }

@@ -65,6 +65,10 @@ public class DailyService {
         User creator = userService.getUser(username);
         Challenge challenge = challengeRepository.findById(dailyDTO.getChallengeId()).get();
 
+        if(this.challengeProgressService.totalTaskPresent(creator)>=creator.getTaskLimit()){
+            throw new RuntimeException("Không thể tạo thêm bạn đã đạt giới hạn! giới hạn cho các task của bạn là: "+creator.getTaskLimit());
+        }
+
         Daily daily = Daily.builder()
                 .title(dailyDTO.getTitle())
                 .description(dailyDTO.getDescription())

@@ -13,4 +13,5 @@ import java.util.List;
 @NoArgsConstructor
 public class LoginResponse {
     private List<ChallengeDTO> challengesCompleted;
+    private List<AchievementDTO> achievementsCompleted;
 }

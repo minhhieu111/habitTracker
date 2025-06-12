@@ -2,13 +2,16 @@ package com.example.habittracker.Controller.client;
 
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
+import com.example.habittracker.DTO.AchievementDTO;
 import com.example.habittracker.DTO.CalendarDTO;
 import com.example.habittracker.DTO.ChallengeDTO;
 import com.example.habittracker.DTO.LoginResponse;
 import com.example.habittracker.Domain.Reward;
 import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.UserAchievement;
 import com.example.habittracker.Domain.UserChallenge;
 import com.example.habittracker.Repository.UserChallengeRepository;
+import com.example.habittracker.Service.AchievementService;
 import com.example.habittracker.Service.CalendarService;
 import com.example.habittracker.Service.ChallengeService;
 import com.example.habittracker.Service.UserService;
@@ -34,14 +37,16 @@ public class HomeController {
     private final ChallengeService challengeService;
     private final CalendarService calendarService;
     private final UserChallengeRepository userChallengeRepository;
+    private final AchievementService achievementService;
 
-    public HomeController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, CalendarService calendarService, UserChallengeRepository userChallengeRepository) {
+    public HomeController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, CalendarService calendarService, UserChallengeRepository userChallengeRepository, AchievementService achievementService) {
         this.userService = userService;
         this.tokenUtil = tokenUtil;
         this.jwtUtil = jwtUtil;
         this.challengeService = challengeService;
         this.calendarService = calendarService;
         this.userChallengeRepository = userChallengeRepository;
+        this.achievementService = achievementService;
     }
 
     @GetMapping("/home")
@@ -87,6 +92,9 @@ public class HomeController {
         // Lấy danh sách thử thách hoàn thành cần thông báo
         List<UserChallenge> completedChallenges = challengeService.getCompletedChallengesForNotification(user);
 
+        //Lấy thành tựu đạt được để thông báo
+        List<UserAchievement> userAchievements = this.achievementService.getAchievementReceive(user);
+
         LoginResponse response = new LoginResponse();
         response.setChallengesCompleted(completedChallenges.stream()
                 .map(userChallenge -> ChallengeDTO.builder()
@@ -98,6 +106,14 @@ public class HomeController {
                         .build()
                 )
                 .collect(Collectors.toList()));
+
+        response.setAchievementsCompleted(userAchievements.stream()
+                .map(userAchievement -> AchievementDTO.builder()
+                        .achievementTitle(userAchievement.getAchievement().getTitle())
+                        .achievementDescription(userAchievement.getAchievement().getDescription())
+                        .bonusTask(userAchievement.getAchievement().getTaskBonus())
+                        .bonusChallenge(userAchievement.getAchievement().getChallengeBonus())
+                        .build()).collect(Collectors.toList()));
 
         completedChallenges.forEach(userChallenge -> {
             userChallenge.setNotificationShown(true);

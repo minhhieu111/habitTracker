@@ -21,8 +21,9 @@ public class ChallengeProgressService {
     private final EmailService emailService;
     private final UserService userService;
     private final CoinCalculationService coinCalculationService;
+    private final TodoRepository todoRepository;
 
-    public ChallengeProgressService(UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, UserChallengeDPRepository userChallengeDPRepository, UserChallengeRepository userChallengeRepository, EmailService emailService, UserService userService, CoinCalculationService coinCalculationService) {
+    public ChallengeProgressService(UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, UserChallengeDPRepository userChallengeDPRepository, UserChallengeRepository userChallengeRepository, EmailService emailService, UserService userService, CoinCalculationService coinCalculationService, TodoRepository todoRepository) {
         this.userDailyRepository = userDailyRepository;
         this.userHabitRepository = userHabitRepository;
         this.habitHistoryRepository = habitHistoryRepository;
@@ -32,6 +33,7 @@ public class ChallengeProgressService {
         this.emailService = emailService;
         this.userService = userService;
         this.coinCalculationService = coinCalculationService;
+        this.todoRepository = todoRepository;
     }
 
     @Transactional
@@ -343,5 +345,14 @@ public class ChallengeProgressService {
             default:
                 return false;
         }
+    }
+
+    @Transactional
+    public Long totalTaskPresent(User user) {
+        List<Todo> todos = this.todoRepository.findByUser(user);
+        List<UserDaily> userDailies = this.userDailyRepository.findByUserAndNotInChallengeAndUnavailableFalse(user);
+        List<UserHabit> userHabits = this.userHabitRepository.findByUserAndNotInChallengeAndUnavailableFalse(user);
+
+        return (long)(todos.size()+userDailies.size()+userHabits.size());
     }
 }

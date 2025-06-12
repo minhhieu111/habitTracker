@@ -36,6 +36,6 @@ public interface HabitHistoryRepository extends JpaRepository<HabitHistory, Long
     @Query("SELECT hh.coinEarned FROM HabitHistory hh WHERE hh.userHabit = :userHabit AND hh.date = :today")
     Long findCoinEarnByUserHabitAndDate(@Param("userHabit")UserHabit userHabit, @Param("today")LocalDate date);
 
-    @Query("SELECT COUNT(*) FROM HabitHistory hh WHERE hh.userHabit = :userHabit")
+    @Query("SELECT COUNT(*) FROM HabitHistory hh WHERE hh.userHabit = :userHabit AND hh.isCompleted = true")
     Long countCompleteHabit(@Param("userHabit") UserHabit userHabit);
 }

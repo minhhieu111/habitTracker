@@ -71,6 +71,10 @@ public class HabitService {
         }
         Challenge challenge = this.challengeRepository.findById(habitDTO.getChallengeId()).get();
 
+        if(this.challengeProgressService.totalTaskPresent(user)>=user.getTaskLimit()){
+            throw new RuntimeException("Không thể tạo thêm bạn đã đạt giới hạn! giới hạn cho các task của bạn là: "+user.getTaskLimit());
+        }
+
         Habit createHabit = Habit.builder()
                 .title(habitDTO.getTitle())
                 .description(habitDTO.getDescription())

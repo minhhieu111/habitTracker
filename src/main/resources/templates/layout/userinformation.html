@@ -7,15 +7,15 @@
     <!-- Thông tin chi tiết -->
     <div class="col-3">
         <strong>
-            <span class="mb-1">Danh Hiệu: <span th:text="${username}"></span></span>
+            <span class="mb-1">Danh Hiệu: <span th:text="${user.achieveTitle}"></span></span>
         </strong>
 
-        <p>Người dùng: <span th:text="${user.getUserName()}"></span></p>
+        <p>Người dùng: <span th:text="${user.userName}"></span></p>
     </div>
 
     <!-- Coin -->
     <div th:style="'width:20px'" class="d-flex flex-column align-items-center col-7 ms-auto">
         <img src="/images/coin-icon.png" alt="coin" class="user-coin">
-        <span th:text="${user.getCoins()}">0</span>
+        <span th:text="${user.coins}">0</span>
     </div>
 </div>

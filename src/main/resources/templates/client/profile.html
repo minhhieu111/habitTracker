@@ -41,7 +41,7 @@
                     <img th:src="${user.avatar}" alt="">
                 </div>
                 <div class="profile-info">
-                    <div class="profile-title" th:text="'Danh hiệu: ' + ${title}">Danh hiệu: Người mới bắt đầu</div>
+                    <div class="profile-title" th:text="'Danh hiệu: ' + ${user.achieveTitle}">Danh hiệu: Người mới bắt đầu</div>
                     <div class="profile-username" th:text="'Người dùng: ' + ${user.userName}">Người dùng: user</div>
                     <div class="profile-email" th:text="'Email: ' + ${user.email}">Email: User@gmail.com</div>
                     <div class="gold-badge">
@@ -141,6 +141,13 @@
                     <div class="mb-4">
                         <label for="editEmailAddress" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Địa chỉ Email</label>
                         <input type="email" readonly class="form-control edit-profile-input" id="editEmailAddress" th:field="*{email}"  required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="achieveSelected"  class="form-label">Thành tựu</label>
+                        <select class="form-control"  id="achieveSelected" th:field="*{achieveTitle}">
+                            <option th:each="achievement : ${achievements}" th:value="${achievement.getAchievement().getTitle()}" th:text="${achievement.getAchievement().getTitle()}"></option>
+                        </select>
                     </div>
                     <div style="width: 100%;text-align: center;">
                         <a href="#" class="text-change-password" style="  font-size: 0.9rem; " data-bs-toggle="modal" data-bs-target="#changePassword">Thay đổi mật khẩu</a>

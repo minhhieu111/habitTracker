@@ -3,7 +3,9 @@ package com.example.habittracker.Service;
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.DTO.Login;
 import com.example.habittracker.DTO.Register;
+import com.example.habittracker.Domain.Achievement;
 import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.UserAchievement;
 import com.example.habittracker.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,14 +22,16 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final ImageService imageService;
+    private final AchievementService achievementService;
     private String folder = "user_avatar";
     public static String defaultPassAuth = "oauth2_user_password";
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, ImageService imageService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, ImageService imageService, AchievementService achievementService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.imageService = imageService;
+        this.achievementService = achievementService;
     }
 
     public void register(Register register) {
@@ -38,13 +42,22 @@ public class AuthService {
             throw new RuntimeException("Mật khẩu không khớp");
         }
 
+        Achievement achievement = this.achievementService.getAchievementById(1L);
+
         User user = User.builder()
                 .userName(register.getUsername())
                 .password(passwordEncoder.encode(register.getPassword()))
                 .email(register.getEmail())
                 .role(User.Role.USER)
                 .coins(0L)
+                .challengeLimit(3L)
+                .taskLimit(10L)
+                .limitCoinsEarnedPerDay(0L)
                 .build();
+
+        UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).build();
+
+        this.achievementService.saveUserAchievement(userAchievement);
 
         userRepository.save(user);
     }
@@ -74,6 +87,8 @@ public class AuthService {
                 .password(passwordEncoder.encode(defaultPassAuth))
                 .role(User.Role.USER)
                 .coins(0L)
+                .challengeLimit(3L)
+                .taskLimit(10L)
                 .limitCoinsEarnedPerDay(0L)
                 .build();
 

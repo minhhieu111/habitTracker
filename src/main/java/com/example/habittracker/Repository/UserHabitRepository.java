@@ -23,4 +23,7 @@ public interface UserHabitRepository extends JpaRepository<UserHabit,Long> {
 
     @Query("SELECT uh FROM UserHabit uh WHERE uh.user =:user AND uh.habit.challenge = :challenge AND uh.unavailable = false ")
     List<UserHabit> findByUserAndHabitChallengeAndUnavailableFalse(@Param("user")User user, @Param("challenge") Challenge challenge);
+
+    @Query("SELECT uh FROM UserHabit uh WHERE uh.user =:user AND uh.habit.challenge =null And uh.unavailable=false")
+    List<UserHabit>findByUserAndNotInChallengeAndUnavailableFalse(@Param("user")User user);
 }

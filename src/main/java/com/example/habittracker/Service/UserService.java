@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,6 @@ public class UserService {
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private String folder = "user_avatar";
-    private final AuthService authService;
     private final HabitHistoryRepository habitHistoryRepository;
     private final DailyHistoryRepository dailyHistoryRepository;
     private final TodoHistoryRepository todoHistoryRepository;
@@ -30,11 +30,10 @@ public class UserService {
     private final UserHabitRepository userHabitRepository;
     private final TodoRepository todoRepository;
 
-    public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder, AuthService authService, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, TodoRepository todoRepository) {
+    public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, TodoRepository todoRepository) {
         this.userRepository = userRepository;
         this.imageService = imageService;
         this.passwordEncoder = passwordEncoder;
-        this.authService = authService;
         this.habitHistoryRepository = habitHistoryRepository;
         this.dailyHistoryRepository = dailyHistoryRepository;
         this.todoHistoryRepository = todoHistoryRepository;
@@ -106,14 +105,25 @@ public class UserService {
         return null;
     }
 
-    public long getTaskComplete(User user){
-        List<Todo> todos = this.todoRepository.findAllByUser(user);
-        List<UserDaily> userDailies = this.userDailyRepository.findByUserId(user.getUserId());
-        List<UserHabit> userHabits = this.userHabitRepository.findHabitsForUser(user.getUserId());
+    public long getTaskComplete(User user, boolean inChallenge){
+        List<Todo> todos;
+        List<UserDaily> userDailies;
+        List<UserHabit> userHabits;
+
+        if(inChallenge){
+            todos = this.todoRepository.findAllByUser(user);
+            userDailies = this.userDailyRepository.findByUserId(user.getUserId());
+            userHabits = this.userHabitRepository.findHabitsForUser(user.getUserId());
+        }else{
+            todos = this.todoRepository.findByUser(user);
+            userDailies = this.userDailyRepository.findByUserAndNotInChallengeAndUnavailableFalse(user);
+            userHabits = this.userHabitRepository.findByUserAndNotInChallengeAndUnavailableFalse(user);
+        }
+
 
         long totalCompleteTask = 0;
         for (Todo todo : todos) {
-            totalCompleteTask += this.todoHistoryRepository.getCompleteTask(todo);
+            totalCompleteTask += this.todoHistoryRepository.countCompleteTask(todo);
         }
 
         for (UserDaily userDaily : userDailies) {
@@ -131,6 +141,7 @@ public class UserService {
         User user = this.userRepository.findById(userUpdateInfo.getUserId()).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
 
         user.setUserName(userUpdateInfo.getUserName());
+        user.setAchieveTitle(userUpdateInfo.getAchieveTitle());
 
         if (image != null && !image.isEmpty()) {
             try {

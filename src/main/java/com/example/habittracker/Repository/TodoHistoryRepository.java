@@ -24,5 +24,5 @@ public interface TodoHistoryRepository extends JpaRepository<TodoHistory,Long> {
     Long findCoinEarnedByTodoAndToday(@Param("todo")Todo todo, @Param("today")LocalDate today);
 
     @Query("SELECT COUNT(*) FROM TodoHistory th WHERE th.todo = :todo AND th.isCompleted = true")
-    Long getCompleteTask(@Param("todo")Todo todo);
+    Long countCompleteTask(@Param("todo")Todo todo);
 }

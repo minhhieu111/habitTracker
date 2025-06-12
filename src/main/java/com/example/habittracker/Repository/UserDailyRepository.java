@@ -1,9 +1,6 @@
 package com.example.habittracker.Repository;
 
-import com.example.habittracker.Domain.Challenge;
-import com.example.habittracker.Domain.Daily;
-import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserDaily;
+import com.example.habittracker.Domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +18,7 @@ public interface UserDailyRepository extends JpaRepository<UserDaily,Long> {
 
     @Query("SELECT ud FROM UserDaily ud WHERE ud.user.userId = :userId")
     List<UserDaily> findByUserId(@Param("userId")Long userId);
+
+    @Query("SELECT ud FROM UserDaily ud WHERE ud.user =:user AND ud.daily.challenge =null AND ud.unavailable=false")
+    List<UserDaily>findByUserAndNotInChallengeAndUnavailableFalse(@Param("user")User user);
 }

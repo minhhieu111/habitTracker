@@ -21,6 +21,7 @@ public class Achievement {
     private Long requiredChallenge;
     private Long taskBonus;
     private Long challengeBonus;
+    private Long coinBonus;
 
     @OneToMany(mappedBy = "achievement")
     List<UserAchievement> userAchievements;

@@ -1,9 +1,6 @@
 package com.example.habittracker.Repository;
 
-import com.example.habittracker.Domain.Diary;
-import com.example.habittracker.Domain.Todo;
-import com.example.habittracker.Domain.TodoHistory;
-import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface TodoRepository extends JpaRepository<Todo, Long> {
     @Query("SELECT th from Todo th WHERE th.user = :user")
-    Todo findByUser(@Param("user") User user);
+    List<Todo> findByUser(@Param("user") User user);
 
     @Query("SELECT th FROM Todo th WHERE th.user = :user AND th.isCompleted = false")
     List<Todo> findByUserAndIsCompletedFalse(@Param("user") User user);

@@ -19,14 +19,16 @@ public class SchedulerConfig {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final UserService userService;
+    private final AchievementService achievementService;
 
-    public SchedulerConfig(HabitService habitService, DailyService dailyService, ChallengeService challengeService, UserRepository userRepository, EmailService emailService, UserService userService) {
+    public SchedulerConfig(HabitService habitService, DailyService dailyService, ChallengeService challengeService, UserRepository userRepository, EmailService emailService, UserService userService, AchievementService achievementService) {
         this.habitService = habitService;
         this.dailyService = dailyService;
         this.challengeService = challengeService;
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.userService = userService;
+        this.achievementService = achievementService;
     }
 
 
@@ -42,6 +44,14 @@ public class SchedulerConfig {
     public void calChallengeProgress(){
         this.challengeService.CalChallengeProgressEndDay();
    }
+
+   @Scheduled(cron="30 59 23 * * *")
+   public void achievementCheck(){
+       List<User> users = userRepository.findAll();
+       for (User user : users) {
+           this.achievementService.receiveAchievement(user);
+       }
+    }
 
    @Scheduled(cron="1 0 0 * * *")
     public void setTaskHistory(){

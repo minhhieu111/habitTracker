@@ -65,8 +65,9 @@ public class ChallengeService {
     }
 
     @Transactional
+    //lấy list uc mà đag active và uc hoàn thành thử thach bằng progress 100
     public List<UserChallenge> getValidChallenges(Long userId) {
-        List<UserChallenge> userChallenges = this.challengeRepository.findChallengeByUsers_Username(userId).get();
+        List<UserChallenge> userChallenges = this.challengeRepository.findChallengeByUserId(userId).get();
         LocalDate today = LocalDate.now();
         return userChallenges.stream()
                 .filter(uc->{
@@ -151,6 +152,10 @@ public class ChallengeService {
 
         if (challengeDTO.getDay() < 5) {
             throw new RuntimeException("Thời gian thực hiện phải ít nhất 5 ngày!");
+        }
+
+        if(getValidChallenges(creator.getUserId()).size()>=creator.getChallengeLimit()){
+            throw new RuntimeException("Bạn đã đạt giới hạn tạo thử thách. Giới hạn hiện tại của bạn là: "+creator.getChallengeLimit());
         }
 
         Challenge challenge = Challenge.builder()

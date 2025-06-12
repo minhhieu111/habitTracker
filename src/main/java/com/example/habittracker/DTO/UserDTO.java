@@ -19,4 +19,5 @@ public class UserDTO {
     private String password;
     private String confirmPassword;
     private boolean justLoginWithGoogle;
+    private String achievementTitleSelected;
 }

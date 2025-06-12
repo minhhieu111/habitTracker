@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("SELECT uc FROM UserChallenge uc WHERE uc.user.userId = :userId ")
-    Optional<List<UserChallenge>> findChallengeByUsers_Username(@Param("userId") Long userId);
+    Optional<List<UserChallenge>> findChallengeByUserId(@Param("userId") Long userId);
 
     @Query("SELECT c.habits FROM Challenge c WHERE c.challengeId = :challengeId")
     List<Habit> findHabitsByChallengeId(@Param("challengeId") Long challengeId);
