@@ -37,7 +37,7 @@ public class AchievementService {
 
     @Transactional
     public List<UserAchievement> getAchievementReceive(User user){
-        return this.userAchievementRepository.getUserAchievementReceiveToday(LocalDate.now(),user);
+        return this.userAchievementRepository.getUserAchievementReceiveTodayAndNotificationFalse(LocalDate.now(),user);
     }
 
     @Transactional
@@ -95,4 +95,7 @@ public class AchievementService {
         }
     }
 
+    public List<Achievement> getAllAchievement() {
+        return this.achievementRepository.findAll();
+    }
 }

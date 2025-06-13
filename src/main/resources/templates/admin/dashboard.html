@@ -9,103 +9,13 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="/css/admin_dashboard.css">
+    <link rel="stylesheet" href="/css/layout_dashboard.css">
 </head>
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <body>
-<!-- Top Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-    <div class="container-fluid">
-        <!-- Toggle Button for Sidebar -->
-        <button id="sidebarCollapse" class="btn btn-link text-light me-2">
-            <i class="fas fa-bars"></i>
-        </button>
-
-        <!-- Brand Logo -->
-        <a class="navbar-brand" href="#">BeBet</a>
-
-        <!-- Navbar Toggler for Mobile -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- Navbar Content -->
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ms-auto">
-                <!-- Notifications Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-bell"></i>
-                        <span class="badge rounded-pill bg-danger">3</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><h6 class="dropdown-header">Thông báo</h6></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Người dùng mới đăng ký</a></li>
-                        <li><a class="dropdown-item" href="#">Báo cáo mới</a></li>
-                        <li><a class="dropdown-item" href="#">Cập nhật hệ thống</a></li>
-                    </ul>
-                </li>
-
-                <!-- User Profile Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle"></i> <span th:text="${userAdmin.getUserName()}"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user fa-fw"></i> Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog fa-fw"></i> Cài đặt</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" th:href="@{/logout}"><i class="fas fa-sign-out-alt fa-fw"></i> Đăng xuất</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-
 <!-- Sidebar -->
-<nav id="sidebar">
-    <div class="sidebar-header">
-        <h3>Admin Panel</h3>
-    </div>
-    <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link active" href="#">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-users"></i>
-                <span>Người dùng</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-gamepad"></i>
-                <span>Trò chơi</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-money-bill-wave"></i>
-                <span>Giao dịch</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-chart-bar"></i>
-                <span>Báo cáo</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" th:href="@{/home}">
-                <i class="fas fa-cog"></i>
-                <span>Cài đặt</span>
-            </a>
-        </li>
-    </ul>
-</nav>
+<div th:replace="layout/sidebardashboard.html"></div>
 
 <!-- Page Content -->
 <div id="content">
@@ -120,87 +30,7 @@
         </div>
 
         <!-- Dashboard Stats Cards -->
-        <div class="row g-4 mb-4">
-            <div class="col-xl-3 col-md-6">
-                <div class="card dashboard-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted">Tổng người dùng</h6>
-                                <h3>2,456</h3>
-                            </div>
-                            <div class="card-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-success"><i class="fas fa-arrow-up"></i> 12%</span>
-                            <span class="text-muted ms-2">So với tháng trước</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card dashboard-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted">Doanh thu</h6>
-                                <h3>$34,252</h3>
-                            </div>
-                            <div class="card-icon">
-                                <i class="fas fa-dollar-sign"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-success"><i class="fas fa-arrow-up"></i> 8.3%</span>
-                            <span class="text-muted ms-2">So với tháng trước</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card dashboard-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted">Đặt cược</h6>
-                                <h3>12,345</h3>
-                            </div>
-                            <div class="card-icon">
-                                <i class="fas fa-dice"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-danger"><i class="fas fa-arrow-down"></i> 3.2%</span>
-                            <span class="text-muted ms-2">So với tháng trước</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card dashboard-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted">Người dùng mới</h6>
-                                <h3>128</h3>
-                            </div>
-                            <div class="card-icon">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-success"><i class="fas fa-arrow-up"></i> 18.7%</span>
-                            <span class="text-muted ms-2">So với tháng trước</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div th:replace="/layout/adminsection.html"></div>
 
         <!-- Recent Activity and Users -->
         <div class="row g-4">
@@ -324,33 +154,9 @@
         </div>
     </div>
 </div>
-
-<!-- Bootstrap JS Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- jQuery (needed for some custom functionality) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
-    $(document).ready(function() {
-        // Toggle sidebar
-        $('#sidebarCollapse').on('click', function() {
-            $('#sidebar').toggleClass('collapsed');
-            $('#content').toggleClass('expanded');
-        });
+    document.addEventListener('DOMContentLoaded', function() {
 
-        // Activate current nav item
-        $('.nav-link').on('click', function() {
-            $('.nav-link').removeClass('active');
-            $(this).addClass('active');
-        });
-
-        // Handle responsive behavior
-        $(window).resize(function() {
-            if ($(window).width() <= 768) {
-                $('#sidebar').addClass('collapsed');
-                $('#content').addClass('expanded');
-            }
-        }).resize(); // Trigger on page load
     });
 </script>
 </body>

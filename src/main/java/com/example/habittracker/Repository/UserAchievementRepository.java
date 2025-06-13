@@ -13,8 +13,8 @@ import java.util.List;
 @Repository
 public interface UserAchievementRepository extends JpaRepository<UserAchievement, Long> {
 
-    @Query("SELECT ua FROM UserAchievement ua WHERE DATE(ua.earnedDate) = :date AND ua.user = :user")
-    List<UserAchievement> getUserAchievementReceiveToday(@Param("date")LocalDate date,@Param("user") User user);
+    @Query("SELECT ua FROM UserAchievement ua WHERE DATE(ua.earnedDate) = :date AND ua.user = :user AND ua.isNotification=false")
+    List<UserAchievement> getUserAchievementReceiveTodayAndNotificationFalse(@Param("date")LocalDate date,@Param("user") User user);
 
     @Query("SELECT ua FROM UserAchievement ua WHERE ua.user = :user")
     List<UserAchievement> getUserAchievementReceive(User user);

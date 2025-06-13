@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Bài Đăng - BeBet</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/post_management.css">
+    <link rel="stylesheet" href="/css/layout_dashboard.css">
+</head>
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<body>
+<!-- Sidebar -->
+<div th:replace="layout/sidebardashboard.html"></div>
+
+<!-- Page Content -->
+<div id="content">
+    <div class="container-fluid">
+        <!-- Page Title -->
+        <h1 class="page-title">Cộng Đồng Thử Thách</h1>
+
+        <div class="row">
+            <!-- Published Posts Column -->
+            <div class="col-lg-8">
+                <div class="post-list-container">
+                    <h2 class="post-list-title">Danh Sách Bài Đăng</h2>
+
+                    <!-- Post Items -->
+                    <div class="post-contain">
+                        <div th:each="post : ${publishedPosts}" class="post-item">
+                            <div class="post-header">
+                                <div class="author-avatar" th:text="${post.authorInitials}">NA</div>
+                                <div class="post-author-info">
+                                    <div class="post-author" th:text="${post.authorName}">Nguyễn Văn A</div>
+                                    <!--                                <div class="post-date" th:text="${#dates.format(new java.util.Date(post.date.toString().replace(' ', 'T')), 'yyyy-MM-dd HH:mm')}">2024-06-13 09:30</div>-->
+                                </div>
+                            </div>
+
+                            <div class="post-title" th:text="${post.title}">30 Ngày Tập Thể Dục</div>
+                            <div class="post-content" th:text="${post.content}">
+                                Hôm nay tôi đã hoàn thành ngày thứ 15 của thử thách. Cảm thấy rất tuyệt vời và có nhiều năng lượng hơn!
+                            </div>
+
+                            <div class="post-stats">
+                                <div class="post-stat-item">
+                                    <i class="fas fa-fire post-stat-icon"></i>
+                                    <span th:text="'Streak: ' + ${post.streak}">Streak: 15/30</span>
+                                </div>
+
+                                <div class="post-stat-item">
+                                    <span>Tiến độ:</span>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar"
+                                             th:style="'width: ' + ${post.completion} + '%'"
+                                             th:aria-valuenow="${post.completion}"
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <span th:text="${post.completion} + '%'">50%</span>
+                                </div>
+
+                                <div class="post-stat-item">
+                                    <i class="fas fa-thumbs-up post-stat-icon"></i>
+                                    <span th:text="${post.likes} + ' likes'">12 likes</span>
+                                </div>
+
+                                <div class="post-stat-item">
+                                    <i class="fas fa-comment post-stat-icon"></i>
+                                    <span th:text="${post.comments} + ' bình luận'">3 bình luận</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Pending Posts Column -->
+            <div class="col-lg-4">
+                <div class="pending-posts-container">
+                    <h2 class="pending-posts-title">Bài đăng chờ duyệt: <span th:text="${pendingCount}">4</span></h2>
+
+                    <!-- Pending Post Items -->
+                    <div class="pending-contain">
+                        <div th:each="post : ${pendingPosts}" class="pending-post-item">
+                            <div class="pending-post-info">
+                                <div class="pending-post-author" th:text="${post.authorName}">Nguyễn Văn A</div>
+                                <div class="pending-post-title" th:text="${post.title}">30 Ngày Tập Thể Dục</div>
+                            </div>
+
+                            <div class="pending-post-actions">
+                                <button class="btn btn-approve" th:data-id="${post.id}">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-edit" th:data-id="${post.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-delete" th:data-id="${post.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery (needed for some custom functionality) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Handle post approval
+        $('.btn-approve').on('click', function() {
+            const postId = $(this).data('id');
+            // This would typically make an API call to approve the post
+            alert('Đã duyệt bài đăng #' + postId);
+            $(this).closest('.pending-post-item').fadeOut();
+
+            // Update pending count
+            const currentCount = parseInt($('.pending-posts-title span').text());
+            $('.pending-posts-title span').text(currentCount - 1);
+        });
+
+        // Handle post edit
+        $('.btn-edit').on('click', function() {
+            const postId = $(this).data('id');
+            // This would typically open a modal or navigate to edit page
+            alert('Chỉnh sửa bài đăng #' + postId);
+        });
+
+        // Handle post deletion
+        $('.btn-delete').on('click', function() {
+            const postId = $(this).data('id');
+            if (confirm('Bạn có chắc chắn muốn xóa bài đăng này?')) {
+                // This would typically make an API call to delete the post
+                alert('Đã xóa bài đăng #' + postId);
+                $(this).closest('.pending-post-item').fadeOut();
+
+                // Update pending count
+                const currentCount = parseInt($('.pending-posts-title span').text());
+                $('.pending-posts-title span').text(currentCount - 1);
+            }
+        });
+    });
+</script>
+</body>
+</html>

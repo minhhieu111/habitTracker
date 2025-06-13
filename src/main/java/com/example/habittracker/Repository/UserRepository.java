@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     Optional<User> findUserByUserName(String userName);
 
-    User findByEmail(@NotBlank(message = "Nhập email") String email);
+    Optional<User> findByEmail(@NotBlank(message = "Nhập email") String email);
 
     @Query("SELECT u AS user,COUNT(uc) AS completedChallengesCount FROM User u LEFT JOIN u.userChallenges uc WHERE uc.status = 'COMPLETE' GROUP BY u ORDER BY COUNT(uc) DESC")
     List<UserChallengeStats> findAllUsersOrderedByCompletedChallenges();

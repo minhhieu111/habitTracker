@@ -44,7 +44,7 @@ public class UserService {
 
     @Transactional
     public User getUser(String email) {
-        return this.userRepository.findByEmail(email);
+        return userRepository.findByEmail(email).orElseThrow(()->new RuntimeException("Không tìm thấy Email!"));
     }
 
     @Transactional
@@ -54,10 +54,13 @@ public class UserService {
 
     @Transactional
     public User findUserByEmail(String email) {
-        return this.userRepository.findByEmail(email);
+        return userRepository.findByEmail(email).orElseThrow(()->new RuntimeException("Không tìm thấy Email!"));
     }
 
-
+    @Transactional
+    public List<User> getAllUsers() {
+        return this.userRepository.findAll();
+    }
 
     @Transactional
     public List<UserChallengeStats> getUsersAndCompletedChallenges() {

@@ -25,6 +25,11 @@ public class AuthService {
     private final AchievementService achievementService;
     private String folder = "user_avatar";
     public static String defaultPassAuth = "oauth2_user_password";
+    private final Long coinsDefault = 0L;
+    private final Long challengeLimitDefault = 3L;
+    private final Long taskLimitDefault = 10L;
+    private final Long limitCoinsEarnedPerDayDefault = 10L;
+
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, ImageService imageService, AchievementService achievementService) {
         this.userRepository = userRepository;
@@ -49,25 +54,22 @@ public class AuthService {
                 .password(passwordEncoder.encode(register.getPassword()))
                 .email(register.getEmail())
                 .role(User.Role.USER)
-                .coins(0L)
-                .challengeLimit(3L)
-                .taskLimit(10L)
-                .limitCoinsEarnedPerDay(0L)
+                .coins(coinsDefault)
+                .challengeLimit(challengeLimitDefault)
+                .taskLimit(taskLimitDefault)
+                .limitCoinsEarnedPerDay(limitCoinsEarnedPerDayDefault)
+                .createAt(LocalDateTime.now())
                 .build();
-
-        UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).build();
+        userRepository.save(user);
+        UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).isNotification(false).build();
 
         this.achievementService.saveUserAchievement(userAchievement);
 
-        userRepository.save(user);
+
     }
 
     public User login(Login login) {
-        User user = userRepository.findByEmail(login.getEmail());
-
-        if(user == null){
-            throw new RuntimeException("Không tìm thấy Email!");
-        }
+        User user = userRepository.findByEmail(login.getEmail()).orElseThrow(()->new RuntimeException("Không tìm thấy Email!"));
         if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
             throw new RuntimeException("Mật khẩu không chính xác!");
         }
@@ -86,10 +88,11 @@ public class AuthService {
                 .email(email)
                 .password(passwordEncoder.encode(defaultPassAuth))
                 .role(User.Role.USER)
-                .coins(0L)
-                .challengeLimit(3L)
-                .taskLimit(10L)
-                .limitCoinsEarnedPerDay(0L)
+                .coins(coinsDefault)
+                .challengeLimit(challengeLimitDefault)
+                .taskLimit(taskLimitDefault)
+                .limitCoinsEarnedPerDay(limitCoinsEarnedPerDayDefault)
+                .createAt(LocalDateTime.now())
                 .build();
 
         if (avatar != null && !avatar.isEmpty()) {
@@ -101,6 +104,12 @@ public class AuthService {
             }
         }
         this.userRepository.save(user);
+        Achievement achievement = this.achievementService.getAchievementById(1L);
+
+        UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).isNotification(false).build();
+        this.achievementService.saveUserAchievement(userAchievement);
+
+
         return user;
     }
 }
