@@ -35,6 +35,7 @@ public class User {
     private Long challengeLimit;
     private Long taskLimit;
     private String achieveTitle;
+    private LocalDateTime createAt;
 
     @OneToMany(mappedBy = "user")
     List<UserHabit> userHabits;

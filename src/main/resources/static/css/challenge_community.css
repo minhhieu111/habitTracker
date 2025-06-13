@@ -225,7 +225,7 @@ body {
 }
 
 /*Modal challenge*/
-.modal-header{
+.header-style{
     background: #4900F2;
     border: none;
     border-radius: 0px 0px 50px 50px;

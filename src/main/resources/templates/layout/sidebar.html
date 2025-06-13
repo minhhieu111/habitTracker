@@ -56,6 +56,12 @@
                 <span>Hồ sơ</span>
             </a>
         </li>
+        <li class="nav-item mt-auto" th:if="${user.role.name() == 'ADMIN'}">
+            <a class="nav-link" href="/admin/dashboard">
+                <i class="fa-solid fa-table-columns"></i>
+                <span>Quản trị</span>
+            </a>
+        </li>
         <li class="nav-item">
             <a class="nav-link text-danger" href="/logout">
                 <i class="fas fa-sign-out-alt"></i>

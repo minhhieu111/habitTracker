@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - BeBet</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/user_mange.css">
+    <link rel="stylesheet" href="/css/layout_dashboard.css">
+</head>
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<body>
+<!-- Sidebar -->
+<div th:replace="/layout/sidebardashboard.html"></div>
+
+<!-- Page Content -->
+<div id="content">
+    <div class="container-fluid">
+        <!-- Dashboard Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Quản lý người dùng</h2>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Người dùng</li>
+            </ol>
+        </div>
+
+<!--        &lt;!&ndash; Dashboard Stats Cards &ndash;&gt;-->
+<!--        <div th:replace="/layout/adminsection.html"></div>-->
+
+        <!-- Booking List -->
+        <div class="user-list">
+            <div class="user-list-header">
+                <h5 class="user-list-title">Booking List</h5>
+                <div class="search-container">
+                    <input type="text" class="form-control search-input" placeholder="Search">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+
+                <button class="btn add-user-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Thêm người dùng</span>
+                </button>
+            </div>
+            <div class="row">
+                <div class="col-8 user-table-contain">
+                    <div class="table-responsive">
+                        <table class="user-table">
+                            <thead>
+                            <tr>
+                                <th>Client Name</th>
+                                <th>Booking Date</th>
+                                <th>Provider Name</th>
+                                <th>Service</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="booking : ${bookings}">
+                                <td>
+                                    <div class="client-info">
+                                        <div class="client-avatar">
+                                            <img th:src="@{/placeholder.svg?height=40&width=40}" alt="Client Avatar">
+                                        </div>
+                                        <div>
+                                            <div th:text="${booking.clientName}">Jerome Bell</div>
+                                            <div class="text-muted small" th:text="'#' + ${booking.id}">#235645</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td th:text="${booking.bookingDate}">2:00 PM, Tue, 13 Nov</td>
+                                <td th:text="${booking.providerName}">Ronald Richards</td>
+                                <td th:text="${booking.service}">Relax & Rejuvenate: Salon</td>
+                                <td>
+                                    <div th:class="${booking.status == 'Confirmed' ? 'status-badge status-confirmed' : 'status-badge status-canceled'}"
+                                         th:text="${booking.status}">Confirmed</div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">Người dùng mới</h5>
+                        </div>
+                        <div class="card-body user-stat">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Nguyễn Văn A</h6>
+                                        <small class="text-muted">Đăng ký 2 giờ trước</small>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Nguyễn Văn A</h6>
+                                        <small class="text-muted">Đăng ký 2 giờ trước</small>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Nguyễn Văn A</h6>
+                                        <small class="text-muted">Đăng ký 2 giờ trước</small>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Nguyễn Văn A</h6>
+                                        <small class="text-muted">Đăng ký 2 giờ trước</small>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Nguyễn Văn A</h6>
+                                        <small class="text-muted">Đăng ký 2 giờ trước</small>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Nguyễn Văn A</h6>
+                                        <small class="text-muted">Đăng ký 2 giờ trước</small>
+                                    </div>
+                                </li>
+
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Trần Thị B</h6>
+                                        <small class="text-muted">Đăng ký 3 giờ trước</small>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Lê Văn C</h6>
+                                        <small class="text-muted">Đăng ký 5 giờ trước</small>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Phạm Thị D</h6>
+                                        <small class="text-muted">Đăng ký 8 giờ trước</small>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- jQuery (needed for some custom functionality) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Search functionality
+        $('.search-input').on('keyup', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $('.booking-table tbody tr').each(function() {
+                const clientName = $(this).find('.client-info div:first').text().toLowerCase();
+                const providerId = $(this).find('.client-info .text-muted').text().toLowerCase();
+                const providerName = $(this).find('td:nth-child(3)').text().toLowerCase();
+                const service = $(this).find('td:nth-child(4)').text().toLowerCase();
+
+                if (clientName.includes(searchTerm) ||
+                    providerId.includes(searchTerm) ||
+                    providerName.includes(searchTerm) ||
+                    service.includes(searchTerm)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        // Add user button click
+        $('.add-user-btn').on('click', function() {
+            // This would typically open a modal or navigate to a form
+            alert('Thêm người dùng mới');
+        });
+    });
+</script>
+</body>
+</html>

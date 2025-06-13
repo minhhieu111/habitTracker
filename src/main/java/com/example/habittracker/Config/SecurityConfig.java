@@ -39,10 +39,9 @@ public class SecurityConfig{
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/home",
-                                "admin/dashboard").permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/home").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                                "/home").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/home").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

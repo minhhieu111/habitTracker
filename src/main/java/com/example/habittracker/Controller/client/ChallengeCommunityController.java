@@ -54,6 +54,8 @@ public class ChallengeCommunityController {
         int currentYear = today.getYear();
         int currentMonth = today.getMonthValue();
 
+        model.addAttribute("user", user);
+
         model.addAttribute("currentYear", currentYear);
         model.addAttribute("currentMonth", currentMonth);
         model.addAttribute("months", new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});

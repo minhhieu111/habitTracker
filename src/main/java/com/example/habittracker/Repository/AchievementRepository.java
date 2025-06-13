@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AchievementRepository extends JpaRepository<Achievement, Long> {
-    @Query("SELECT a FROM Achievement a WHERE a.achievementId=:achivementId")
+    @Query("SELECT a FROM Achievement a WHERE a.achievementId=:achievementId")
     Achievement getAchievementById(@Param("achievementId")Long achievementId);
 }

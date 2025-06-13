@@ -17,6 +17,7 @@ public class UserAchievement {
     private Long userAchievementId;
 
     private LocalDateTime earnedDate;
+    private boolean isNotification;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")

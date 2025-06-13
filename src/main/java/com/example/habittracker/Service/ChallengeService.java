@@ -65,6 +65,11 @@ public class ChallengeService {
     }
 
     @Transactional
+    public List<Challenge> getAllPendingChallenge(){
+        return this.challengeRepository.findAll().stream().filter(challenge->challenge.getIsPublic().equals(Challenge.Visibility.PENDING)).collect(Collectors.toList());
+    }
+
+    @Transactional
     //lấy list uc mà đag active và uc hoàn thành thử thach bằng progress 100
     public List<UserChallenge> getValidChallenges(Long userId) {
         List<UserChallenge> userChallenges = this.challengeRepository.findChallengeByUserId(userId).get();

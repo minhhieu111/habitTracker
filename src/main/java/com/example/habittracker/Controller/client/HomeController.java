@@ -10,6 +10,7 @@ import com.example.habittracker.Domain.Reward;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Domain.UserAchievement;
 import com.example.habittracker.Domain.UserChallenge;
+import com.example.habittracker.Repository.UserAchievementRepository;
 import com.example.habittracker.Repository.UserChallengeRepository;
 import com.example.habittracker.Service.AchievementService;
 import com.example.habittracker.Service.CalendarService;
@@ -38,8 +39,9 @@ public class HomeController {
     private final CalendarService calendarService;
     private final UserChallengeRepository userChallengeRepository;
     private final AchievementService achievementService;
+    private final UserAchievementRepository userAchievementRepository;
 
-    public HomeController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, CalendarService calendarService, UserChallengeRepository userChallengeRepository, AchievementService achievementService) {
+    public HomeController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, CalendarService calendarService, UserChallengeRepository userChallengeRepository, AchievementService achievementService, UserAchievementRepository userAchievementRepository) {
         this.userService = userService;
         this.tokenUtil = tokenUtil;
         this.jwtUtil = jwtUtil;
@@ -47,6 +49,7 @@ public class HomeController {
         this.calendarService = calendarService;
         this.userChallengeRepository = userChallengeRepository;
         this.achievementService = achievementService;
+        this.userAchievementRepository = userAchievementRepository;
     }
 
     @GetMapping("/home")
@@ -62,6 +65,8 @@ public class HomeController {
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();
         int currentMonth = today.getMonthValue();
+
+        model.addAttribute("user", user);
 
         model.addAttribute("currentYear", currentYear);
         model.addAttribute("currentMonth", currentMonth);
@@ -118,6 +123,11 @@ public class HomeController {
         completedChallenges.forEach(userChallenge -> {
             userChallenge.setNotificationShown(true);
             userChallengeRepository.save(userChallenge);
+        });
+
+        userAchievements.forEach(userAchievement -> {
+            userAchievement.setNotification(true);
+            userAchievementRepository.save(userAchievement);
         });
 
         return ResponseEntity.ok().body(response);
