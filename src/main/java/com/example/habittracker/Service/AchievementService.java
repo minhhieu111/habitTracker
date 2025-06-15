@@ -1,13 +1,19 @@
 package com.example.habittracker.Service;
 
+import com.example.habittracker.DTO.AchievementDTO;
+import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.*;
 import com.example.habittracker.Repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AchievementService {
@@ -28,6 +34,23 @@ public class AchievementService {
     @Transactional
     public Achievement getAchievementById(Long id) {
         return this.achievementRepository.getAchievementById(id);
+    }
+
+    @Transactional
+    public AchievementDTO getUpdateAchievementById(Long id) {
+        Achievement achievement = this.achievementRepository.getAchievementById(id);
+        return AchievementDTO.builder()
+                .achievementId(achievement.getAchievementId())
+                .achievementTitle(achievement.getTitle())
+                .achievementDescription(achievement.getDescription())
+                .bonusChallenge(achievement.getChallengeBonus())
+                .bonusTask(achievement.getTaskBonus())
+                .requiredChallenge(achievement.getRequiredChallenge())
+                .requiredTask(achievement.getRequiredTask())
+                .icon(achievement.getIcon())
+                .color(achievement.getColor())
+                .coinBonus(achievement.getCoinBonus())
+                .build();
     }
 
     @Transactional
@@ -95,7 +118,107 @@ public class AchievementService {
         }
     }
 
+    public Page<Achievement> getAchievementsBySearch(String search, Pageable pageable) {
+        if (search != null && !search.isEmpty()) {
+            return achievementRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(search, search, pageable);
+        } else {
+            return achievementRepository.findAll(pageable);
+        }
+    }
+
+    @Transactional
     public List<Achievement> getAllAchievement() {
         return this.achievementRepository.findAll();
+    }
+
+    @Transactional
+    public List<AchievementDTO> getAllUserAchievementToday() {
+        List<UserAchievement> userAchievements = this.userAchievementRepository.findAllAllUserAchievementReceiveToday(LocalDate.now());
+        return userAchievements.stream().map(userAchievement->{
+            UserDTO userDTO = UserDTO.builder()
+                    .username(userAchievement.getUser().getUserName())
+                    .avatar(userAchievement.getUser().getAvatar())
+                    .build();
+            Duration duration = Duration.between(userAchievement.getEarnedDate(), LocalDateTime.now());
+            return AchievementDTO.builder()
+                    .user(userDTO)
+                    .achievementTitle(userAchievement.getAchievement().getTitle())
+                    .durationAchievement(duration.toHours())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void addNewAchievement(AchievementDTO achievementDTO) {
+        if(achievementDTO.getAchievementTitle()==null && achievementDTO.getAchievementTitle().isEmpty()){
+            throw new RuntimeException("Tên thành tựu không được trống!");
+        }
+
+        Achievement achievement = Achievement.builder()
+                .title(achievementDTO.getAchievementTitle())
+                .description(achievementDTO.getAchievementDescription())
+                .requiredChallenge(achievementDTO.getRequiredChallenge())
+                .requiredTask(achievementDTO.getRequiredTask())
+                .challengeBonus(achievementDTO.getBonusChallenge())
+                .taskBonus(achievementDTO.getBonusTask())
+                .icon(achievementDTO.getIcon())
+                .coinBonus(achievementDTO.getCoinBonus())
+                .color(achievementDTO.getColor())
+                .isAvailable(true)
+                .build();
+
+        this.achievementRepository.save(achievement);
+    }
+
+    @Transactional
+    public void updateAchievement(AchievementDTO achievementDTO) {
+        Achievement achievement = this.achievementRepository.getAchievementById(achievementDTO.getAchievementId());
+
+        if(achievement == null){
+            throw new RuntimeException("Không tìm thấy thành tựu!");
+        }
+
+        if(achievementDTO.getAchievementTitle()==null && achievementDTO.getAchievementTitle().isEmpty()){
+            throw new RuntimeException("Tên thành tựu không được trống!");
+        }
+
+        achievement = Achievement.builder()
+                .achievementId(achievementDTO.getAchievementId())
+                .title(achievementDTO.getAchievementTitle())
+                .description(achievementDTO.getAchievementDescription())
+                .requiredChallenge(achievementDTO.getRequiredChallenge())
+                .requiredTask(achievementDTO.getRequiredTask())
+                .challengeBonus(achievementDTO.getBonusChallenge())
+                .taskBonus(achievementDTO.getBonusTask())
+                .icon(achievementDTO.getIcon())
+                .coinBonus(achievementDTO.getCoinBonus())
+                .color(achievementDTO.getColor())
+                .build();
+
+        this.achievementRepository.save(achievement);
+    }
+
+    @Transactional
+    public void hideAchievement(Long achievementId) {
+        Achievement achievement = this.achievementRepository.getAchievementById(achievementId);
+        if(achievement == null){
+            throw new RuntimeException("Không tìm thấy thành tựu!");
+        }
+        achievement.setAvailable(!achievement.isAvailable());
+        this.achievementRepository.save(achievement);
+    }
+
+    @Transactional
+    public void deleteAchievement(Long achievementId) {
+        Achievement achievement = this.achievementRepository.getAchievementById(achievementId);
+        if(achievement == null){
+            throw new RuntimeException("Không tìm thấy thành tựu!");
+        }
+        List<UserAchievement> userAchievements = this.userAchievementRepository.findAllByAchievementId(achievement.getAchievementId()).orElse(null);
+
+        if(userAchievements != null){
+            this.userAchievementRepository.deleteAll(userAchievements);
+        }
+        this.achievementRepository.delete(achievement);
     }
 }
