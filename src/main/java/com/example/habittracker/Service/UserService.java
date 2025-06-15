@@ -60,8 +60,12 @@ public class UserService {
     }
 
     @Transactional
-    public Page<User> getAllUsers(Pageable pageable) {
+    public Page<User> getAllUsersBySearch(String search,Pageable pageable) {
+        if (search != null && !search.isEmpty()) {
+            return userRepository.findByUserNameContainingIgnoreCaseOrEmailContainingIgnoreCase(search, search, pageable);
+        } else {
         return this.userRepository.findAll(pageable);
+        }
     }
 
     @Transactional

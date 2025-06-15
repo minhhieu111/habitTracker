@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserAchievementRepository extends JpaRepository<UserAchievement, Long> {
@@ -18,4 +19,10 @@ public interface UserAchievementRepository extends JpaRepository<UserAchievement
 
     @Query("SELECT ua FROM UserAchievement ua WHERE ua.user = :user")
     List<UserAchievement> getUserAchievementReceive(User user);
+
+    @Query("SELECT ua FROM UserAchievement ua WHERE DATE(ua.earnedDate) = :date")
+    List<UserAchievement> findAllAllUserAchievementReceiveToday(@Param("date")LocalDate date);
+
+    @Query("SELECT ua FROM UserAchievement ua WHERE ua.achievement.achievementId = :achievementId")
+    Optional<List<UserAchievement>> findAllByAchievementId(@Param("achievementId")Long achievementId);
 }

@@ -39,7 +39,8 @@ public class UserManagementController {
     @GetMapping("")
     public String userManagement(HttpServletRequest request, Model model,
                                  @RequestParam(value = "page", defaultValue = "0") int page,
-                                 @RequestParam(value = "size", defaultValue = "7") int size) {
+                                 @RequestParam(value = "size", defaultValue = "7") int size,
+                                 @RequestParam(value = "search", required = false, defaultValue = "") String search) {
         User userAdmin = getUserAdmin(request);
         model.addAttribute("userAdmin", userAdmin);
 
@@ -47,8 +48,9 @@ public class UserManagementController {
         model.addAttribute("newUsers", newUsers);
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> users = this.userService.getAllUsers(pageable);
+        Page<User> users = this.userService.getAllUsersBySearch(search,pageable);
         model.addAttribute("users", users);
+        model.addAttribute("search", search);
 
         UserDTO createUser = new UserDTO();
         model.addAttribute("createUpdateUser", createUser);

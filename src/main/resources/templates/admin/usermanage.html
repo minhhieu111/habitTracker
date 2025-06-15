@@ -36,10 +36,11 @@
         <div class="user-list">
             <div class="user-list-header">
                 <h5 class="user-list-title">Danh sách người dùng</h5>
-                <div class="search-container">
-                    <input type="text" class="form-control search-input" placeholder="Tìm kiếm">
+                <form action="" class="search-container" method="get">
+                    <input type="text" class="form-control search-input" name="search" placeholder="Tìm kiếm"
+                           value="">
                     <i class="fas fa-search search-icon"></i>
-                </div>
+                </form>
 
                 <button class="btn add-user-btn" data-bs-target="#addUserModal" data-bs-toggle="modal">
                     <i class="fas fa-plus"></i>
@@ -228,37 +229,9 @@
         </div>
     </div>
 </div>
-<!-- jQuery (needed for some custom functionality) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Tìm ô tìm kiếm và lắng nghe sự kiện 'keyup'
-        const searchInput = document.querySelector('.search-input');
-
-        searchInput.addEventListener('keyup', function() {
-            const searchTerm = searchInput.value.toLowerCase(); // Lấy giá trị tìm kiếm và chuyển thành chữ thường
-
-            // Lặp qua tất cả các hàng trong bảng
-            const rows = document.querySelectorAll('.user-table tbody tr');
-            rows.forEach(function(row) {
-                const clientName = row.querySelector('.client-info div:nth-child(2)').textContent.toLowerCase();
-                const providerId = row.querySelector('.client-info .text-muted').textContent.toLowerCase();
-                const providerName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                const service = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
-
-                // Kiểm tra nếu bất kỳ thông tin nào trong hàng chứa từ khóa tìm kiếm
-                if (clientName.includes(searchTerm) ||
-                    providerId.includes(searchTerm) ||
-                    providerName.includes(searchTerm) ||
-                    service.includes(searchTerm)) {
-                    row.style.display = ''; // Hiển thị hàng
-                } else {
-                    row.style.display = 'none'; // Ẩn hàng
-                }
-            });
-        });
-
         // Modal update user
         window.updateUser = (userId) => {
             fetch(`/admin/users/${userId}`)

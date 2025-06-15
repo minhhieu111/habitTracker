@@ -3,6 +3,8 @@ package com.example.habittracker.Repository;
 import com.example.habittracker.DTO.UserChallengeStats;
 import com.example.habittracker.Domain.User;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +30,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Query("SELECT u FROM User u WHERE FUNCTION('DATE', u.createAt) = :date AND u.role = 'USER' ORDER BY u.createAt DESC " )
     List<User> findAllUserRegisterToday(@Param("date")LocalDate date);
+
+    Page<User> findByUserNameContainingIgnoreCaseOrEmailContainingIgnoreCase(String search, String search1, Pageable pageable);
 }

@@ -6,20 +6,16 @@ import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.Achievement;
 import com.example.habittracker.Domain.Challenge;
 import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserChallenge;
 import com.example.habittracker.Service.AchievementService;
 import com.example.habittracker.Service.ChallengeService;
 import com.example.habittracker.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
