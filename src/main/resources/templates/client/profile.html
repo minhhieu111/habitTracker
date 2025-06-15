@@ -41,18 +41,25 @@
                     <img th:src="${user.avatar==null?'/images/user_ava.png':user.avatar}" alt="">
                 </div>
                 <div class="profile-info">
-                    <div class="profile-title" th:text="'Danh hiệu: ' + ${user.achieveTitle}">Danh hiệu: Người mới bắt đầu</div>
+                    <div class="w-100 d-flex">
+                        <div class="achievement-icon" th:style="'background-color: ' + ${userAchievement.color}">
+                            <i th:class="${userAchievement.icon}"></i>
+                        </div>
+                        <div class="profile-title align-content-center" th:text="'Danh hiệu: ' + ${userAchievement.title}">Danh hiệu: Người mới bắt đầu</div>
+                    </div>
                     <div class="profile-username" th:text="'Người dùng: ' + ${user.userName}">Người dùng: user</div>
                     <div class="profile-email" th:text="'Email: ' + ${user.email}">Email: User@gmail.com</div>
                     <div class="gold-badge">
                         <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
                         <span th:text="${user.coins} + ' Xu'">100 Xu</span>
                     </div>
+
                 </div>
             </div>
             <button class="btn edit-profile-btn" id="editProfile">
                 <i class="fas fa-edit"></i>
             </button>
+
         </div>
 
         <!-- Statistics Grid -->
@@ -87,7 +94,7 @@
             </div>
 
             <!-- Completed Tasks -->
-            <div class="stat-card">
+            <div class="stat-card" data-bs-toggle="modal" data-bs-target="#taskCompletionModal">
                 <div class="stat-title">Task đã hoàn thành từ khi tham gia</div>
                 <div class="stat-value" th:text="${completedTask}">120</div>
             </div>
@@ -145,8 +152,8 @@
 
                     <div class="mb-3">
                         <label for="achieveSelected"  class="form-label">Thành tựu</label>
-                        <select class="form-control"  id="achieveSelected" th:field="*{achieveTitle}">
-                            <option th:each="achievement : ${achievements}" th:value="${achievement.getAchievement().getTitle()}" th:text="${achievement.getAchievement().getTitle()}"></option>
+                        <select class="form-control"  id="achieveSelected" th:field="*{achieveId}">
+                            <option th:each="achievement : ${achievements}" th:value="${achievement.achievement.achievementId}" th:text="${achievement.achievement.title}"></option>
                         </select>
                     </div>
                     <div style="width: 100%;text-align: center;">
@@ -244,8 +251,8 @@
             <!-- Modal Header with Purple Gradient -->
             <div class="modal-header text-white text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 30px 20px 20px;">
                 <div class="w-100">
-                    <h4 class="modal-title fw-bold mb-2" id="completeChallengeModalLabel">Thử thách đang tham gia</h4>
-                    <p class="mb-0 opacity-75" id="completeCount" th:text="'Thử thách đang tham gia '+ ${completedChallenges.size()}">Thử thách có thể chia sẻ: 3</p>
+                    <h4 class="modal-title fw-bold mb-2" id="completeChallengeModalLabel">Thử thách đã hoàn thành</h4>
+                    <p class="mb-0 opacity-75" id="completeCount" th:text="'Thử thách đã hoàn thành: '+ ${completedChallenges.size()}"></p>
                 </div>
                 <button type="button" class="btn-close btn-close-white position-absolute" style="top: 15px; right: 15px;" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -256,9 +263,9 @@
                     <!-- Challenge Card 1 -->
                     <div th:each="challenge : ${completedChallenges}" class="challenge-card mb-3" >
                         <div class="challenge-card-content">
-                            <h5 class="challenge-name" th:text="${challenge.challenge.title}">Chơi Thể Thao</h5>
-                            <p class="challenge-desc" th:text="${challenge.challenge.description}">Mô tả: Duy trì chơi thể thao thay đổi hình thể</p>
-                            <div class="challenge-duration" th:text="${challenge.challenge.day}+ ' Ngày'">20 Ngày</div>
+                            <h5 class="challenge-name" th:text="${challenge.challenge.title}"></h5>
+                            <p class="challenge-desc" th:text="${challenge.challenge.description}"></p>
+                            <div class="challenge-duration" th:text="${challenge.challenge.day}+ ' Ngày'"></div>
                         </div>
                     </div>
                 </div>
@@ -403,12 +410,12 @@
                                 <div class="me-3">
                                     <div class="rounded-circle d-flex align-items-center justify-content-center"
                                          style="width: 40px; height: 40px; background-color: #e8f5e8;">
-                                        <i class="fas fa-play text-success"></i>
+                                        <i class="fa-solid fa-calendar-days text-success"></i>
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h5 class="fw-bold mb-0 text-success" id="challengeStatus" th:text="${longestStreakChallenge.status}">ACTIVE</h5>
-                                    <small class="text-muted">Trạng thái</small>
+                                    <h5 class="fw-bold mb-0 text-success" id="challengeDay" th:text="${longestStreakChallenge.challenge.day}+' Ngày'">ACTIVE</h5>
+                                    <small class="text-muted">Thời gian thực hiện</small>
                                 </div>
                             </div>
                         </div>
@@ -455,6 +462,44 @@
                     </ul>
                 </div>
                 <div class="modal-footer ">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Completion Statistics Modal -->
+<div class="modal fade task-completion-modal" id="taskCompletionModal" tabindex="-1" aria-labelledby="taskCompletionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title w-100" id="taskCompletionModalLabel">Task đã hoàn thành</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="completion-subtitle">
+                    Tổng thói quen bạn đã hoàn thành được: <span id="totalCompletedTasks" th:text="${completedTask}">24</span>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-number" id="habitsCount" th:text="${habitsCount}">5</div>
+                        <div class="stat-label">Thói Quen</div>
+                    </div>
+
+                    <div class="stat-divider"></div>
+
+                    <div class="stat-item">
+                        <div class="stat-number" id="dailyHabitsCount" th:text="${dailiesCount}">7</div>
+                        <div class="stat-label">Thói quen hàng ngày</div>
+                    </div>
+
+                    <div class="stat-divider"></div>
+
+                    <div class="stat-item">
+                        <div class="stat-number" id="todosCount" th:text="${todosCount}">12</div>
+                        <div class="stat-label">Việc cần làm</div>
+                    </div>
                 </div>
             </div>
         </div>

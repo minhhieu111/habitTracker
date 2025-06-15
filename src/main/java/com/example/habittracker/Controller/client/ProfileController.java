@@ -4,14 +4,8 @@ import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.DTO.MessageResponse;
 import com.example.habittracker.DTO.UserDTO;
-import com.example.habittracker.Domain.Diary;
-import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserAchievement;
-import com.example.habittracker.Domain.UserChallenge;
-import com.example.habittracker.Service.AchievementService;
-import com.example.habittracker.Service.ChallengeService;
-import com.example.habittracker.Service.DiaryService;
-import com.example.habittracker.Service.UserService;
+import com.example.habittracker.Domain.*;
+import com.example.habittracker.Service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,20 +28,30 @@ public class ProfileController {
     private final ChallengeService challengeService;
     private final DiaryService diaryService;
     private final AchievementService achievementService;
+    private final HabitService habitService;
+    private final DailyService dailyService;
+    private final TodoService todoService;
 
-    public ProfileController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, DiaryService diaryService, AchievementService achievementService) {
+    public ProfileController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, DiaryService diaryService, AchievementService achievementService, HabitService habitService, DailyService dailyService, TodoService todoService) {
         this.userService = userService;
         this.tokenUtil = tokenUtil;
         this.jwtUtil = jwtUtil;
         this.challengeService = challengeService;
         this.diaryService = diaryService;
         this.achievementService = achievementService;
+        this.habitService = habitService;
+        this.dailyService = dailyService;
+        this.todoService = todoService;
     }
 
     @GetMapping("")
     public String profile(HttpServletRequest request,Model model) {
         User user = getUserFromRequest(request);
         model.addAttribute("user", user);
+
+        Achievement achievement = this.achievementService.getAchievementById(user.getAchieveId());
+        model.addAttribute("userAchievement", achievement);
+
         model.addAttribute("newUser", user);
         UserDTO userDTO = this.userService.UserChangePassword(user);
         model.addAttribute("changePassword", userDTO);
@@ -71,6 +75,15 @@ public class ProfileController {
 
         long completedTask = this.userService.getTaskComplete(user,true);
         model.addAttribute("completedTask",completedTask);
+
+        long habitsCount = this.habitService.countCompleteHabit(user);
+        model.addAttribute("habitsCount",habitsCount);
+
+        long dailiesCount = this.dailyService.countCompleteDaily(user);
+        model.addAttribute("dailiesCount",dailiesCount);
+
+        long todosCount = this.todoService.countCompleteTodo(user);
+        model.addAttribute("todosCount",todosCount);
 
         return "client/profile";
     }

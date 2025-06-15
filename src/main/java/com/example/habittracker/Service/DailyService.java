@@ -363,4 +363,12 @@ public class DailyService {
         }
         return null;
     }
+
+    @Transactional
+    public long countCompleteDaily(User user) {
+        List<UserDaily> userDailies = this.userDailyRepository.findByUserId(user.getUserId());
+        return userDailies.stream().mapToLong(userDaily -> this.dailyHistoryRepository.countCompleteDaily(userDaily)).sum();
+    }
+
+
 }

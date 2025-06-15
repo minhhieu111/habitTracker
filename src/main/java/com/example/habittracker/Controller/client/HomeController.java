@@ -6,10 +6,7 @@ import com.example.habittracker.DTO.AchievementDTO;
 import com.example.habittracker.DTO.CalendarDTO;
 import com.example.habittracker.DTO.ChallengeDTO;
 import com.example.habittracker.DTO.LoginResponse;
-import com.example.habittracker.Domain.Reward;
-import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserAchievement;
-import com.example.habittracker.Domain.UserChallenge;
+import com.example.habittracker.Domain.*;
 import com.example.habittracker.Repository.UserAchievementRepository;
 import com.example.habittracker.Repository.UserChallengeRepository;
 import com.example.habittracker.Service.AchievementService;
@@ -57,6 +54,9 @@ public class HomeController {
         User user = getUserFromRequest(request);
 
         model.addAttribute("user", user);
+
+        Achievement achievement = this.achievementService.getAchievementById(user.getAchieveId());
+        model.addAttribute("userAchievement", achievement);
 
         //challenge
         List<UserChallenge> userChallenges  = this.challengeService.getValidChallenges(user.getUserId());

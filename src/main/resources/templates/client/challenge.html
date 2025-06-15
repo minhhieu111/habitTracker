@@ -29,7 +29,7 @@
 <div id="content">
     <!-- Header -->
     <div class="row mx-0">
-        <div class="col-md-12"><div th:replace="layout/userinformation.html :: user(user=${user})"></div></div>
+        <div th:replace="layout/userinformation.html :: user(user=${user},userAchievement=${userAchievement})"></div>
     </div>
 
     <!-- Content Area -->
@@ -336,20 +336,20 @@
 
     <!-- Challenge Overview Modal -->
     <div class="modal fade" id="challengeOverviewModal" tabindex="-1" aria-labelledby="challengeOverviewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <!-- Modal Header with Challenge Info -->
                 <div class="modal-header text-white p-4" style="background-color: #0049F2;">
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-12 text-center mb-3">
-                                <h1 class="modal-title fw-bold" id="challengeOverviewTitle">Thay Đổi Lối Sống</h1>
+                                <h2 class="modal-title fw-bold" id="challengeOverviewTitle">Thay Đổi Lối Sống</h2>
                             </div>
                         </div>
                         <div class="row d-flex justify-content-center">
                             <div class="col-8 text-center mb-3 ">
                                 <span class="mb-0">Mô tả</span>
-                                <div class="bg-light bg-opacity-25 rounded p-2 mt-1" style="height: 100px" id="challengeOverviewDescription">
+                                <div class="bg-light bg-opacity-25 rounded p-2 mt-1" style="height: 50px" id="challengeOverviewDescription">
                                     Thay đổi thói quen trở nên lành mạnh
                                 </div>
                             </div>
@@ -357,15 +357,15 @@
                         <hr class="bg-white opacity-50">
                         <div class="row text-center">
                             <div class="col-md-4">
-                                <h4 class="display-4 fw-bold" id="bestStreak">5</h4>
+                                <h5 class="display-6 fw-bold" id="bestStreak">5</h5>
                                 <p class="mb-0">Chuỗi tốt nhất</p>
                             </div>
                             <div class="col-md-4">
-                                <h4 class="display-4 fw-bold" id="completionRate">74%</h4>
+                                <h5 class="display-6 fw-bold" id="completionRate">74%</h5>
                                 <p class="mb-0">Tỷ lệ hoàn thành</p>
                             </div>
                             <div class="col-md-4">
-                                <h4 class="display-4 fw-bold" id="totalHabits">42</h4>
+                                <h5 class="display-6 fw-bold" id="totalHabits">42</h5>
                                 <p class="mb-0">Tổng số thói quen thực hiện</p>
                             </div>
                         </div>
@@ -379,7 +379,7 @@
                         <!-- Line Chart -->
                         <div class="row mb-4">
                             <div class="col-12">
-                                <div class="chart-container" style="position: relative; height:250px;">
+                                <div class="chart-container" style="position: relative; height:200px;">
                                     <canvas id="habitCompletionChart"></canvas>
                                 </div>
                                 <p class="text-center mt-2 fw-bold">Biểu đồ hoàn thiện các thói quen</p>
@@ -389,7 +389,7 @@
                         <!-- Donut Chart and Calendar -->
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="chart-container" style="position: relative; height:250px;">
+                                <div class="chart-container" style="position: relative; height:200px;">
                                     <canvas id="habitProgressChart"></canvas>
                                 </div>
                                 <div class="d-flex justify-content-center mt-3 mb-3">

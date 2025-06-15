@@ -14,7 +14,7 @@ public class UserDTO {
     private String username;
     private String avatar;
     private String email;
-    private String achieveTitle;
+    private Long achieveId;
     private String role;
     private MultipartFile image;
     private String oldPassword;

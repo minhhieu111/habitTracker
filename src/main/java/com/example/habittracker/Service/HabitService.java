@@ -383,4 +383,11 @@ public class HabitService {
         habit.setChallenge(null);
         habitRepository.save(habit);
     }
+
+    @Transactional
+    public long countCompleteHabit(User user) {
+        List<UserHabit> userHabits = this.userHabitRepository.findHabitsForUser(user.getUserId());
+        return userHabits.stream()
+                .mapToLong(userHabit->this.habitHistoryRepository.countCompleteHabit(userHabit)).sum();
+    }
 }

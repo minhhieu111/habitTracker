@@ -35,38 +35,38 @@
                     <div class="post-contain">
                         <div th:each="post : ${challengePost}" class="post-item">
                             <div class="post-header">
-                                <div class="author-avatar"><img th:src="${post.getUser().getAvatar()!=null?post.getUser().avatar:'/images/user_ava.png'}" alt=""></div>
+                                <div class="author-avatar"><img th:src="${post.user.avatar!=null?post.getUser().avatar:'/images/user_ava.png'}" alt=""></div>
                                 <div class="post-author-info">
-                                    <div class="post-author" th:text="${post.getUser().getUserName()}">Nguyễn Văn A</div>
+                                    <div class="post-author" th:text="${post.user.userName}">Nguyễn Văn A</div>
                                     <!--                                <div class="post-date" th:text="${#dates.format(new java.util.Date(post.date.toString().replace(' ', 'T')), 'yyyy-MM-dd HH:mm')}">2024-06-13 09:30</div>-->
                                 </div>
                             </div>
 
-                            <div class="post-title" th:text="'Thử thách: '+${post.getChallenge().getTitle()}">30 Ngày Tập Thể Dục</div>
-                            <div class="post-content" th:text="${post.getChallenge().getDescription()}">
+                            <div class="post-title" th:text="'Thử thách: '+${post.challenge.title}">30 Ngày Tập Thể Dục</div>
+                            <div class="post-content" th:text="${post.challenge.description}">
                                 Hôm nay tôi đã hoàn thành ngày thứ 15 của thử thách. Cảm thấy rất tuyệt vời và có nhiều năng lượng hơn!
                             </div>
 
                             <div class="post-stats">
                                 <div class="post-stat-item">
                                     <i class="fa-solid fa-users post-stat-icon"></i>
-                                    <span th:text="'Người tham gia: ' + ${post.getChallenge().getParticipantCount()}"></span>
+                                    <span th:text="'Người tham gia: ' + ${post.challenge.participantCount}"></span>
                                 </div>
 
                                 <div class="post-stat-item">
                                     <span>Người dùng đã hoàn thành được:</span>
                                     <div class="progress">
                                         <div class="progress-bar bg-success" role="progressbar"
-                                             th:style="'width: ' + ${post.getProgress()} + '%'"
-                                             th:aria-valuenow="${post.getProgress()}"
+                                             th:style="'width: ' + ${post.progress} + '%'"
+                                             th:aria-valuenow="${post.progress}"
                                              aria-valuemin="0" aria-valuemax="100">
                                         </div>
                                     </div>
-                                    <span th:text="${post.getProgress()} + '%'">50%</span>
+                                    <span th:text="${post.progress} + '%'">50%</span>
                                 </div>
                             </div>
                             <div class="w-100 d-flex justify-content-end">
-                                <button th:onclick="|approveChallenge(${post.getChallenge().getChallengeId()},false)|" class="btn btn-delete" >
+                                <button th:onclick="|approveChallenge(${post.challenge.challengeId},false)|" class="btn btn-delete" >
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </div>
@@ -97,17 +97,17 @@
 
                     <!-- Pending Post Items -->
                     <div class="pending-contain">
-                        <div th:each="post : ${challengePending}" class="pending-post-item" th:onclick="|showChallengeDetail(${post.getChallenge().getChallengeId()})|">
+                        <div th:each="post : ${challengePending}" class="pending-post-item" th:onclick="|showChallengeDetail(${post.challenge.challengeId})|">
                             <div class="pending-post-info">
-                                <div class="pending-post-author" th:text="${post.getUser().getUserName()}">Nguyễn Văn A</div>
-                                <div class="pending-post-title" th:text="${post.getChallenge().getTitle()}">30 Ngày Tập Thể Dục</div>
+                                <div class="pending-post-author" th:text="${post.user.userName}">Nguyễn Văn A</div>
+                                <div class="pending-post-title" th:text="${post.challenge.title}">30 Ngày Tập Thể Dục</div>
                             </div>
 
                             <div class="pending-post-actions">
-                                <button th:onclick="|approveChallenge(${post.getChallenge().getChallengeId()},true);event.stopPropagation();|" class="btn btn-approve" >
+                                <button th:onclick="|approveChallenge(${post.challenge.challengeId},true);event.stopPropagation();|" class="btn btn-approve" >
                                     <i class="fas fa-check"></i>
                                 </button>
-                                <button th:onclick="|approveChallenge(${post.getChallenge().getChallengeId()},false);event.stopPropagation();|" class="btn btn-delete" >
+                                <button th:onclick="|approveChallenge(${post.challenge.challengeId},false);event.stopPropagation();|" class="btn btn-delete" >
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </div>

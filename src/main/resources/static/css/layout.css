@@ -90,13 +90,13 @@
     width: 30px;
     height: 100%;
 }
-.progress-bar {
-    background-color: var(--primary-color);
-    height: var(--progress-bar-height);
-}
-
-.progress {
-    height: var(--progress-bar-height);
-    background-color: #e9ecef;
-    width: 300px;
+.achievement-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
 }

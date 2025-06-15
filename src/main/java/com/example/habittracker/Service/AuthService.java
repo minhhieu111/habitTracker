@@ -30,14 +30,16 @@ public class AuthService {
     private final Long challengeLimitDefault = 3L;
     private final Long taskLimitDefault = 10L;
     private final Long limitCoinsEarnedPerDayDefault = 10L;
+    private final EmailService emailService;
 
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, ImageService imageService, AchievementService achievementService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, ImageService imageService, AchievementService achievementService, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.imageService = imageService;
         this.achievementService = achievementService;
+        this.emailService = emailService;
     }
 
     public void register(Register register) {
@@ -60,7 +62,7 @@ public class AuthService {
                 .taskLimit(taskLimitDefault)
                 .limitCoinsEarnedPerDay(limitCoinsEarnedPerDayDefault)
                 .createAt(LocalDateTime.now())
-                .achieveTitle(achievement.getTitle())
+                .achieveId(achievement.getAchievementId())
                 .isLocked(false)
                 .build();
         userRepository.save(user);
@@ -68,7 +70,7 @@ public class AuthService {
 
         this.achievementService.saveUserAchievement(userAchievement);
 
-
+        this.emailService.sendWelcomeEmail(user);
     }
 
     public User login(Login login) {
@@ -101,7 +103,7 @@ public class AuthService {
                 .taskLimit(taskLimitDefault)
                 .limitCoinsEarnedPerDay(limitCoinsEarnedPerDayDefault)
                 .createAt(LocalDateTime.now())
-                .achieveTitle(achievement.getTitle())
+                .achieveId(achievement.getAchievementId())
                 .isLocked(false)
                 .build();
 
@@ -118,6 +120,7 @@ public class AuthService {
         UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).isNotification(false).build();
         this.achievementService.saveUserAchievement(userAchievement);
 
+        this.emailService.sendWelcomeEmail(user);
         return user;
     }
 
@@ -143,12 +146,12 @@ public class AuthService {
                 .limitCoinsEarnedPerDay(limitCoinsEarnedPerDayDefault)
                 .challengeLimit(challengeLimitDefault)
                 .taskLimit(taskLimitDefault)
-                .achieveTitle(achievement.getTitle())
+                .achieveId(achievement.getAchievementId())
                 .isLocked(false)
                 .build();
         this.userRepository.save(user);
         UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).isNotification(false).build();
         this.achievementService.saveUserAchievement(userAchievement);
-
+        this.emailService.sendWelcomeEmail(user);
     }
 }

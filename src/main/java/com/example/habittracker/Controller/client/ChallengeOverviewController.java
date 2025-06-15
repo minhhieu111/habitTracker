@@ -3,23 +3,20 @@ package com.example.habittracker.Controller.client;
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.DTO.ChallengeDTO;
+import com.example.habittracker.Domain.Achievement;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Domain.UserChallenge;
+import com.example.habittracker.Service.AchievementService;
 import com.example.habittracker.Service.ChallengeService;
 import com.example.habittracker.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/challenge_overview")
@@ -29,12 +26,14 @@ public class ChallengeOverviewController {
     private final JwtUtil jwtUtil;
     private final TokenUtil tokenUtil;
     private final ChallengeService challengeService;
+    private final AchievementService achievementService;
 
-    public ChallengeOverviewController(UserService userService, JwtUtil jwtUtil, TokenUtil tokenUtil, ChallengeService challengeService) {
+    public ChallengeOverviewController(UserService userService, JwtUtil jwtUtil, TokenUtil tokenUtil, ChallengeService challengeService, AchievementService achievementService) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.tokenUtil = tokenUtil;
         this.challengeService = challengeService;
+        this.achievementService = achievementService;
     }
 
     @GetMapping()
@@ -43,6 +42,9 @@ public class ChallengeOverviewController {
         User user = getUserFromRequest(request);
 
         model.addAttribute("user", user);
+
+        Achievement achievement = this.achievementService.getAchievementById(user.getAchieveId());
+        model.addAttribute("userAchievement", achievement);
 
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();
