@@ -36,6 +36,7 @@ public class User {
     private Long taskLimit;
     private String achieveTitle;
     private LocalDateTime createAt;
+    private boolean isLocked;
 
     @OneToMany(mappedBy = "user")
     List<UserHabit> userHabits;

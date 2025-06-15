@@ -2,17 +2,19 @@ package com.example.habittracker.Service;
 
 import com.example.habittracker.DTO.UserChallengeStats;
 import com.example.habittracker.DTO.UserDTO;
-import com.example.habittracker.Domain.Todo;
-import com.example.habittracker.Domain.User;
-import com.example.habittracker.Domain.UserDaily;
-import com.example.habittracker.Domain.UserHabit;
+import com.example.habittracker.Domain.*;
 import com.example.habittracker.Repository.*;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,6 +60,11 @@ public class UserService {
     }
 
     @Transactional
+    public Page<User> getAllUsers(Pageable pageable) {
+        return this.userRepository.findAll(pageable);
+    }
+
+    @Transactional
     public List<User> getAllUsers() {
         return this.userRepository.findAll();
     }
@@ -65,6 +72,18 @@ public class UserService {
     @Transactional
     public List<UserChallengeStats> getUsersAndCompletedChallenges() {
         return this.userRepository.findAllUsersOrderedByCompletedChallenges();
+    }
+
+
+
+    @Transactional
+    public List<UserDTO> getAllNewUser() {
+        return this.userRepository.findAllUserRegisterToday(LocalDate.now()).stream().map(user->{
+            Duration durationSinceRegister = Duration.between(user.getCreateAt(), LocalDateTime.now());
+            return UserDTO.builder()
+                    .username(user.getUserName())
+                    .durationRegister(durationSinceRegister.toHours()).build();
+        }).collect(Collectors.toList());
     }
 
     @Transactional
@@ -87,6 +106,7 @@ public class UserService {
         return message;
     }
 
+    @Transactional
     public void resetLimitCoin() {
         List<User> users = this.userRepository.findAll().stream().map(user -> {
             user.setLimitCoinsEarnedPerDay(0L);
@@ -97,6 +117,7 @@ public class UserService {
 
     }
 
+    @Transactional
     public Integer getUserRank(Long userId) {
         List<UserChallengeStats> usersStats = userRepository.findAllUsersOrderedByCompletedChallenges();
         for (int i = 0; i < usersStats.size(); i++) {
@@ -108,6 +129,7 @@ public class UserService {
         return null;
     }
 
+    @Transactional
     public long getTaskComplete(User user, boolean inChallenge){
         List<Todo> todos;
         List<UserDaily> userDailies;
@@ -140,6 +162,7 @@ public class UserService {
         return totalCompleteTask;
     }
 
+    @Transactional
     public void updateUser(User userUpdateInfo, MultipartFile image) {
         User user = this.userRepository.findById(userUpdateInfo.getUserId()).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
 
@@ -158,6 +181,7 @@ public class UserService {
         this.userRepository.save(user);
     }
 
+    @Transactional
     public UserDTO UserChangePassword(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setUserId(user.getUserId());
@@ -165,6 +189,7 @@ public class UserService {
         return userDTO;
     }
 
+    @Transactional
     public void changePassword(UserDTO userDTO) {
         User user = this.userRepository.findById(userDTO.getUserId()).get();
 
@@ -185,5 +210,33 @@ public class UserService {
             throw new RuntimeException("Mật khẩu cũ không khớp!");
         }
         this.userRepository.save(user);
+    }
+
+    @Transactional
+    public UserDTO getUserUpdate(Long userId) {
+        User user = this.userRepository.findById(userId).get();
+        return UserDTO.builder()
+                .userId(user.getUserId())
+                .username(user.getUserName())
+                .role(user.getRole().name())
+                .email(user.getEmail())
+                .build();
+    }
+
+    @Transactional
+    public void AdminUpdateUser(UserDTO userDTO) {
+        User user = this.userRepository.findById(userDTO.getUserId()).get();
+        user.setUserName(userDTO.getUsername());
+        user.setRole(userDTO.getRole().equals("ADMIN")?User.Role.ADMIN:User.Role.USER);
+
+        this.userRepository.save(user);
+    }
+
+    @Transactional
+    public boolean LockUser(Long userId) {
+        User user = this.userRepository.findById(userId).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
+        user.setLocked(!user.isLocked());
+        userRepository.save(user);
+        return user.isLocked();
     }
 }

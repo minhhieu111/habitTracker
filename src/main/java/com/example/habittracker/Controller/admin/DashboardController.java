@@ -2,6 +2,7 @@ package com.example.habittracker.Controller.admin;
 
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
+import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.Achievement;
 import com.example.habittracker.Domain.Challenge;
 import com.example.habittracker.Domain.User;
@@ -45,7 +46,7 @@ public class DashboardController {
         List<User> allUsers = this.userService.getAllUsers();
         model.addAttribute("allUsers", allUsers);
 
-        List<User> newUsers = allUsers.stream().filter(u -> u.getCreateAt().toLocalDate().equals(LocalDate.now())).collect(Collectors.toList());
+        List<UserDTO> newUsers = this.userService.getAllNewUser();
         model.addAttribute("newUsers", newUsers);
 
         List<Challenge> pendingChallenge = this.challengeService.getAllPendingChallenge();

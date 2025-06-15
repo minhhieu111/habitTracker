@@ -14,6 +14,6 @@ import java.util.Optional;
 @Repository
 public interface UserChallengeDailyProgressRepository extends JpaRepository<UserChallengeDailyProgress, Long> {
 
-    @Query("SELECT dp FROM UserChallengeDailyProgress dp WHERE dp.userChallenge=:userchallenge AND dp.date=:date")
+    @Query("SELECT dp FROM UserChallengeDailyProgress dp WHERE dp.userChallenge=:userChallenge AND dp.date=:date")
     Optional<UserChallengeDailyProgress> findByUserChallengeAndDate(@Param("userChallenge") UserChallenge userChallenge, @Param("date") LocalDate date);
 }

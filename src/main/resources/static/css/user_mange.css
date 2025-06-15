@@ -132,6 +132,10 @@ body {
     vertical-align: middle;
 }
 
+.user-table tbody tr:hover {
+    background-color: rgba(106, 13, 173, 0.15);
+}
+
 .client-info {
     display: flex;
     align-items: center;
@@ -174,6 +178,13 @@ body {
     color: #dc3545;
 }
 
+.lock-btn{
+    height: 30px;
+    width: 30px;
+    border: none;
+    border-radius: 10px;
+    z-index: 101;
+}
 /*user stat*/
 .user-stat{
     height: 500px;

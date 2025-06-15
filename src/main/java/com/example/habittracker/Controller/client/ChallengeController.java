@@ -164,6 +164,7 @@ public class ChallengeController {
     @ResponseBody
     public ResponseEntity<ChallengeDTO> getChallengeDetails(HttpServletRequest request, @PathVariable Long id, @RequestParam(value = "creator",defaultValue = "true") Boolean creator) {
         User user;
+        //creator = false khi người dùng ở cộng đồng xem chi tiết quá trình của người dùng
         if(creator){
             user = getUserFromRequest(request);
         }else{

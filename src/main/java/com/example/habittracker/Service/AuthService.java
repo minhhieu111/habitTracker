@@ -3,6 +3,7 @@ package com.example.habittracker.Service;
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.DTO.Login;
 import com.example.habittracker.DTO.Register;
+import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.Achievement;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Domain.UserAchievement;
@@ -59,6 +60,8 @@ public class AuthService {
                 .taskLimit(taskLimitDefault)
                 .limitCoinsEarnedPerDay(limitCoinsEarnedPerDayDefault)
                 .createAt(LocalDateTime.now())
+                .achieveTitle(achievement.getTitle())
+                .isLocked(false)
                 .build();
         userRepository.save(user);
         UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).isNotification(false).build();
@@ -73,6 +76,9 @@ public class AuthService {
         if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
             throw new RuntimeException("Mật khẩu không chính xác!");
         }
+        if(user.isLocked()){
+            throw new RuntimeException("Tài khoản của bạn hiện đã bị khóa!");
+        }
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().toString());
         user.setToken(token);
@@ -83,6 +89,8 @@ public class AuthService {
 
     @Transactional
     public User createOAuth2User(String username, String email, String avatar){
+        Achievement achievement = this.achievementService.getAchievementById(1L);
+
         User user = User.builder()
                 .userName(username)
                 .email(email)
@@ -93,6 +101,8 @@ public class AuthService {
                 .taskLimit(taskLimitDefault)
                 .limitCoinsEarnedPerDay(limitCoinsEarnedPerDayDefault)
                 .createAt(LocalDateTime.now())
+                .achieveTitle(achievement.getTitle())
+                .isLocked(false)
                 .build();
 
         if (avatar != null && !avatar.isEmpty()) {
@@ -104,12 +114,41 @@ public class AuthService {
             }
         }
         this.userRepository.save(user);
-        Achievement achievement = this.achievementService.getAchievementById(1L);
 
         UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).isNotification(false).build();
         this.achievementService.saveUserAchievement(userAchievement);
 
-
         return user;
+    }
+
+    @Transactional
+    public void AdminCreateUser(UserDTO userDTO) {
+        if (userRepository.existsUserByEmail(userDTO.getEmail())) {
+            throw new RuntimeException("Email đã tồn tại");
+        }
+        if (!userDTO.getPassword().equals(userDTO.getConfirmPassword())) {
+            throw new RuntimeException("Mật khẩu không khớp");
+        }
+
+        Achievement achievement = this.achievementService.getAchievementById(1L);
+
+
+        User user = User.builder()
+                .userName(userDTO.getUsername())
+                .email(userDTO.getEmail())
+                .createAt(LocalDateTime.now())
+                .coins(coinsDefault)
+                .password(passwordEncoder.encode(userDTO.getPassword()))
+                .role(userDTO.getRole().equals("ADMIN")?User.Role.ADMIN:User.Role.USER)
+                .limitCoinsEarnedPerDay(limitCoinsEarnedPerDayDefault)
+                .challengeLimit(challengeLimitDefault)
+                .taskLimit(taskLimitDefault)
+                .achieveTitle(achievement.getTitle())
+                .isLocked(false)
+                .build();
+        this.userRepository.save(user);
+        UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).isNotification(false).build();
+        this.achievementService.saveUserAchievement(userAchievement);
+
     }
 }
