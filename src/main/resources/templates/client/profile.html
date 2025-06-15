@@ -38,7 +38,7 @@
         <div class="profile-section d-flex justify-content-between">
             <div class="profile-header">
                 <div class="profile-avatar" >
-                    <img th:src="${user.avatar}" alt="">
+                    <img th:src="${user.avatar==null?'/images/user_ava.png':user.avatar}" alt="">
                 </div>
                 <div class="profile-info">
                     <div class="profile-title" th:text="'Danh hiệu: ' + ${user.achieveTitle}">Danh hiệu: Người mới bắt đầu</div>
@@ -115,7 +115,7 @@
                     <div class="text-center mb-4">
                         <div class="profile-photo-container position-relative d-inline-block">
                             <div class="profile-avatar">
-                                <img th:src="${user.avatar}" alt="Avatar" id="avatarImg">
+                                <img th:src="${user.avatar==null?'/images/user_ava.png':user.avatar}" alt="Avatar" id="avatarImg">
                             </div>
                             <!-- Input file để chọn ảnh -->
                             <input type="file" id="fileInput" style="display: none;" name="image" accept="image/*">

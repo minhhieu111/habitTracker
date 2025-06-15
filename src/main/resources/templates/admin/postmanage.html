@@ -14,6 +14,8 @@
 <!-- Bootstrap JS Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <body>
+
+<div th:replace="/layout/toastnotification.html :: toast(failed=${fail}, success=${success})"></div>
 <!-- Sidebar -->
 <div th:replace="layout/sidebardashboard.html"></div>
 
@@ -31,76 +33,82 @@
 
                     <!-- Post Items -->
                     <div class="post-contain">
-                        <div th:each="post : ${publishedPosts}" class="post-item">
+                        <div th:each="post : ${challengePost}" class="post-item">
                             <div class="post-header">
-                                <div class="author-avatar" th:text="${post.authorInitials}">NA</div>
+                                <div class="author-avatar"><img th:src="${post.getUser().getAvatar()!=null?post.getUser().avatar:'/images/user_ava.png'}" alt=""></div>
                                 <div class="post-author-info">
-                                    <div class="post-author" th:text="${post.authorName}">Nguyễn Văn A</div>
+                                    <div class="post-author" th:text="${post.getUser().getUserName()}">Nguyễn Văn A</div>
                                     <!--                                <div class="post-date" th:text="${#dates.format(new java.util.Date(post.date.toString().replace(' ', 'T')), 'yyyy-MM-dd HH:mm')}">2024-06-13 09:30</div>-->
                                 </div>
                             </div>
 
-                            <div class="post-title" th:text="${post.title}">30 Ngày Tập Thể Dục</div>
-                            <div class="post-content" th:text="${post.content}">
+                            <div class="post-title" th:text="'Thử thách: '+${post.getChallenge().getTitle()}">30 Ngày Tập Thể Dục</div>
+                            <div class="post-content" th:text="${post.getChallenge().getDescription()}">
                                 Hôm nay tôi đã hoàn thành ngày thứ 15 của thử thách. Cảm thấy rất tuyệt vời và có nhiều năng lượng hơn!
                             </div>
 
                             <div class="post-stats">
                                 <div class="post-stat-item">
-                                    <i class="fas fa-fire post-stat-icon"></i>
-                                    <span th:text="'Streak: ' + ${post.streak}">Streak: 15/30</span>
+                                    <i class="fa-solid fa-users post-stat-icon"></i>
+                                    <span th:text="'Người tham gia: ' + ${post.getChallenge().getParticipantCount()}"></span>
                                 </div>
 
                                 <div class="post-stat-item">
-                                    <span>Tiến độ:</span>
+                                    <span>Người dùng đã hoàn thành được:</span>
                                     <div class="progress">
                                         <div class="progress-bar bg-success" role="progressbar"
-                                             th:style="'width: ' + ${post.completion} + '%'"
-                                             th:aria-valuenow="${post.completion}"
+                                             th:style="'width: ' + ${post.getProgress()} + '%'"
+                                             th:aria-valuenow="${post.getProgress()}"
                                              aria-valuemin="0" aria-valuemax="100">
                                         </div>
                                     </div>
-                                    <span th:text="${post.completion} + '%'">50%</span>
+                                    <span th:text="${post.getProgress()} + '%'">50%</span>
                                 </div>
-
-                                <div class="post-stat-item">
-                                    <i class="fas fa-thumbs-up post-stat-icon"></i>
-                                    <span th:text="${post.likes} + ' likes'">12 likes</span>
-                                </div>
-
-                                <div class="post-stat-item">
-                                    <i class="fas fa-comment post-stat-icon"></i>
-                                    <span th:text="${post.comments} + ' bình luận'">3 bình luận</span>
-                                </div>
+                            </div>
+                            <div class="w-100 d-flex justify-content-end">
+                                <button th:onclick="|approveChallenge(${post.getChallenge().getChallengeId()},false)|" class="btn btn-delete" >
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-
+                </div>
+            </div>
+<!--            modal remove post-->
+            <div class="modal fade" id="approveChallengeModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="approveChallengeTitle">Modal title</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <a type="button" class="btn btn-primary">Xác nhận</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Pending Posts Column -->
             <div class="col-lg-4">
                 <div class="pending-posts-container">
-                    <h2 class="pending-posts-title">Bài đăng chờ duyệt: <span th:text="${pendingCount}">4</span></h2>
+                    <h2 class="pending-posts-title">Bài đăng chờ duyệt: <span th:text="${challengePending.size()}">4</span></h2>
 
                     <!-- Pending Post Items -->
                     <div class="pending-contain">
-                        <div th:each="post : ${pendingPosts}" class="pending-post-item">
+                        <div th:each="post : ${challengePending}" class="pending-post-item" th:onclick="|showChallengeDetail(${post.getChallenge().getChallengeId()})|">
                             <div class="pending-post-info">
-                                <div class="pending-post-author" th:text="${post.authorName}">Nguyễn Văn A</div>
-                                <div class="pending-post-title" th:text="${post.title}">30 Ngày Tập Thể Dục</div>
+                                <div class="pending-post-author" th:text="${post.getUser().getUserName()}">Nguyễn Văn A</div>
+                                <div class="pending-post-title" th:text="${post.getChallenge().getTitle()}">30 Ngày Tập Thể Dục</div>
                             </div>
 
                             <div class="pending-post-actions">
-                                <button class="btn btn-approve" th:data-id="${post.id}">
+                                <button th:onclick="|approveChallenge(${post.getChallenge().getChallengeId()},true);event.stopPropagation();|" class="btn btn-approve" >
                                     <i class="fas fa-check"></i>
                                 </button>
-                                <button class="btn btn-edit" th:data-id="${post.id}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-delete" th:data-id="${post.id}">
-                                    <i class="fas fa-trash"></i>
+                                <button th:onclick="|approveChallenge(${post.getChallenge().getChallengeId()},false);event.stopPropagation();|" class="btn btn-delete" >
+                                    <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </div>
                         </div>
@@ -108,47 +116,163 @@
 
                 </div>
             </div>
+
+<!--            Challenge pending detail-->
+            <div class="modal fade" id="challengeStatsModal" tabindex="-1" aria-labelledby="challengeStatsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="border-radius: 15px; overflow: hidden;">
+                        <div class="modal-body p-4" style="background-color: #f5f5f5;">
+                            <!-- Main Stats Card -->
+                            <div class="card mb-4" style="border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                <div class="card-body text-center p-4">
+                                    <div class="row">
+                                        <div class="col-12 text-center mb-3">
+                                            <h3 class="modal-title fw-bold" id="challengeDetailTitle">Chơi Thể Thao</h3>
+                                        </div>
+                                    </div>
+
+                                    <!-- Challenge Description Box -->
+                                    <div class="row">
+                                        <div class="col-12 text-center mb-3" >
+                                            <textarea readonly class="challenge-modal-descrip rounded p-3" style="border: none; width: 80%; background: rgb(236, 236, 236); height: 75px;" id="challengeDetailDescription">
+                                                Thay đổi thói quen trở nên lành mạnh
+                                            </textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Challenge Statistics -->
+                                    <div class="row text-center d-flex justify-content-center">
+                                        <div class="col-12">
+                                            <div class="fw-bold mb-3" id="challengeDurationInfo">Thời gian: 7 ngày</div>
+                                        </div>
+                                    </div>
+                                    <!-- Streak Number -->
+                                    <div class="d-flex justify-content-center mb-3">
+                                        <div  style="width: 100%; height: 50px;">
+                                            <h1 class="fw-bold mb-0" id="progressPercentage">73%</h1>
+                                            <p class="text-muted">Độ hoàn thành</p>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h3 class="display-3 fw-bold mb-0" id="streakNumber">11</h3>
+                                        <p class="text-muted mb-3">Streak dài nhất</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal Body with Daily Tasks and Habits -->
+                            <div class="mb-3">
+                                <h6 class="fw-bold text-dark">Thống kê chi tiết</h6>
+                            </div>
+                            <div class="modal-body p-4">
+                                <!-- Daily Tasks Section -->
+                                <div class="mb-4">
+                                    <h5 class="fw-bold mb-3">Hàng ngày</h5>
+                                    <div id="dailyTasksList">
+                                        <!-- Daily tasks will be populated here -->
+                                    </div>
+                                </div>
+
+                                <!-- Habits Section -->
+                                <div class="mb-4">
+                                    <h5 class="fw-bold mb-3">Thói quen</h5>
+                                    <div id="habitsList">
+                                        <!-- Habits will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- jQuery (needed for some custom functionality) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
-    $(document).ready(function() {
-        // Handle post approval
-        $('.btn-approve').on('click', function() {
-            const postId = $(this).data('id');
-            // This would typically make an API call to approve the post
-            alert('Đã duyệt bài đăng #' + postId);
-            $(this).closest('.pending-post-item').fadeOut();
+    document.addEventListener('DOMContentLoaded', function() {
+        window.showChallengeDetail = (challengeId)=> {
+            fetch(`/challenges/${challengeId}?creator=false`)
+                .then(response =>{
+                    if(response.url.includes("/login")){
+                        window.location.href = "/login";
+                        return;
+                    }
+                    return response.json()
+                }).then((challenge)=>{
+                    console.log(challenge)
+                document.querySelector("#challengeDetailTitle").textContent = "Thử thách "+challenge.title;
+                document.querySelector("#challengeDetailDescription").textContent = challenge.description;
+                document.querySelector("#challengeDurationInfo").textContent = "thời gian: "+challenge.day+" ngày";
+                document.querySelector("#progressPercentage").textContent = challenge.progress+"%";
+                document.querySelector("#streakNumber").textContent = challenge.bestStreak;
 
-            // Update pending count
-            const currentCount = parseInt($('.pending-posts-title span').text());
-            $('.pending-posts-title span').text(currentCount - 1);
-        });
+                // Populate daily tasks (if available)
+                if (challenge.dailies) {
+                    document.querySelector('#dailyTasksList').innerHTML = ""
+                    let dailyTasksHtml = '';
+                    challenge.dailies.forEach(task => {
+                        dailyTasksHtml += `
+                            <div class="mb-3">
+                                <input type="text" class="form-control bg-light border-0 rounded-pill py-3"
+                                       placeholder="${task.title}" readonly style="background-color: #f0f0f0 !important;">
+                            </div>
+                        `;
+                    });
+                    document.querySelector('#dailyTasksList').innerHTML = dailyTasksHtml;
+                }
 
-        // Handle post edit
-        $('.btn-edit').on('click', function() {
-            const postId = $(this).data('id');
-            // This would typically open a modal or navigate to edit page
-            alert('Chỉnh sửa bài đăng #' + postId);
-        });
+                // Populate habits (if available)
+                if (challenge.habits) {
+                    document.querySelector('#habitsList').innerHTML = ""
+                    let habitsHtml = '';
+                    challenge.habits.forEach(habit => {
+                        let hiddenPositive = "block";
+                        let hiddenNegative = "block";
+                        if(habit.type === "POSITIVE"){
+                            hiddenNegative = "none"
+                        }else if(habit.type === "NEGATIVE"){
+                            hiddenPositive = "none"
+                        }
+                        habitsHtml += `
+                            <div class="bg-light rounded-pill p-3 mb-3 d-flex justify-content-between align-items-center">
+                                <span>${habit.title}</span>
+                                <div class="habit-toggles d-flex">
+                                    <button class="btn btn-success btn-sm rounded-circle me-2" style="display:${hiddenPositive};width: 30px; height: 30px;">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm rounded-circle" style="display:${hiddenNegative};width: 30px; height: 30px;">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    document.querySelector('#habitsList').innerHTML = habitsHtml;
+                }
 
-        // Handle post deletion
-        $('.btn-delete').on('click', function() {
-            const postId = $(this).data('id');
-            if (confirm('Bạn có chắc chắn muốn xóa bài đăng này?')) {
-                // This would typically make an API call to delete the post
-                alert('Đã xóa bài đăng #' + postId);
-                $(this).closest('.pending-post-item').fadeOut();
+                const challengeDetailModal = new bootstrap.Modal(document.getElementById('challengeStatsModal'));
+                challengeDetailModal.show();
+            })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu thử thách:', error);
+                    alert('Không thể lấy dữ liệu thử thách. Do phiên đăng nhập hết hạn! Mời đăng nhập lại');
+                });
+        }
 
-                // Update pending count
-                const currentCount = parseInt($('.pending-posts-title span').text());
-                $('.pending-posts-title span').text(currentCount - 1);
+        window.approveChallenge= (challengeId,isApprove)=>{
+            if(isApprove){
+                document.getElementById("approveChallengeTitle").textContent= 'Duyệt thử thách!'
+                document.querySelector("#approveChallengeModal a").href = `/admin/posts/${challengeId}?approve=true`
+            }else{
+                document.getElementById("approveChallengeTitle").textContent= 'Từ chối thử thách!'
+                document.querySelector("#approveChallengeModal a").href = `/admin/posts/${challengeId}?approve=false`
             }
-        });
+
+            const modal = new bootstrap.Modal(document.getElementById("approveChallengeModal"))
+            modal.show();
+        }
     });
 </script>
 </body>

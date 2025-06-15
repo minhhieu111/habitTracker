@@ -140,6 +140,8 @@ public class ChallengeService {
                 .isPublic(challenge.getIsPublic())
                 .habits(habits)
                 .dailies(dailies)
+                .bestStreak(userChallenge.getBestStreak())
+                .progress(userChallenge.getProgress())
                 .build();
     }
 
@@ -457,4 +459,18 @@ public class ChallengeService {
         List<UserChallenge> activeChallenges = userChallengeRepository.findByStatus(UserChallenge.Status.ACTIVE);
         activeChallenges.forEach(challengeProgressService::checkAndCompleteChallenge);
     }
+
+//    dashBoard-------------------------------------------------------------------------------------
+    @Transactional
+    public List<UserChallenge> getPendingChallenges(){
+        return this.userChallengeRepository.findByChallengePending();
+    }
+
+    @Transactional
+    public void ChallengeApprove(Long challengeId, boolean approve){
+        Challenge challenge = this.challengeRepository.findById(challengeId).orElseThrow(()->new RuntimeException("Không tìm thấy thử thách!"));
+        challenge.setIsPublic(approve?Challenge.Visibility.PUBLIC:Challenge.Visibility.PRIVATE);
+        this.challengeRepository.save(challenge);
+    }
+
 }

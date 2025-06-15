@@ -1,7 +1,7 @@
 <div class="user-profile row align-items-center" th:fragment="user(user)">
     <!-- Avatar và Cấp độ -->
     <div class="user-avatar">
-        <img th:src="${user.avatar}"/>
+        <img th:src="${user.avatar==null?'/images/user_ava.png':user.avatar}"/>
     </div>
 
     <!-- Thông tin chi tiết -->

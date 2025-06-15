@@ -30,7 +30,71 @@
         </div>
 
         <!-- Dashboard Stats Cards -->
-        <div th:replace="/layout/adminsection.html"></div>
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted">Tổng Người Dùng</h6>
+                                <h3 th:text="${allUsers.size()}">2,456</h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted">Số Lượng Thành Tựu</h6>
+                                <h3 th:text="${achievements.size()}"></h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fa-solid fa-medal"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted">Thử Thách Chờ Duyệt</h6>
+                                <h3 th:text="${pendingChallenge.size()}">12,345</h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted">Người Dùng Mới</h6>
+                                <h3 th:text="${newUsers.size()}">128</h3>
+                            </div>
+                            <div class="card-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Recent Activity and Users -->
         <div class="row g-4">
@@ -102,49 +166,16 @@
                         <h5 class="card-title mb-0">Người dùng mới</h5>
                     </div>
                     <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex align-items-center">
+                        <ul class="list-group list-group-flush" >
+                            <li class="list-group-item d-flex align-items-center" th:each="newUser:${newUsers}">
                                 <div class="me-3">
                                     <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
                                         <i class="fas fa-user text-primary"></i>
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-1">Nguyễn Văn A</h6>
-                                    <small class="text-muted">Đăng ký 2 giờ trước</small>
-                                </div>
-                            </li>
-                            <li class="list-group-item d-flex align-items-center">
-                                <div class="me-3">
-                                    <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
-                                        <i class="fas fa-user text-primary"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">Trần Thị B</h6>
-                                    <small class="text-muted">Đăng ký 3 giờ trước</small>
-                                </div>
-                            </li>
-                            <li class="list-group-item d-flex align-items-center">
-                                <div class="me-3">
-                                    <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
-                                        <i class="fas fa-user text-primary"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">Lê Văn C</h6>
-                                    <small class="text-muted">Đăng ký 5 giờ trước</small>
-                                </div>
-                            </li>
-                            <li class="list-group-item d-flex align-items-center">
-                                <div class="me-3">
-                                    <div class="avatar bg-light-primary rounded-circle text-center" style="width: 40px; height: 40px; line-height: 40px;">
-                                        <i class="fas fa-user text-primary"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">Phạm Thị D</h6>
-                                    <small class="text-muted">Đăng ký 8 giờ trước</small>
+                                    <h6 class="mb-1" th:text="${newUser.username}">Nguyễn Văn A</h6>
+                                    <small class="text-muted" th:text="${newUser.durationRegister > 0?'Đăng ký '+newUser.durationRegister+' giờ trước':'Mới đây'}">Đăng ký 2 giờ trước</small>
                                 </div>
                             </li>
                         </ul>

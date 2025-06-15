@@ -104,6 +104,9 @@ public class AuthController {
             String avatar = principal.getAttribute("picture");
 
             User user = this.userService.findUserByEmail(email);
+            if(user.isLocked()) {
+                throw new RuntimeException("Tài khoản của bạn đã bị khóa!");
+            }
             if(user == null) {
                 user = this.authService.createOAuth2User(username,email,avatar);
             }
@@ -124,7 +127,7 @@ public class AuthController {
                 return "redirect:/home";
             }
         }catch(RuntimeException e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi xảy ra khi đăng nhập!");
+            redirectAttributes.addFlashAttribute("fail", "Lỗi xảy ra khi đăng nhập! " + e.getMessage());
             return "redirect:/login";
         }
     }
