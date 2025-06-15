@@ -28,8 +28,9 @@ public class OverviewController {
     private final ChallengeService challengeService;
     private final TodoService todoService;
     private final DiaryService diaryService;
+    private final AchievementService achievementService;
 
-    public OverviewController(JwtUtil jwtUtil, TokenUtil tokenUtil, UserService userService, HabitService habitService, DailyService dailyService, ChallengeService challengeService, TodoService todoService, DiaryService diaryService) {
+    public OverviewController(JwtUtil jwtUtil, TokenUtil tokenUtil, UserService userService, HabitService habitService, DailyService dailyService, ChallengeService challengeService, TodoService todoService, DiaryService diaryService, AchievementService achievementService) {
         this.jwtUtil = jwtUtil;
         this.tokenUtil = tokenUtil;
         this.userService = userService;
@@ -38,14 +39,17 @@ public class OverviewController {
         this.challengeService = challengeService;
         this.todoService = todoService;
         this.diaryService = diaryService;
+        this.achievementService = achievementService;
     }
 
     @GetMapping("")
     public String overview(HttpServletRequest request,Model model) {
         // User data
         User user = getUserFromRequest(request);
-
         model.addAttribute("user", user);
+
+        Achievement achievement = this.achievementService.getAchievementById(user.getAchieveId());
+        model.addAttribute("userAchievement", achievement);
 
         // Challenge data
         List<UserChallenge> userChallenges  = this.challengeService.getChallenges(user.getUserId());
@@ -81,10 +85,12 @@ public class OverviewController {
     @GetMapping("/detail")
     public String overviewChallengeDetail(HttpServletRequest request, Model model, @RequestParam("challenge")Long challengeId) {
         User user = getUserFromRequest(request);
+        model.addAttribute("user", user);
+
+        Achievement achievement = this.achievementService.getAchievementById(user.getAchieveId());
+        model.addAttribute("userAchievement", achievement);
 
         Challenge challenge = this.challengeService.getChallengeById(challengeId);
-
-        model.addAttribute("user", user);
         //challenge
         UserChallenge userChallenge = this.challengeService.getUserChallenge(user,challenge);
         model.addAttribute("userChallenge", userChallenge);

@@ -322,8 +322,8 @@ select {
 
 .calendar__date {
     text-align: center;
-    height: 40px;
-    line-height: 40px;
+    height: 20px;
+    line-height: 20px;
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;

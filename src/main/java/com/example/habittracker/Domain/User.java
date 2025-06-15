@@ -34,7 +34,7 @@ public class User {
 
     private Long challengeLimit;
     private Long taskLimit;
-    private String achieveTitle;
+    private Long achieveId;
     private LocalDateTime createAt;
     private boolean isLocked;
 

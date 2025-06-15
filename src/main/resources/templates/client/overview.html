@@ -29,7 +29,7 @@
     <div class="row mx-0">
         <div class="col-md-8 head-content">
             <!-- Include user information from existing template -->
-            <div th:replace="layout/userinformation.html :: user(user=${user})"></div>
+            <div th:replace="layout/userinformation.html :: user(user=${user},userAchievement=${userAchievement})"></div>
             <!-- Progress Section -->
             <div class="progress-section" th:if="${userChallenge!=null}">
                 <div class="progress-title">Tiến độ</div>
@@ -39,7 +39,7 @@
                         <div class="progress-value" th:text="'Chuỗi cao nhất:' + ${userChallenge.bestStreak}"> 15</div>
                     </div>
                     <div class="progress-bar-container mb-3">
-                        <div class="progress-bar-fill" th:style="'width: ' + (100 -(${userChallenge.streak} * 100 / ${userChallenge.bestStreak})) + '%'"></div>
+                        <div class="progress-bar-fill" th:style="'width: ' + ${userChallenge.bestStreak==0?'0':(100 -(userChallenge.streak * 100 / userChallenge.bestStreak))} + '%'"></div>
                     </div>
                     <div class="d-flex justify-content-between">
                         <div class="progress-label">Thực hiện/Tổng thói quen trong thử thách</div>

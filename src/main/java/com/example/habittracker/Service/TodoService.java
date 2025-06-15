@@ -2,10 +2,7 @@ package com.example.habittracker.Service;
 
 import com.example.habittracker.DTO.TodoDTO;
 import com.example.habittracker.DTO.TodoSubtaskDTO;
-import com.example.habittracker.Domain.Todo;
-import com.example.habittracker.Domain.TodoHistory;
-import com.example.habittracker.Domain.TodoSubtask;
-import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.*;
 import com.example.habittracker.Repository.TodoHistoryRepository;
 import com.example.habittracker.Repository.TodoRepository;
 import com.example.habittracker.Repository.TodoSubTaskRepository;
@@ -216,4 +213,11 @@ public class TodoService {
         this.todoSubTaskRepository.save(subtask);
         return updateTodoCompletion(user,todoId,false);
     }
+
+    @Transactional
+    public long countCompleteTodo(User user) {
+        List<Todo> todos = this.todoRepository.findAllByUser(user);
+        return todos.stream().mapToLong(todo->this.todoHistoryRepository.countCompleteTask(todo)).sum();
+    }
+
 }

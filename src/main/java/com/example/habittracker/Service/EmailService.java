@@ -138,16 +138,45 @@ public class EmailService {
         if (userAchievement.getAchievement().getTaskBonus() != null && userAchievement.getAchievement().getTaskBonus() > 0) {
             body.append("- Thêm ").append(userAchievement.getAchievement().getTaskBonus()).append(" lượt tạo nhiệm vụ mới (task limit).\n");
         }
-//        Thêm phần thưởng xu (nếu achievement có bonusCoins)
+
         if (userAchievement.getAchievement().getCoinBonus() != null && userAchievement.getAchievement().getCoinBonus() > 0) {
             body.append("- ").append(userAchievement.getAchievement().getCoinBonus()).append(" xu vào tài khoản của bạn.\n");
         }
-
 
         body.append("\n");
         body.append("Hãy tiếp tục hành trình rèn luyện thói quen và chinh phục những đỉnh cao mới nhé!\n\n");
         body.append("Trân trọng,\n");
         body.append("Đội ngũ ứng dụng Bebet");
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderEmail);
+        message.setTo(recipientEmail);
+        message.setSubject(subject);
+        message.setText(body.toString());
+    }
+
+    public void sendWelcomeEmail(User newUser) {
+
+        String recipientEmail = newUser.getEmail();
+        String subject = "Chào mừng bạn đến với Bebet - Hành trình rèn luyện thói quen của bạn!";
+
+        StringBuilder body = new StringBuilder();
+        body.append("Chào ").append(newUser.getUserName()).append(",\n\n");
+        body.append("Chào mừng bạn đã gia nhập cộng đồng Bebet! Chúng tôi rất vui mừng khi bạn quyết định cùng chúng tôi xây dựng những thói quen tốt và chinh phục các thử thách.\n\n");
+
+        body.append("Tại Bebet, bạn có thể:\n");
+        body.append("- Tạo và theo dõi các nhiệm vụ hàng ngày (Dailies).\n");
+        body.append("- Xây dựng và duy trì những thói quen tích cực (Habits) hoặc từ bỏ những thói quen tiêu cực.\n");
+        body.append("- Quản lý các công việc cần làm (To-Dos).\n");
+        body.append("- Tham gia vào các thử thách thú vị và kết nối với cộng đồng.\n");
+        body.append("- Ghi lại hành trình của bạn với nhật ký cá nhân.\n\n");
+
+        body.append("Hãy bắt đầu hành trình của bạn ngay hôm nay bằng cách tạo thử thách đầu tiên hoặc thêm một thói quen mới.\n");
+        body.append("Nếu có bất kỳ câu hỏi nào, đừng ngần ngại liên hệ với chúng tôi nhé!\n\n");
+
+        body.append("Chúc bạn có những trải nghiệm tuyệt vời với Bebet!\n\n");
+        body.append("Trân trọng,\n");
+        body.append("Đội ngũ Bebet\n");
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(senderEmail);

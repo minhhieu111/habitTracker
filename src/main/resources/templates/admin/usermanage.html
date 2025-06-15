@@ -177,7 +177,7 @@
                                     <div class="mb-3">
                                         <label class="form-label">Quyền</label>
                                         <select class="form-control" id="createRole" th:field="*{role}">
-                                            <option th:each="role : ${createUpdateUser.getRoleOption()}" th:value="${role}" th:text="${role}">    </option>
+                                            <option th:each="role : ${createUpdateUser.roleOption}" th:value="${role}" th:text="${role}">    </option>
                                         </select>
                                     </div>
                                     <div class="modal-footer">

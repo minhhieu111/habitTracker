@@ -171,7 +171,7 @@ public class UserService {
         User user = this.userRepository.findById(userUpdateInfo.getUserId()).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
 
         user.setUserName(userUpdateInfo.getUserName());
-        user.setAchieveTitle(userUpdateInfo.getAchieveTitle());
+        user.setAchieveId(userUpdateInfo.getAchieveId());
 
         if (image != null && !image.isEmpty()) {
             try {
