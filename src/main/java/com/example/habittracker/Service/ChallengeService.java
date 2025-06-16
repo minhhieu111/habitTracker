@@ -369,7 +369,7 @@ public class ChallengeService {
                 .bestStreak(0L)
                 .progress(0.0)
                 .totalCompletedTasks(0L)
-                .daysSinceStart(0L)
+                .daysSinceStart(ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.now()))
                 .totalExpectedTasks(0L)
                 .completedTasks(0L)
                 .skippedTasks(0L)
@@ -452,6 +452,11 @@ public class ChallengeService {
             this.challengeProgressService.calculateAndSaveDailyProgress(uc.getUserChallengeId(),LocalDate.now());
             this.challengeProgressService.recalculateUserChallengeProgress(uc);
             this.challengeProgressService.updateChallengeStreak(uc,true);
+
+            //cập nhật iscompleteToday của userchallenge
+            uc.setCompletedToday(false);
+            uc.setDaysSinceStart(ChronoUnit.DAYS.between(uc.getStartDate(), LocalDate.now().plusDays(1)));
+            this.userChallengeRepository.save(uc);
         }
     }
     @Transactional

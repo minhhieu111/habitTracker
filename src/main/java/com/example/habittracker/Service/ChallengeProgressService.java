@@ -147,7 +147,6 @@ public class ChallengeProgressService {
 
 
         // --- BƯỚC 4: Cập nhật các trường trong UserChallenge ---
-        userChallenge.setDaysSinceStart(ChronoUnit.DAYS.between(challengeStartDate, LocalDate.now()));
         userChallenge.setTotalExpectedTasks(totalExpectedTasks);
         userChallenge.setTotalCompletedTasks(completedTasksForChart);
         userChallenge.setCompletedTasks(completedTasksForChart);
@@ -208,22 +207,89 @@ public class ChallengeProgressService {
         return expectedTasks;
     }
 
-    @Transactional
-    public void updateChallengeStreak(UserChallenge userChallenge,boolean isEndDay) {
+//    @Transactional
+//    public void updateChallengeStreak(UserChallenge userChallenge,boolean isEndDay) {
+//
+//            LocalDate today = LocalDate.now();
+//        int completionThreshold = 100;
+//
+//        UserChallengeDailyProgress userChallengeDailyProgress = this.userChallengeDPRepository.findByUserChallengeAndDate(userChallenge,today).orElse(null);
+//
+//        double progress = 0;
+//        if(userChallengeDailyProgress != null){
+//            progress = userChallengeDailyProgress.getCompletionPercentage();
+//        }
+//        int unComplete = (int) Math.round(progress);
+//
+//        LocalDate yesterday = today.minusDays(1);
+//
+//        boolean wasCompletedYesterday = false;
+//        if (!yesterday.isBefore(userChallenge.getStartDate()) && !yesterday.isAfter(userChallenge.getEndDate())) {
+//            Optional<UserChallengeDailyProgress> yesterdayProgressOpt = userChallengeDPRepository
+//                    .findByUserChallengeAndDate(userChallenge, yesterday);
+//            if (yesterdayProgressOpt.isPresent()) {
+//                wasCompletedYesterday = yesterdayProgressOpt.get().getCompletionPercentage() >= completionThreshold;
+//            }
+//        } else if (yesterday.isBefore(userChallenge.getStartDate())) {
+//            wasCompletedYesterday = true;
+//        }
+//
+//
+//        boolean isCompletedToday = false;
+//        if (!today.isBefore(userChallenge.getStartDate()) && !today.isAfter(userChallenge.getEndDate())) {
+//            Optional<UserChallengeDailyProgress> todayProgressOpt = userChallengeDPRepository
+//                    .findByUserChallengeAndDate(userChallenge, today);
+//            if (todayProgressOpt.isPresent()) {
+//                isCompletedToday = todayProgressOpt.get().getCompletionPercentage() >= completionThreshold;
+//            }
+//        }
+//
+//           long currentStreak = userChallenge.getStreak();
+//
+//        if (!today.isBefore(userChallenge.getStartDate()) && !today.isAfter(userChallenge.getEndDate())) {
+//            if(isCompletedToday){
+//                if (!isEndDay) {
+//                    if (wasCompletedYesterday || today.equals(userChallenge.getStartDate())) {
+//                        currentStreak++;
+//                        userChallenge.setCompletedToday(true);
+//                    } else {
+//                        currentStreak = 1L;
+//                    }
+//                }
+//            }else{
+//                if (currentStreak > 0 && isEndDay) {
+//                    emailService.sendStreakLostNotification(userChallenge, currentStreak);
+//                    currentStreak = 0L;
+//                } else if (currentStreak > 0 && userChallenge.isCompletedToday()) {
+//                    currentStreak--;
+//                    userChallenge.setCompletedToday(false);
+//                }
+//            }
+//        }
+//
+//        long bestStreak = userChallenge.getBestStreak();
+//        if (currentStreak > bestStreak && isEndDay) {
+//            bestStreak = currentStreak;
+//        }
+//
+//        userChallenge.setStreak(currentStreak);
+//        userChallenge.setBestStreak(bestStreak);
+//        userChallengeRepository.save(userChallenge);
+//    }
 
-            LocalDate today = LocalDate.now();
+    @Transactional
+    public void updateChallengeStreak(UserChallenge userChallenge, boolean isEndDay) {
+        LocalDate today = LocalDate.now();
         int completionThreshold = 100;
 
-        UserChallengeDailyProgress userChallengeDailyProgress = this.userChallengeDPRepository.findByUserChallengeAndDate(userChallenge,today).orElse(null);
+        // Kiểm tra hoàn thành ngày hôm nay
+        UserChallengeDailyProgress userChallengeDailyProgress = this.userChallengeDPRepository
+                .findByUserChallengeAndDate(userChallenge, today).orElse(null);
+        boolean isCompletedToday = userChallengeDailyProgress != null &&
+                userChallengeDailyProgress.getCompletionPercentage() >= completionThreshold;
 
-        double progress = 0;
-        if(userChallengeDailyProgress != null){
-            progress = userChallengeDailyProgress.getCompletionPercentage();
-        }
-        int unComplete = (int) Math.round(progress);
-
+        // Kiểm tra hoàn thành ngày hôm qua
         LocalDate yesterday = today.minusDays(1);
-
         boolean wasCompletedYesterday = false;
         if (!yesterday.isBefore(userChallenge.getStartDate()) && !yesterday.isAfter(userChallenge.getEndDate())) {
             Optional<UserChallengeDailyProgress> yesterdayProgressOpt = userChallengeDPRepository
@@ -235,46 +301,41 @@ public class ChallengeProgressService {
             wasCompletedYesterday = true;
         }
 
-
-        boolean isCompletedToday = false;
-        if (!today.isBefore(userChallenge.getStartDate()) && !today.isAfter(userChallenge.getEndDate())) {
-            Optional<UserChallengeDailyProgress> todayProgressOpt = userChallengeDPRepository
-                    .findByUserChallengeAndDate(userChallenge, today);
-            if (todayProgressOpt.isPresent()) {
-                isCompletedToday = todayProgressOpt.get().getCompletionPercentage() >= completionThreshold;
-            }
-        }
-
-           long currentStreak = userChallenge.getStreak();
+        long currentStreak = userChallenge.getStreak();
 
         if (!today.isBefore(userChallenge.getStartDate()) && !today.isAfter(userChallenge.getEndDate())) {
-            if(isCompletedToday){
-                if (!isEndDay) {
-                    if (wasCompletedYesterday || today.equals(userChallenge.getStartDate())) {
+            if (isCompletedToday) {
+                if (wasCompletedYesterday || today.equals(userChallenge.getStartDate())) {
+                    if (!userChallenge.isCompletedToday()) {
                         currentStreak++;
-                        userChallenge.setCompletedToday(true);
-                    } else {
-                        currentStreak = 1L;
                     }
+                } else {
+                    currentStreak = 1L;
                 }
-            }else{
-                if (currentStreak > 0 && isEndDay) {
-                    emailService.sendStreakLostNotification(userChallenge, currentStreak);
-                    currentStreak = 0L;
-                } else if (currentStreak > 0 && userChallenge.isCompletedToday()) {
-                    currentStreak--;
+                userChallenge.setCompletedToday(true);
+            } else {
+                if (userChallenge.isCompletedToday()) {
+                    if (currentStreak > 0) {
+                        currentStreak--;
+                    }
                     userChallenge.setCompletedToday(false);
                 }
+
+                if (isEndDay) {
+                    // Nếu là cuối ngày và chưa hoàn thành
+                    if (currentStreak > 0) {
+                        emailService.sendStreakLostNotification(userChallenge, currentStreak);
+                    }
+                    currentStreak = 0L;
+                }
             }
         }
 
-        long bestStreak = userChallenge.getBestStreak();
-        if (currentStreak > bestStreak && isEndDay) {
-            bestStreak = currentStreak;
+        if (currentStreak > userChallenge.getBestStreak()) {
+            userChallenge.setBestStreak(currentStreak);
         }
 
         userChallenge.setStreak(currentStreak);
-        userChallenge.setBestStreak(bestStreak);
         userChallengeRepository.save(userChallenge);
     }
 
