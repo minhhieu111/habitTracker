@@ -33,6 +33,7 @@ public class EmailService {
                 + "- Tổng số lần thực hiện thói quen thành công: " + userChallenge.getTotalCompletedTasks() + "\n"
                 + "- Chuỗi thực hiện tốt nhất của bạn: " + userChallenge.getBestStreak() + " ngày liên tiếp\n"
                 + "- Tổng số lần bỏ lỡ thói quen: " + userChallenge.getSkippedTasks() + "\n\n"
+                + "Bạn nhận được \"" + userChallenge.getCoinEarn() + "\" xu khi hoàn thành thử thách!\n"
                 + "Đây là một thành tựu đáng tự hào! Bạn có thể chia sẻ hành trình và kết quả này với bạn bè và cộng đồng.\n\n"
                 + "Trân trọng,\n"
                 + "Đội ngũ ứng dụng của bạn\n"

@@ -20,6 +20,7 @@ public class HabitService {
     private final UserChallengeRepository userChallengeRepository;
     private final ChallengeProgressService challengeProgressService;
     private final CoinCalculationService coinCalculationService;
+    private static final Long coinLimitDefault = 500L;
 
     public HabitService(HabitRepository habitRepository, UserService userService, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, ChallengeRepository challengeRepository, UserChallengeRepository userChallengeRepository, ChallengeProgressService challengeProgressService, CoinCalculationService coinCalculationService) {
         this.habitRepository = habitRepository;
@@ -260,8 +261,14 @@ public class HabitService {
 
             if(!(habit.getType().name().equals("NEGATIVE")) && habitHistory.getCoinEarned()==0){
                 Long coinEarn = this.coinCalculationService.calculatePositiveHabitCoins(habit, habit.getChallenge() != null);
-                habitHistory.setCoinEarned(coinEarn);
-                String message = this.userService.getCoinComplete(userHabit.getUser(),coinEarn);
+                Long actualCoinEarned = this.userService.getCoinComplete(user, coinEarn);
+                habitHistory.setCoinEarned(actualCoinEarned);
+                String message;
+                if(actualCoinEarned>0){
+                    message = "+"+actualCoinEarned;
+                }else{
+                    message = "Bạn đã đạt giới hạn xu trong ngày!";
+                }
                 habitDTO.setUserCoinMessage(message);
                 habitDTO.setCoinEarned(coinEarn);
             }
@@ -273,8 +280,14 @@ public class HabitService {
 
             if(habitHistory.getCoinEarned()>0){
                 Long coinBack = this.habitHistoryRepository.findCoinEarnByUserHabitAndDate(userHabit,today);
-                habitDTO.setCoinEarned(coinBack);
-                String message = this.userService.getCoinComplete(userHabit.getUser(),-coinBack);
+                Long actualCoinBack = this.userService.getCoinComplete(user, -coinBack);
+                habitDTO.setCoinEarned(actualCoinBack);
+                String message;
+                if(actualCoinBack<0){
+                    message = ""+actualCoinBack;
+                }else{
+                    message="";
+                }
                 habitDTO.setUserCoinMessage(message);
                 habitHistory.setCoinEarned(0L);
             }
@@ -317,8 +330,11 @@ public class HabitService {
             Long coinEarn = 0L;
             if(userHabit.getHabit().getType().name().equals("NEGATIVE")){
                 coinEarn = this.coinCalculationService.calculateNegativeHabitCoins(userHabit.getHabit(),userHabit.getNegativeCount(), userHabit.getHabit().getChallenge() != null);
-                this.userService.getCoinComplete(userHabit.getUser(),coinEarn);
-                habitHistory.setCoinEarned(coinEarn);
+                Long actualCoinEarn = 0L;
+                if(userHabit.getUser().getLimitCoinsEarnedPerDay()<=coinLimitDefault){
+                    actualCoinEarn = this.userService.getCoinComplete(userHabit.getUser(),coinEarn);
+                }
+                habitHistory.setCoinEarned(actualCoinEarn);
             }
             habitHistoryRepository.save(habitHistory);
 

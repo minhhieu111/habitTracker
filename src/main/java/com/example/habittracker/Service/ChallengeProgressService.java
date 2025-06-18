@@ -357,7 +357,7 @@ public class ChallengeProgressService {
             }
             userChallenge.setStatus(UserChallenge.Status.COMPLETE);
             Long coinEarn = this.coinCalculationService.calculateChallengeCompletionReward(userChallenge.getChallenge(),userChallenge,false);
-            this.userService.getCoinComplete(userChallenge.getUser(),coinEarn);
+            this.userService.getCoinCompleteForCompleteChallenge(userChallenge.getUser(),coinEarn);
             userChallenge.setCoinEarn(coinEarn);
             userChallengeRepository.save(userChallenge);
 
@@ -378,7 +378,7 @@ public class ChallengeProgressService {
                 userDailyRepository.save(userDaily);
             });
         }else{
-            if(userChallenge.getStatus() == UserChallenge.Status.COMPLETE){this.userService.getCoinComplete(userChallenge.getUser(),-userChallenge.getCoinEarn());}
+            if(userChallenge.getStatus() == UserChallenge.Status.COMPLETE){this.userService.getCoinCompleteForCompleteChallenge(userChallenge.getUser(),-userChallenge.getCoinEarn());}
             userChallenge.setStatus(UserChallenge.Status.ACTIVE);
             userChallenge.setNotificationShown(true);
             userChallengeRepository.save(userChallenge);

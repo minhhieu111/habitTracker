@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DiaryService {
@@ -28,9 +29,10 @@ public class DiaryService {
     private final TodoRepository todoRepository;
     private final UserService userService;
     private final CoinCalculationService coinCalculationService;
+    private final UserChallengeRepository userChallengeRepository;
 
 
-    public DiaryService(DiaryRepository diaryRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, ImageService imageService, UserHabitRepository userHabitRepository, UserDailyRepository userDailyRepository, TodoRepository todoRepository, UserService userService, CoinCalculationService coinCalculationService) {
+    public DiaryService(DiaryRepository diaryRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, ImageService imageService, UserHabitRepository userHabitRepository, UserDailyRepository userDailyRepository, TodoRepository todoRepository, UserService userService, CoinCalculationService coinCalculationService, UserChallengeRepository userChallengeRepository) {
         this.diaryRepository = diaryRepository;
         this.habitHistoryRepository = habitHistoryRepository;
         this.dailyHistoryRepository = dailyHistoryRepository;
@@ -41,6 +43,7 @@ public class DiaryService {
         this.todoRepository = todoRepository;
         this.userService = userService;
         this.coinCalculationService = coinCalculationService;
+        this.userChallengeRepository = userChallengeRepository;
     }
     @Transactional
     public List<Diary> getDiariesByUser(User user) {
@@ -119,7 +122,8 @@ public class DiaryService {
         diary.getTodoList().addAll(completedTodos);
 
         Long coinEarned = this.coinCalculationService.calculateDiaryCoins(diary);
-        String message = this.userService.getCoinComplete(user, coinEarned);
+        Long actualCoinEarned = this.userService.getCoinComplete(user, coinEarned);
+        String message = "+"+actualCoinEarned;
 
         diaryRepository.save(diary);
 
@@ -239,5 +243,28 @@ public class DiaryService {
         }
 
         return completedTasks;
+    }
+
+    @Transactional
+    public List<DiaryDTO> getDiariesInChallenge(Long userChallengeId) {
+        UserChallenge userChallenge = userChallengeRepository.findById(userChallengeId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy UserChallenge với ID: " + userChallengeId));
+
+        LocalDate endDate = userChallenge.getEndDate().isAfter(LocalDate.now()) ? LocalDate.now() : userChallenge.getEndDate();
+
+        List<Diary> diaries = diaryRepository.findDiaryInChallenge(
+                userChallenge.getUser(),
+                userChallenge.getStartDate(),
+                endDate
+        );
+
+        return diaries.stream()
+                .map(diary -> DiaryDTO.builder()
+                        .diaryId(diary.getDiaryId())
+                        .date(diary.getDate())
+                        .content(diary.getContent())
+                        .imageUrl(diary.getImageUrl())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
