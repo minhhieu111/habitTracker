@@ -56,7 +56,7 @@
 
         <div class="challenges-grid">
             <div th:each="challenge : ${challenges}" class="challenge-card">
-                <div class="challenge-detail" th:onclick="|DetailChallenge(${challenge.getChallenge().getChallengeId()})|">
+                <div class="challenge-detail" th:onclick="|DetailChallenge(${challenge.getChallenge().getChallengeId()}, ${challenge.getUserChallengeId()})|">
                     <div class="challenge-name" th:text="${challenge.getChallenge().getTitle()}"></div>
                     <div class="challenge-description" th:text="${challenge.getChallenge().getDescription()}">
                         Mô tả:
@@ -68,7 +68,9 @@
                     </span>
                 </div>
                 <div class="footer-content">
-                    <button class="update-button" th:onclick="|openChallengeUpdateModal(${challenge.getChallenge().getChallengeId()})|">Chỉnh sửa</button>
+                    <button class="update-button bg-primary text-light rounded"
+                            th:if="${challenge.challenge.isPublic.name() == 'PRIVATE'}"
+                            th:onclick="|openChallengeUpdateModal(${challenge.getChallenge().getChallengeId()})|">Chỉnh sửa</button>
                     <div class="streak-info">
                         <span th:text="'Chuỗi liên tiếp: ' + ${challenge.streak}">Chuỗi liên tiếp: </span><i class="fas fa-fire"></i>
                     </div>
@@ -370,6 +372,10 @@
                             </div>
                         </div>
                         <hr class="bg-white opacity-50">
+                        <div class="w-100 d-flex justify-content-center">
+                            <button class="text-decoration-underline border-0 bg-transparent text-light" id="diaryDuringChallenge">Nhật ký trong quá trình thực hiện thử thách</button>
+                        </div>
+
                     </div>
                     <button type="button" class="btn-close btn-close-white position-absolute" style="top: 15px; right: 15px;" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -448,8 +454,51 @@
         </div>
     </div>
 
+    <div class="modal fade" id="diaryListModal" tabindex="-1" aria-labelledby="diaryListModalLabel" style="background-color: rgba(85,85,85,0.71)" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" >
+            <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
+                <div class="modal-header text-white text-center" style="background: #0069d3; border: none; padding: 30px 20px 20px;">
+                    <div class="w-100">
+                        <h4 class="modal-title fw-bold mb-2" id="diaryListModalLabel">Nhật ký trong thử thách</h4>
+                        <p class="mb-0 opacity-75" id="diaryListCount"></p>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white position-absolute" style="top: 15px; right: 15px;" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 20px; background-color: #f8f9fa;">
+                    <div id="diaryListContainer" class="challenge-contain" style="max-height: 400px; overflow-y: auto; overflow-x: hidden">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="diaryDetailModal" style="background-color: rgba(85,85,85,0.71)" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header text-bg-warning p-4">
+                    <div class="w-100">
+                        <h4 class="fw-bold mb-3">Chi tiết Nhật ký</h4>
+                        <div class="mb-3">
+                            <label for="diaryDetailContentInput" class="form-label">Nội dung</label>
+                            <textarea class="form-control" readonly id="diaryDetailContentInput" rows="5"></textarea>
+                        </div>
+                        <div class="d-flex justify-content-center w-100">
+                            <img id="diaryDetailImagePreview" class="img-fluid mt-1" style="max-width: 300px; max-height: 400px; display: none;" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body p-4">
+                    <strong>Task đã hoàn thành vào ngày này:</strong>
+                    <ul id="diaryDetailCompletedTasksList"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -825,12 +874,12 @@
         }
 
         //detail modal
-        window.DetailChallenge = function(challengeId) {
-            showChallengeDetails(challengeId);
+        window.DetailChallenge = function(challengeId,userChallengeId) {
+            showChallengeDetails(challengeId, userChallengeId);
         }
 
         let completedDates = [];
-        function showChallengeDetails(challengeId) {
+        function showChallengeDetails(challengeId, userChallengeId) {
         fetch(`/challenges/detail/challenge/${challengeId}`)
             .then(response=>{
                 if(response.url.includes("/login")){
@@ -849,6 +898,9 @@
                 document.getElementById('bestStreak').textContent = data.bestStreak;
                 document.getElementById('completionRate').textContent = data.progress + '%';
                 document.getElementById('totalHabits').textContent = data.totalCompletedTasks;
+
+                const diaryButton = document.getElementById('diaryDuringChallenge');
+                diaryButton.setAttribute('data-user-challenge-id', userChallengeId);
 
                 // Initialize charts
                 initLineChart(data.dailyProgresses);
@@ -1045,6 +1097,99 @@
                 generateCalendar(selectedYear, selectedMonth);
             });
         });
+
+        //Diary
+
+        // Xử lý sự kiện click cho nút xem nhật ký
+        const diaryButton = document.getElementById('diaryDuringChallenge');
+        if(diaryButton){
+            diaryButton.addEventListener('click', function() {
+                const userChallengeId = this.getAttribute('data-user-challenge-id');
+                if (userChallengeId) {
+                    fetch(`/diaries/inChallenge/${userChallengeId}`)
+                        .then(response =>{
+                            if(response.url.includes("/login")){
+                                window.location.href = "/login"
+                                return;
+                            }
+                            return response.json();
+                        })
+                        .then(diaries => {
+                            const diaryListContainer = document.getElementById('diaryListContainer');
+                            const diaryListCount = document.getElementById('diaryListCount');
+                            diaryListContainer.innerHTML = '';
+
+                            if (diaries && diaries.length > 0) {
+                                diaryListCount.textContent = `Tìm thấy ${diaries.length} nhật ký.`;
+                                diaries.forEach(diary => {
+                                    const diaryCard = document.createElement('div');
+                                    diaryCard.className = 'diary-card mb-3';
+                                    diaryCard.style.cursor = 'pointer';
+                                    // Định dạng lại ngày tháng cho dễ đọc
+                                    const formattedDate = new Date(diary.date).toLocaleDateString('vi-VN', {
+                                        day: '2-digit', month: '2-digit', year: 'numeric'
+                                    });
+                                    diaryCard.innerHTML = `
+                                        <div class="challenge-card-content">
+                                            <h5 class="challenge-name" onclick="openChallengeDiaryDetailModal(${diary.diaryId})">Ngày: ${formattedDate}</h5>
+
+                                        </div>
+                                    `;
+                                    // diaryCard.onclick = () => openChallengeDiaryDetailModal(diary.diaryId);
+                                    diaryListContainer.appendChild(diaryCard);
+                                });
+                            } else {
+                                diaryListCount.textContent = 'Không tìm thấy nhật ký nào.';
+                                diaryListContainer.innerHTML = '<p class="text-center text-muted">Bạn chưa viết nhật ký nào trong suốt thử thách này.</p>';
+                            }
+                            const modal = new bootstrap.Modal(document.getElementById("diaryListModal"));
+                            modal.show();
+
+                        })
+                        .catch(error => console.error('Lỗi khi lấy danh sách nhật ký:', error));
+                }
+            });
+        }
+
+        // Hàm mở modal chi tiết nhật ký
+        window.openChallengeDiaryDetailModal = (diaryId) => {
+            fetch(`/diaries/${diaryId}`)
+                .then(response => {
+                    if(response.url.includes("/login")){
+                        window.location.href = "/login"
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(diary => {
+                    document.getElementById('diaryDetailContentInput').value = diary.content;
+                    const imgPreview = document.getElementById('diaryDetailImagePreview');
+                    if (diary.imageUrl) {
+                        imgPreview.src = diary.imageUrl;
+                        imgPreview.style.display = 'block';
+                    } else {
+                        imgPreview.style.display = 'none';
+                    }
+
+                    const taskList = document.getElementById('diaryDetailCompletedTasksList');
+                    taskList.innerHTML = '';
+                    if (diary.completedTasks && diary.completedTasks.length > 0) {
+                        diary.completedTasks.forEach(task => {
+                            const li = document.createElement('li');
+                            li.textContent = task.title;
+                            taskList.appendChild(li);
+                        });
+                    } else {
+                        taskList.innerHTML = '<li>Không có task nào được ghi nhận.</li>';
+                    }
+
+
+                    const modal = new bootstrap.Modal(document.getElementById("diaryDetailModal"));
+                    modal.show();
+
+                })
+                .catch(error => console.error('Lỗi khi lấy chi tiết nhật ký:', error));
+        };
 
     });
 

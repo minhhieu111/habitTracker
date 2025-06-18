@@ -31,6 +31,7 @@ public class UserService {
     private final UserDailyRepository userDailyRepository;
     private final UserHabitRepository userHabitRepository;
     private final TodoRepository todoRepository;
+    private Long coinLimit = 500L ;
 
     public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, TodoRepository todoRepository) {
         this.userRepository = userRepository;
@@ -91,24 +92,39 @@ public class UserService {
     }
 
     @Transactional
-    public String getCoinComplete(User user, Long coinEarn) {
-        String message = "";
+    public Long getCoinComplete(User user, Long coinEarn) {
         if(user.getCoins() >= 0 && coinEarn > 0){
-            if(user.getLimitCoinsEarnedPerDay() < 500){
+            if(user.getLimitCoinsEarnedPerDay() < coinLimit){
                 user.setCoins(user.getCoins()+coinEarn);
                 user.setLimitCoinsEarnedPerDay(user.getLimitCoinsEarnedPerDay()+coinEarn);
-                message = "+"+coinEarn;
             }else{
-                message = "Bạn đã đạt giới hạn nhận xu ngày hôm này là 500 xu";
+                return 0L;
             }
         }else{
             user.setCoins(user.getCoins()+coinEarn);
             user.setLimitCoinsEarnedPerDay(user.getLimitCoinsEarnedPerDay()+coinEarn);
-            message = ""+coinEarn;
+            this.userRepository.save(user);
+            return coinEarn;
         }
         this.userRepository.save(user);
-        return message;
+        return coinEarn;
     }
+
+    @Transactional
+    public Long getCoinCompleteForCompleteChallenge(User user, Long coinEarn) {
+        if(user.getCoins() >= 0 && coinEarn > 0){
+            user.setCoins(user.getCoins()+coinEarn);
+            user.setLimitCoinsEarnedPerDay(user.getLimitCoinsEarnedPerDay()+coinEarn);
+        }else{
+            user.setCoins(user.getCoins()+coinEarn);
+            user.setLimitCoinsEarnedPerDay(user.getLimitCoinsEarnedPerDay()+coinEarn);
+            this.userRepository.save(user);
+            return coinEarn;
+        }
+        this.userRepository.save(user);
+        return coinEarn;
+    }
+
 
     @Transactional
     public void resetLimitCoin() {

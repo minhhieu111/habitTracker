@@ -227,8 +227,14 @@ public class DailyService {
             userDaily.setStreak(userDaily.getStreak() + 1);
 
             Long coinEarn = this.coinCalculationService.calculateDailyCoins(userDaily,daily.getChallenge() != null && userDaily.isUnavailable());
-            dailyHistory.setCoinEarned(coinEarn);
-            String message = this.userService.getCoinComplete(user,coinEarn);
+            Long actualCoinEarn = this.userService.getCoinComplete(user,coinEarn);
+            dailyHistory.setCoinEarned(actualCoinEarn);
+            String message;
+            if(actualCoinEarn > 0){
+                message = "+"+actualCoinEarn;
+            }else {
+                message = "Bạn đã đạt giới hạn xu ngày hôm nay";
+            }
             dailyDTO.setUserCoinMessage(message);
             dailyDTO.setCoinEarned(coinEarn);
         } else if ("unchecked".equals(status)) {
@@ -238,7 +244,13 @@ public class DailyService {
 
             Long coinBack = this.dailyHistoryRepository.findCoinEarnedByUserDailyAndUser(userDaily,today);
             dailyDTO.setCoinEarned(coinBack);
-            String message = this.userService.getCoinComplete(user,-coinBack);
+            Long actualCoinBack = this.userService.getCoinComplete(user,-coinBack);
+            String message;
+            if(actualCoinBack<0){
+                message = ""+actualCoinBack;
+            }else{
+                message ="";
+            }
             dailyDTO.setUserCoinMessage(message);
             dailyHistory.setCoinEarned(0L);
         }

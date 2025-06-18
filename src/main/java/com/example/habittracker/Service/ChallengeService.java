@@ -199,7 +199,7 @@ public class ChallengeService {
                 .status(UserChallenge.Status.ACTIVE)
                 .streak(0L)
                 .bestStreak(0L)
-                .daysSinceStart(ChronoUnit.DAYS.between(startDate, LocalDate.now()))
+                .daysSinceStart(ChronoUnit.DAYS.between(startDate, LocalDate.now().plusDays(1)))
                 .totalCompletedTasks(0L)
                 .totalExpectedTasks(0L)
                 .completedTasks(0L)
@@ -215,9 +215,13 @@ public class ChallengeService {
     @Transactional
     public void updateChallenge(ChallengeDTO challengeDTO, User creator) {
         Challenge challenge = challengeRepository.findById(challengeDTO.getChallengeId())
-                .orElseThrow(() -> new RuntimeException("Challenge not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm tháy dữ liệu thử thách!"));
         UserChallenge userChallenge = userChallengeRepository.findByChallenge(challenge)
-                .orElseThrow(() -> new RuntimeException("UserChallenge not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm tháy dữ liệu thử thách!"));
+
+        if (challenge.getIsPublic() == Challenge.Visibility.PUBLIC) {
+            throw new RuntimeException("Không thể chỉnh sửa thử thách đã được công khai.");
+        }
 
         if (challengeDTO.getTitle() == null || challengeDTO.getTitle().trim().isEmpty()) {
             throw new RuntimeException("Tiêu đề thử thách không được để trống!");

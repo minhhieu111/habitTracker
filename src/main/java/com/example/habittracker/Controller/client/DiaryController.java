@@ -9,6 +9,7 @@ import com.example.habittracker.Domain.User;
 import com.example.habittracker.Service.DiaryService;
 import com.example.habittracker.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -87,6 +88,15 @@ public class DiaryController {
     public DiaryDTO updateDiaryTasks(@PathVariable Long diaryId, HttpServletRequest request) {
         User user = getUserFromRequest(request);
         return diaryService.updateDiaryTasks(diaryId, user);
+    }
+
+
+
+    @GetMapping("/inChallenge/{UserChallengeId}")
+    @ResponseBody
+    public ResponseEntity<List<DiaryDTO>> getDiaryInChallenge(@PathVariable("UserChallengeId")Long userChallengeId){
+        List<DiaryDTO> listDiary = this.diaryService.getDiariesInChallenge(userChallengeId);
+        return ResponseEntity.ok().body(listDiary);
     }
 
     private User getUserFromRequest(HttpServletRequest request) {

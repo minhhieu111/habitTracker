@@ -16,4 +16,7 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
     @Query("SELECT ud.diaryId FROM Diary ud WHERE ud.user = :user AND ud.date = :date")
     List<Long> findIdByUserAndDate(@Param("user")User user, @Param("date") LocalDate date);
+
+    @Query("SELECT d FROM Diary d WHERE d.user = :user AND d.date BETWEEN :startDate AND :endDate ORDER BY d.date DESC ")
+    List<Diary> findDiaryInChallenge(@Param("user")User user,@Param("startDate") LocalDate startDate,@Param("endDate") LocalDate endDate);
 }

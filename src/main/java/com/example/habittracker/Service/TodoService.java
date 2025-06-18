@@ -153,8 +153,15 @@ public class TodoService {
                 }
 
                 Long coinEarned = this.coinCalculationService.calculateTodoCoins(todo);
-                todoHistory.setCoinEarned(coinEarned);
-                String message = this.userService.getCoinComplete(user,coinEarned);
+                Long actualCoinEarned = this.userService.getCoinComplete(user,coinEarned);
+                todoHistory.setCoinEarned(actualCoinEarned);
+                String message;
+                if(actualCoinEarned>0){
+                    message = "+"+coinEarned;
+                }else{
+                    message = "Bạn đã đạt giới hạn xu ngày hôm nay!";
+                }
+
                 todoDTO.setUserCoinMessage(message);
                 todoDTO.setCoinEarned(coinEarned);
             }else{
@@ -163,9 +170,15 @@ public class TodoService {
                     this.todoSubTaskRepository.save(subtask);
                 }
                 Long coinBack = this.todoHistoryRepository.findCoinEarnedByTodoAndToday(todo,today);
-                todoDTO.setCoinEarned(coinBack);
+                Long actualCoinBack = this.userService.getCoinComplete(user,-coinBack);
+                todoDTO.setCoinEarned(actualCoinBack);
                 todoHistory.setCoinEarned(0L);
-                String message = this.userService.getCoinComplete(user,-coinBack);
+                String message;
+                if(actualCoinBack<0){
+                    message = ""+coinBack;
+                }else{
+                    message ="";
+                }
                 todoDTO.setUserCoinMessage(message);
             }
 
@@ -185,15 +198,27 @@ public class TodoService {
 
             if(allCompleted && !todoHistory.isCompleted()){
                 Long coinEarned = this.coinCalculationService.calculateTodoCoins(todo);
-                todoHistory.setCoinEarned(coinEarned);
-                String message = this.userService.getCoinComplete(user,coinEarned);
+                Long actualCoinEarned = this.userService.getCoinComplete(user,coinEarned);
+                todoHistory.setCoinEarned(actualCoinEarned);
+                String message;
+                if(actualCoinEarned>0){
+                    message = "+"+coinEarned;
+                }else{
+                    message = "Bạn đã đạt giới hạn xu ngày hôm nay!";
+                }
                 todoDTO.setUserCoinMessage(message);
                 todoDTO.setCoinEarned(coinEarned);
             } else if (!allCompleted && todoHistory.isCompleted()) {
                 Long coinBack = this.todoHistoryRepository.findCoinEarnedByTodoAndToday(todo,today);
-                todoDTO.setCoinEarned(coinBack);
+                Long actualCoinBack = this.userService.getCoinComplete(user,-coinBack);
+                todoDTO.setCoinEarned(actualCoinBack);
                 todoHistory.setCoinEarned(0L);
-                String message = this.userService.getCoinComplete(user,-coinBack);
+                String message;
+                if(actualCoinBack<0){
+                    message = ""+coinBack;
+                }else{
+                    message ="";
+                }
                 todoDTO.setUserCoinMessage(message);
             }
             todoHistory.setCompleted(allCompleted);
