@@ -20,9 +20,6 @@ public class UserDaily {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userDailyId;
     private Long streak = 0L;
-    private String emailMessage;
-    private LocalDateTime timeSendEmail;
-    private LocalTime executionTime;
     private boolean isCompleted;
     private boolean isEnabled;
     private Integer repeatEvery;

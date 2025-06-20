@@ -149,7 +149,6 @@ public class ChallengeProgressService {
         // --- BƯỚC 4: Cập nhật các trường trong UserChallenge ---
         userChallenge.setTotalExpectedTasks(totalExpectedTasks);
         userChallenge.setTotalCompletedTasks(completedTasksForChart);
-        userChallenge.setCompletedTasks(completedTasksForChart);
         userChallenge.setSkippedTasks(skippedTasksForChart);
 
         // Tính progress tổng
@@ -206,76 +205,6 @@ public class ChallengeProgressService {
         }
         return expectedTasks;
     }
-
-//    @Transactional
-//    public void updateChallengeStreak(UserChallenge userChallenge,boolean isEndDay) {
-//
-//            LocalDate today = LocalDate.now();
-//        int completionThreshold = 100;
-//
-//        UserChallengeDailyProgress userChallengeDailyProgress = this.userChallengeDPRepository.findByUserChallengeAndDate(userChallenge,today).orElse(null);
-//
-//        double progress = 0;
-//        if(userChallengeDailyProgress != null){
-//            progress = userChallengeDailyProgress.getCompletionPercentage();
-//        }
-//        int unComplete = (int) Math.round(progress);
-//
-//        LocalDate yesterday = today.minusDays(1);
-//
-//        boolean wasCompletedYesterday = false;
-//        if (!yesterday.isBefore(userChallenge.getStartDate()) && !yesterday.isAfter(userChallenge.getEndDate())) {
-//            Optional<UserChallengeDailyProgress> yesterdayProgressOpt = userChallengeDPRepository
-//                    .findByUserChallengeAndDate(userChallenge, yesterday);
-//            if (yesterdayProgressOpt.isPresent()) {
-//                wasCompletedYesterday = yesterdayProgressOpt.get().getCompletionPercentage() >= completionThreshold;
-//            }
-//        } else if (yesterday.isBefore(userChallenge.getStartDate())) {
-//            wasCompletedYesterday = true;
-//        }
-//
-//
-//        boolean isCompletedToday = false;
-//        if (!today.isBefore(userChallenge.getStartDate()) && !today.isAfter(userChallenge.getEndDate())) {
-//            Optional<UserChallengeDailyProgress> todayProgressOpt = userChallengeDPRepository
-//                    .findByUserChallengeAndDate(userChallenge, today);
-//            if (todayProgressOpt.isPresent()) {
-//                isCompletedToday = todayProgressOpt.get().getCompletionPercentage() >= completionThreshold;
-//            }
-//        }
-//
-//           long currentStreak = userChallenge.getStreak();
-//
-//        if (!today.isBefore(userChallenge.getStartDate()) && !today.isAfter(userChallenge.getEndDate())) {
-//            if(isCompletedToday){
-//                if (!isEndDay) {
-//                    if (wasCompletedYesterday || today.equals(userChallenge.getStartDate())) {
-//                        currentStreak++;
-//                        userChallenge.setCompletedToday(true);
-//                    } else {
-//                        currentStreak = 1L;
-//                    }
-//                }
-//            }else{
-//                if (currentStreak > 0 && isEndDay) {
-//                    emailService.sendStreakLostNotification(userChallenge, currentStreak);
-//                    currentStreak = 0L;
-//                } else if (currentStreak > 0 && userChallenge.isCompletedToday()) {
-//                    currentStreak--;
-//                    userChallenge.setCompletedToday(false);
-//                }
-//            }
-//        }
-//
-//        long bestStreak = userChallenge.getBestStreak();
-//        if (currentStreak > bestStreak && isEndDay) {
-//            bestStreak = currentStreak;
-//        }
-//
-//        userChallenge.setStreak(currentStreak);
-//        userChallenge.setBestStreak(bestStreak);
-//        userChallengeRepository.save(userChallenge);
-//    }
 
     @Transactional
     public void updateChallengeStreak(UserChallenge userChallenge, boolean isEndDay) {

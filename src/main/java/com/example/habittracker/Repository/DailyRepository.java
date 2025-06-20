@@ -1,6 +1,5 @@
 package com.example.habittracker.Repository;
 
-import com.example.habittracker.Domain.Challenge;
 import com.example.habittracker.Domain.Daily;
 import com.example.habittracker.Domain.UserDaily;
 import org.springframework.data.jpa.repository.JpaRepository;

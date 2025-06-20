@@ -102,22 +102,19 @@ public class OverviewController {
         List<UserChallenge> userChallengeOwner = this.challengeService.getChallengesOwner(user.getUserId());
         model.addAttribute("userChallengeOwner", userChallengeOwner);
 
-        // Habits
+
         model.addAttribute("newHabit",new HabitDTO());
         List<UserHabit> userhabit = this.habitService.getUserHabitsChallenge(user,challenge);
         model.addAttribute("userHabits",userhabit);
 
-        // Dailies
         model.addAttribute("newDaily",new DailyDTO());
         List<UserDaily> userdaily = this.dailyService.getUserDailyChallenge(user,challenge);
         model.addAttribute("userDailies",userdaily);
 
-        //Todos
         model.addAttribute("newTodo", new TodoDTO());
         List<Todo> activeTodos = this.todoService.getActiveTodos(user);
         model.addAttribute("activeTodos", activeTodos);
 
-        //Diary
         model.addAttribute("newDiary", new DiaryDTO());
         List<Diary> diaries = diaryService.getDiariesByUser(user);
         model.addAttribute("diaries", diaries);

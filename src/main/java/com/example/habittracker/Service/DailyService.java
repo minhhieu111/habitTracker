@@ -84,7 +84,6 @@ public class DailyService {
                 .user(creator)
                 .daily(daily)
                 .streak(0L)
-                .executionTime(null)
                 .difficulty(daily.getDifficulty())
                 .repeatFrequency(daily.getRepeatFrequency())
                 .repeatEvery(daily.getRepeatEvery())
@@ -343,20 +342,6 @@ public class DailyService {
             }
         }
     }
-
-//    public List<DailyDTO> getDailiesByChallengeId(Long challengeId) {
-//        List<UserDaily> userDailies = dailyRepository.findByChallenge_ChallengeId(challengeId);
-//        return userDailies.stream().map(userDaily -> DailyDTO.builder()
-//                .dailyId(userDaily.getDaily().getDailyId())
-//                .title(userDaily.getDaily().getTitle())
-//                .description(userDaily.getDaily().getDescription())
-//                .difficulty(userDaily.getDaily().getDifficulty())
-//                .repeatFrequency(userDaily.getDaily().getRepeatFrequency())
-//                .repeatEvery(userDaily.getDaily().getRepeatEvery())
-//                .repeatDays(userDaily.getRepeatDays())
-//                .repeatMonthDays(userDaily.getRepeatMonthDays())
-//                .build()).collect(Collectors.toList());
-//    }
 
     public List<DailyDTO> getDailiesByChallengeId(Long challengeId) {
         List<Daily> dailies = dailyRepository.findByChallengeId(challengeId);

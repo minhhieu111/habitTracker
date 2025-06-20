@@ -136,30 +136,6 @@ public class ChallengeController {
         return "redirect:/challenge_overview";
     }
 
-
-    //Complete challenge
-//    @GetMapping("/completed")
-//    public ResponseEntity<List<ChallengeDTO>> getCompletedChallenges(Authentication authentication) {
-//        try {
-//            String username = authentication.getName();
-//            List<ChallengeDTO> completedChallenges = challengeService.getCompletedChallenges(username);
-//            return ResponseEntity.ok(completedChallenges);
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body(null);
-//        }
-//    }
-//
-//    @PostMapping("/complete/{challengeId}")
-//    public ResponseEntity<?> completeChallenge(@PathVariable Long challengeId, Authentication authentication) {
-//        try {
-//            String username = authentication.getName();
-//            challengeService.completeChallenge(challengeId, username);
-//            return ResponseEntity.ok(new Response("Hoàn thành và chia sẻ thử thách thành công!", true));
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body(new Response(e.getMessage(), false));
-//        }
-//    }
-
     @GetMapping("/detail/challenge/{id}")
     @ResponseBody
     public ResponseEntity<ChallengeDTO> getChallengeDetails(HttpServletRequest request, @PathVariable Long id, @RequestParam(value = "creator",defaultValue = "true") Boolean creator) {
