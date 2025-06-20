@@ -2,6 +2,7 @@ package com.example.habittracker.Controller.admin;
 
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
+import com.example.habittracker.DTO.RecentActivityDTO;
 import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.Achievement;
 import com.example.habittracker.Domain.Challenge;
@@ -50,6 +51,10 @@ public class DashboardController {
 
         List<Achievement> achievements = this.achievementService.getAllAchievement();
         model.addAttribute("achievements", achievements);
+
+        List<RecentActivityDTO> recentActivities = userService.getCombinedRecentActivities(10);
+        model.addAttribute("recentActivities", recentActivities);
+
         return "admin/dashboard";
     }
     public User getUserAdmin(HttpServletRequest request) {

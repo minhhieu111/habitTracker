@@ -23,9 +23,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("SELECT uc FROM UserChallenge uc WHERE uc.challenge.creatorId = :userId AND uc.status = 'ACTIVE'")
     Optional<List<UserChallenge>> findUserChallengeOwner(@Param("userId")Long userId);
 
-    @Query("SELECT uc FROM UserChallenge uc WHERE uc.user.userId = :userId AND uc.status = 'ACTIVE'")
-    Optional<List<UserChallenge>> findUnCompleteChallengeByUsersId(@Param("userId") Long userId);
-
     @Query("SELECT uc FROM UserChallenge uc WHERE uc.user.userId = :user")
     List<UserChallenge> findAllByUser(@Param("user") Long userId);
 }

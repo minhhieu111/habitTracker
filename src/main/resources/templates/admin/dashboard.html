@@ -109,48 +109,33 @@
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Người dùng</th>
-                                    <th>Hoạt động</th>
-                                    <th>Thời gian</th>
-                                    <th>Trạng thái</th>
+                                    <th style="width: 25%;">Người dùng</th>
+                                    <th style="width: 45%;">Hoạt động</th>
+                                    <th style="width: 15%;">Thời gian</th>
+                                    <th style="width: 15%;">Loại</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>#12345</td>
-                                    <td>Nguyễn Văn A</td>
-                                    <td>Đặt cược</td>
-                                    <td>10 phút trước</td>
-                                    <td><span class="badge bg-success">Thành công</span></td>
+                                <tr th:each="activity : ${recentActivities}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img th:src="${activity.userAvatar != null ? activity.userAvatar : '/images/user_ava.png'}" alt="Avatar" class="rounded-circle me-2" width="30" height="30">
+                                            <span th:text="${activity.userName}"></span>
+                                        </div>
+                                    </td>
+                                    <td th:text="${activity.description}"></td>
+                                    <td th:text="${#temporals.format(activity.timestamp, 'HH:mm dd/MM')}"></td>
+                                    <td>
+                                <span class="badge" th:classappend="${
+                                    activity.activityType == 'Đăng Ký Mới' ? 'bg-primary' :
+                                    activity.activityType == 'Thành Tựu Mới' ? 'bg-warning text-dark' :
+                                    activity.activityType == 'Hoàn Thành Thử Thách' ? 'bg-success' : 'bg-secondary'
+                                }" th:text="${activity.activityType}">
+                                </span>
+                                    </td>
                                 </tr>
-                                <tr>
-                                    <td>#12346</td>
-                                    <td>Trần Thị B</td>
-                                    <td>Nạp tiền</td>
-                                    <td>25 phút trước</td>
-                                    <td><span class="badge bg-success">Thành công</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#12347</td>
-                                    <td>Lê Văn C</td>
-                                    <td>Rút tiền</td>
-                                    <td>45 phút trước</td>
-                                    <td><span class="badge bg-warning">Đang xử lý</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#12348</td>
-                                    <td>Phạm Thị D</td>
-                                    <td>Đăng ký</td>
-                                    <td>1 giờ trước</td>
-                                    <td><span class="badge bg-success">Thành công</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#12349</td>
-                                    <td>Hoàng Văn E</td>
-                                    <td>Đặt cược</td>
-                                    <td>2 giờ trước</td>
-                                    <td><span class="badge bg-danger">Thất bại</span></td>
+                                <tr th:if="${#lists.isEmpty(recentActivities)}">
+                                    <td colspan="4" class="text-center p-3">Chưa có hoạt động nào gần đây.</td>
                                 </tr>
                                 </tbody>
                             </table>
