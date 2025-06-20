@@ -80,17 +80,21 @@ public class AchievementService {
         List<Achievement> achievements = this.achievementRepository.findAll();
 
         for (Achievement achievement : achievements) {
+            //kiểm tra đã có achievement chưa
+            UserAchievement userAchievement = this.achievementRepository.getUserAchievemenByUserAchievement(user,achievement).orElse(null);
+            if(userAchievement==null)continue;
+
             if(totalChallengeValid >0 && totalCompletedTask > 0){
                 if(totalChallengeValid >= achievement.getRequiredChallenge() && totalCompletedTask >= achievement.getRequiredTask()){
-                    UserAchievement userAchievement = UserAchievement.builder()
+                    UserAchievement newUserAchievement = UserAchievement.builder()
                             .user(user)
                             .achievement(achievement)
                             .earnedDate(LocalDateTime.now())
                             .isNotification(false)
                             .build();
-                    this.userAchievementRepository.save(userAchievement);
+                    this.userAchievementRepository.save(newUserAchievement);
 
-                    this.emailService.sendEmailReceiveAchievement(userAchievement);
+                    this.emailService.sendEmailReceiveAchievement(newUserAchievement);
 
                     user.setChallengeLimit(achievement.getChallengeBonus()+ user.getChallengeLimit());
                     user.setTaskLimit(achievement.getTaskBonus()+ user.getTaskLimit());
@@ -98,27 +102,27 @@ public class AchievementService {
                     this.userRepository.save(user);
                 }
             } else if (totalCompletedTask>=achievement.getRequiredTask()) {
-                UserAchievement userAchievement = UserAchievement.builder()
+                UserAchievement newUserAchievement = UserAchievement.builder()
                         .user(user)
                         .achievement(achievement)
                         .earnedDate(LocalDateTime.now())
                         .build();
-                this.userAchievementRepository.save(userAchievement);
+                this.userAchievementRepository.save(newUserAchievement);
 
-                this.emailService.sendEmailReceiveAchievement(userAchievement);
+                this.emailService.sendEmailReceiveAchievement(newUserAchievement);
 
                 user.setTaskLimit(achievement.getTaskBonus()+ user.getTaskLimit());
                 user.setCoins(achievement.getCoinBonus()+user.getCoins());
                 this.userRepository.save(user);
             } else if (totalChallengeValid>=achievement.getRequiredChallenge()){
-                UserAchievement userAchievement = UserAchievement.builder()
+                UserAchievement newUserAchievement = UserAchievement.builder()
                         .user(user)
                         .achievement(achievement)
                         .earnedDate(LocalDateTime.now())
                         .build();
-                this.userAchievementRepository.save(userAchievement);
+                this.userAchievementRepository.save(newUserAchievement);
 
-                this.emailService.sendEmailReceiveAchievement(userAchievement);
+                this.emailService.sendEmailReceiveAchievement(newUserAchievement);
 
                 user.setChallengeLimit(achievement.getChallengeBonus()+ user.getChallengeLimit());
                 user.setCoins(achievement.getCoinBonus()+user.getCoins());

@@ -11,14 +11,17 @@ import org.springframework.stereotype.Service;
 public class RewardService {
     private final RewardRepository rewardRepository;
     private final UserRepository userRepository;
+    public static final Long COST_STREAK_PROTECTION = 100L;
+    public static final Long COST_ADD_TASK_LIMIT = 200L;
+    public static final Long COST_ADD_CHALLENGE_LIMIT = 300L;
 
     public RewardService(RewardRepository rewardRepository, UserRepository userRepository) {
         this.rewardRepository = rewardRepository;
         this.userRepository = userRepository;
     }
     @Transactional
-    public void save(Reward reward, String userName) {
-        User user = userRepository.findUserByUserName(userName).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
+    public void save(Reward reward, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng!"));
         if (reward.getTitle().isEmpty()) {
             System.out.println(reward.getTitle());
             throw new RuntimeException("Thêm thất bại tiêu đề đang trống");
@@ -77,5 +80,35 @@ public class RewardService {
         user.setCoins(user.getCoins() - reward.getCoinCost());
         this.userRepository.save(user);
         return exchange;
+    }
+
+    @Transactional
+    public void exchangeSystemReward(User user, int rewardId){
+        switch (rewardId){
+            case 1:
+                if (user.getCoins() < COST_STREAK_PROTECTION) {
+                    throw new RuntimeException("Bạn không đủ xu để mua vật phẩm này.");
+                }
+                user.setCoins(user.getCoins() - COST_STREAK_PROTECTION);
+                user.setStreakProtectionCount(user.getStreakProtectionCount() + 1);
+                userRepository.save(user);
+                break;
+            case 2:
+                if (user.getCoins() < COST_ADD_TASK_LIMIT) {
+                    throw new RuntimeException("Bạn không đủ xu để mua vật phẩm này.");
+                }
+                user.setCoins(user.getCoins() - COST_ADD_TASK_LIMIT);
+                user.setTaskLimit(user.getTaskLimit() + 5);
+                userRepository.save(user);
+                break;
+            case 3:
+                if (user.getCoins() < COST_ADD_CHALLENGE_LIMIT) {
+                    throw new RuntimeException("Bạn không đủ xu để mua vật phẩm này.");
+                }
+                user.setCoins(user.getCoins() - COST_ADD_CHALLENGE_LIMIT);
+                user.setChallengeLimit(user.getChallengeLimit() + 1);
+                userRepository.save(user);
+                break;
+        }
     }
 }

@@ -356,6 +356,9 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="w-100 d-flex justify-content-center">
+                            <p id="challengeStartDate" class="me-2 fw-bold"></p>đến<p id="challengeLastDate" class="ms-2 fw-bold"></p>
+                        </div>
                         <hr class="bg-white opacity-50">
                         <div class="row text-center">
                             <div class="col-md-4">
@@ -889,15 +892,13 @@
                 return response.json()
             })
             .then(data => {
-                console.log(data.title)
-                console.log(data.description)
-
-                // Update modal with challenge data
                 document.getElementById('challengeOverviewTitle').textContent = data.title;
                 document.getElementById('challengeOverviewDescription').textContent = data.description;
                 document.getElementById('bestStreak').textContent = data.bestStreak;
                 document.getElementById('completionRate').textContent = data.progress + '%';
                 document.getElementById('totalHabits').textContent = data.totalCompletedTasks;
+                document.getElementById("challengeStartDate").textContent = data.startDate;
+                document.getElementById("challengeLastDate").textContent = data.endDate;
 
                 const diaryButton = document.getElementById('diaryDuringChallenge');
                 diaryButton.setAttribute('data-user-challenge-id', userChallengeId);

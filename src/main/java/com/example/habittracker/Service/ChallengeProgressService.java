@@ -322,11 +322,17 @@ public class ChallengeProgressService {
                 }
 
                 if (isEndDay) {
-                    // Nếu là cuối ngày và chưa hoàn thành
-                    if (currentStreak > 0) {
-                        emailService.sendStreakLostNotification(userChallenge, currentStreak);
+                    User user = userChallenge.getUser();
+                    if (user.getStreakProtectionCount() != null && user.getStreakProtectionCount() > 0) {
+                        user.setStreakProtectionCount(user.getStreakProtectionCount() - 1);
+                        userService.updateUser(user, null); // Lưu lại thay đổi
+                        emailService.sendStreakProtectNotification(userChallenge, currentStreak,user.getStreakProtectionCount());
+                    } else {
+                        if (currentStreak > 0) {
+                            emailService.sendStreakLostNotification(userChallenge, currentStreak);
+                        }
+                        currentStreak = 0L;
                     }
-                    currentStreak = 0L;
                 }
             }
         }

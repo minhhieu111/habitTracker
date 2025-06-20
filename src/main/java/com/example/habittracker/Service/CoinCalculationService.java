@@ -116,10 +116,10 @@ public class CoinCalculationService {
 
         // Performance multiplier
         double performanceMultiplier = 1.0;
-        if (finalCompletionRate >= 0.95) performanceMultiplier = 2.0;      // Excellent
-        else if (finalCompletionRate >= 0.85) performanceMultiplier = 1.7; // Very good
-        else if (finalCompletionRate >= 0.75) performanceMultiplier = 1.4; // Good
-        else if (finalCompletionRate >= 0.6) performanceMultiplier = 1.1;  // Fair
+        if (finalCompletionRate >= 0.95) performanceMultiplier = 2.0;
+        else if (finalCompletionRate >= 0.85) performanceMultiplier = 1.7;
+        else if (finalCompletionRate >= 0.75) performanceMultiplier = 1.4;
+        else if (finalCompletionRate >= 0.6) performanceMultiplier = 1.1;
 
         return (int)(baseReward * performanceMultiplier) + streakBonus;
     }

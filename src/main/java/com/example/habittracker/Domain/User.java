@@ -38,6 +38,8 @@ public class User {
     private LocalDateTime createAt;
     private boolean isLocked;
 
+    private Integer streakProtectionCount = 0;
+
     @OneToMany(mappedBy = "user")
     List<UserHabit> userHabits;
 

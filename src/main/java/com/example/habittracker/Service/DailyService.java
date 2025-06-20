@@ -131,12 +131,23 @@ public class DailyService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy"));
         UserDaily userDaily = userDailyRepository.findByUserAndDaily(user, daily)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy dữ liệu"));
-        Challenge challenge = challengeRepository.findById(dailyDTO.getChallengeId()).get();
+        Challenge challenge = null;
+        if(dailyDTO.getChallengeId()!=null){
+            challenge = challengeRepository.findById(dailyDTO.getChallengeId()).orElse(null);
+        }
 
         daily.setTitle(dailyDTO.getTitle());
         daily.setDescription(dailyDTO.getDescription());
         daily.setChallenge(challenge);
         this.dailyRepository.save(daily);
+
+        //cập nhật lại thử thách khi thêm thói quen vào
+        UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, daily.getChallenge()).orElse(null);;
+        if(userChallenge != null && userChallenge.getStatus() == UserChallenge.Status.ACTIVE){
+            this.challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),LocalDate.now());
+            this.challengeProgressService.recalculateUserChallengeProgress(userChallenge);
+            this.challengeProgressService.updateChallengeStreak(userChallenge,false);
+        }
 
         userDaily.setDifficulty(dailyDTO.getDifficulty());
         userDaily.setRepeatFrequency(dailyDTO.getRepeatFrequency());

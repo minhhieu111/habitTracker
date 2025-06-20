@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,8 +33,10 @@ public class UserService {
     private final UserHabitRepository userHabitRepository;
     private final TodoRepository todoRepository;
     private Long coinLimit = 500L ;
+    private final EmailService emailService;
+    private final ChallengeRepository challengeRepository;
 
-    public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, TodoRepository todoRepository) {
+    public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, TodoRepository todoRepository, EmailService emailService, ChallengeRepository challengeRepository) {
         this.userRepository = userRepository;
         this.imageService = imageService;
         this.passwordEncoder = passwordEncoder;
@@ -43,6 +46,8 @@ public class UserService {
         this.userDailyRepository = userDailyRepository;
         this.userHabitRepository = userHabitRepository;
         this.todoRepository = todoRepository;
+        this.emailService = emailService;
+        this.challengeRepository = challengeRepository;
     }
 
     @Transactional
@@ -258,5 +263,15 @@ public class UserService {
         user.setLocked(!user.isLocked());
         userRepository.save(user);
         return user.isLocked();
+    }
+
+    @Transactional
+    public void checkUserLogin(User user) {
+        LocalDate lastLogin = user.getLastLogin().toLocalDate();
+        LocalDate now = LocalDate.now();
+        List<UserChallenge> userChallenges= this.challengeRepository.findUnCompleteChallengeByUsersId(user.getUserId()).orElse(null);
+        if(ChronoUnit.DAYS.between(lastLogin, now) >= 2){
+            this.emailService.sendReminderLogin(user,userChallenges,ChronoUnit.DAYS.between(lastLogin, now));
+        }
     }
 }

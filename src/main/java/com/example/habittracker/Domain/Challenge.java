@@ -22,6 +22,7 @@ public class Challenge {
     private Visibility isPublic;
     private Long participantCount;
     private Long creatorId;
+    private Long coinEarnExpect;
 
     @OneToMany(mappedBy = "challenge")
     private List<Habit> habits;

@@ -187,6 +187,14 @@ public class HabitService {
 
         habit.setType(habitDTO.getType());
         this.habitRepository.save(habit);
+
+        //cập nhật lại thử thách khi thêm thói quen vào
+        UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, habit.getChallenge()).orElse(null);
+        if(userChallenge != null && userChallenge.getStatus() == UserChallenge.Status.ACTIVE){
+            this.challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),LocalDate.now());
+            this.challengeProgressService.recalculateUserChallengeProgress(userChallenge);
+            this.challengeProgressService.updateChallengeStreak(userChallenge,false);
+        }
     }
 
     @Transactional

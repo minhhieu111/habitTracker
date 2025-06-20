@@ -32,11 +32,10 @@ public class RewardController {
     }
 
     @PostMapping("/save")
-    public String createReward(HttpServletRequest request, Model model,@ModelAttribute("newReward") Reward reward, RedirectAttributes redirectAttributes) {
+    public String createReward(HttpServletRequest request, @ModelAttribute("newReward") Reward reward, RedirectAttributes redirectAttributes) {
         try{
-            String token = tokenUtil.getTokenFromCookies(request);
-            String email = jwtUtil.getEmailFromToken(token);
-            this.rewardService.save(reward, email);
+            User user = getUserFromRequest(request);
+            this.rewardService.save(reward, user.getUserId());
             redirectAttributes.addFlashAttribute("success", "Thêm thành công");
         }catch (RuntimeException e){
             redirectAttributes.addFlashAttribute("failed", e.getMessage());
@@ -48,7 +47,7 @@ public class RewardController {
 
     @GetMapping("/{rewardId}")
     @ResponseBody
-    public RewardDTO editReward(@PathVariable Long rewardId, Model model) {
+    public RewardDTO editReward(@PathVariable Long rewardId) {
         Reward reward = this.rewardService.getRewardById(rewardId);
         return new RewardDTO(reward.getRewardId(), reward.getTitle(), reward.getDescription(), reward.getCoinCost());
     }
@@ -89,6 +88,25 @@ public class RewardController {
         }catch(RuntimeException e){
             return ResponseEntity.badRequest().body(new RewardResponse("failed",e.getMessage(),null));
         }
+    }
 
+    @GetMapping("/buy/{rewardId}")
+    public String buyStreakProtection(HttpServletRequest request,@PathVariable("rewardId")int rewardId, RedirectAttributes redirectAttributes) {
+        try {
+            User user = getUserFromRequest(request);
+            rewardService.exchangeSystemReward(user,rewardId);
+            redirectAttributes.addFlashAttribute("success","Mua vật phẩm thành công!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("fail","Mua vật phẩm không thành công!");
+            return "redirect:/home";
+        }
+        return "redirect:/home";
+    }
+
+
+    private User getUserFromRequest(HttpServletRequest request) {
+        String token = tokenUtil.getTokenFromCookies(request);
+        String email =  this.jwtUtil.getEmailFromToken(token);
+        return this.userService.getUser(email);
     }
 }
