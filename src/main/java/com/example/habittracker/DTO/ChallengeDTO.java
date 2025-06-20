@@ -17,6 +17,7 @@ public class ChallengeDTO {
     private String title;
     private String description;
     private LocalDate endDate;
+    private LocalDate startDate;
     private Long day;
     private Challenge.Visibility isPublic;
     private List<HabitDTO> habits;
@@ -27,6 +28,7 @@ public class ChallengeDTO {
     private Double progress;
     private Long bestStreak;
     private Long totalCompletedTasks;
+    private Long totalExpectedTasks;
     private Long completedTasks;
     private Long skippedTasks;
     private List<LocalDate> completedTasksList;

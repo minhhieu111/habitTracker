@@ -29,30 +29,8 @@
                 toastBody.classList.add('text-bg-danger');
             }
 
-
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
-        }
-
-        // Reward
-        window.exchangeReward = function(rewardId) {
-            fetch(`/rewards/exchange/${rewardId}`, { method: 'GET' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === "exchange") {
-
-                        showResponseToast(data.exchange, 'exchange');
-
-                        // // Cập nhật số coin của người dùng trên giao diện
-                        document.querySelector(".user-coin").nextElementSibling.textContent -= data.exchange;
-                    } else {
-                        showResponseToast(data.message || 'Lỗi khi đổi phần thưởng!', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showResponseToast('Lỗi khi đổi phần thưởng!', 'error');
-                });
         }
     </script>
 </div>

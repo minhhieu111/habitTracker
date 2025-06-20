@@ -64,6 +64,7 @@ public class AuthService {
                 .createAt(LocalDateTime.now())
                 .achieveId(achievement.getAchievementId())
                 .isLocked(false)
+                .streakProtectionCount(0)
                 .build();
         userRepository.save(user);
         UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).isNotification(false).build();
@@ -105,6 +106,7 @@ public class AuthService {
                 .createAt(LocalDateTime.now())
                 .achieveId(achievement.getAchievementId())
                 .isLocked(false)
+                .streakProtectionCount(0)
                 .build();
 
         if (avatar != null && !avatar.isEmpty()) {
@@ -148,6 +150,7 @@ public class AuthService {
                 .taskLimit(taskLimitDefault)
                 .achieveId(achievement.getAchievementId())
                 .isLocked(false)
+                .streakProtectionCount(0)
                 .build();
         this.userRepository.save(user);
         UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).isNotification(false).build();

@@ -74,4 +74,12 @@ public class SchedulerConfig {
             this.emailService.sendEmailTaskUnComplete(userDailiesUnComplete,userHabitsUnComplete, user);
         });
     }
+
+    @Scheduled(cron="0 0 9 * * *")
+    public void sendEmailReminderLogin(){
+        List<User> users = userRepository.findAll();
+        users.forEach(user -> {
+            this.userService.checkUserLogin(user);
+        });
+    }
 }

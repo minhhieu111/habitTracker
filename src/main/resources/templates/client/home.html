@@ -35,20 +35,29 @@
 
                 <!-- Welcome Box -->
                 <div class="welcome-box">
-                    <h4>Chào bạn!</h4>
-                    <p th:text="'Bạn đang ở ngày thứ ' + ${challengeDay} + ' của thử thách Thay đổi lối sống'">
-                    Bạn đang ở ngày thứ 24 của thử thách "Thay đổi lối sống"
-                    </p>
-                    <p>Cố gắng tiếp tục nhé! <i class="fas fa-fire text-danger"></i></p>
-
-                    <div class="mt-3">
-                        <h5>Hôm nay bạn có 4 thói quen cần hoàn thành:</h5>
-                        <ul>
-                            <li>Uống 1 cốc nước</li>
-                            <li>Ngủ trước 10h</li>
-                        </ul>
+                    <div th:if="${challengeWelcomeBox}">
+                        <h4 th:text="'Chào '+${user.userName}+'!'"></h4>
+                        <p>
+                            <span>Bạn đang ở ngày thứ </span>
+                            <strong th:text="${challengeWelcomeBox.daysSinceStart}"></strong>
+                            <span> của thử thách "</span>
+                            <strong th:text="${challengeWelcomeBox.challenge.title}"></strong>
+                            <span>"</span>
+                        </p>
+                        <p>Cố gắng tiếp tục hoàn thành thử thách để trở nên tốt hơn nhé! <i class="fas fa-fire text-danger"></i></p>
                         <a href="/overview" class="text-primary">Xem chi tiết</a>
+
                     </div>
+
+                    <div th:unless="${!#lists.isEmpty(userChallenges)}">
+                        <h4>Chào mừng bạn đến với BeBet!</h4>
+                        <p>
+                            Hành trình vạn dặm bắt đầu bằng một bước chân. <br/>
+                            Hãy bắt đầu hành trình cải thiện bản thân bằng cách tạo một thử thách mới ngay hôm nay.
+                        </p>
+                        <a href="/challenge_overview" class="btn btn-warning mt-3">Tạo thử thách đầu tiên</a>
+                    </div>
+
                 </div>
 
                 <!-- challenge Section -->
@@ -125,22 +134,51 @@
                             <i class="fas fa-plus"></i> Thêm Mục
                         </button>
                     </div>
-                    <div class="rewards-contain">
-                        <div th:each="reward : ${user.getRewards()}" class="reward-item" >
+                    <ul class="nav nav-tabs mb-2" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#user-reward" type="button" role="tab" aria-controls="user-reward-pane" aria-selected="true">Người dùng</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#system-reward-pane" type="button" role="tab" aria-controls="system-reward-pane" aria-selected="false">Hệ thống</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="user-reward" role="tabpanel" aria-labelledby="user-reward" tabindex="0">
+                            <div class="rewards-contain">
+                                <div th:each="reward : ${user.getRewards()}" class="reward-item" >
 
-                            <button class="add-reward-btn reward-name" th:data-reward-id="${reward.getRewardId()}" onclick="openEditRewardModal(this.getAttribute('data-reward-id'))" >
-                                <div th:text="${reward.getTitle()}">Phần thưởng</div>
-                            </button>
+                                    <button class="add-reward-btn reward-name" th:data-reward-id="${reward.getRewardId()}" onclick="openEditRewardModal(this.getAttribute('data-reward-id'))" >
+                                        <div th:text="${reward.getTitle()}">Phần thưởng</div>
+                                    </button>
 
-                            <button class="reward-points d-flex flex-column justify-content-center align-items-center"
-                                    th:attr="data-reward-id=${reward.getRewardId()}"
-                                    onclick="exchangeReward(this.getAttribute('data-reward-id'))">
-                                <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
-                                <span th:text="${reward.getCoinCost()}">10</span>
-                            </button>
+                                    <button class="reward-points d-flex flex-column justify-content-center align-items-center"
+                                            th:attr="data-reward-id=${reward.getRewardId()}"
+                                            onclick="exchangeReward(this.getAttribute('data-reward-id'))">
+                                        <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
+                                        <span th:text="${reward.getCoinCost()}">10</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="system-reward-pane" role="tabpanel" aria-labelledby="system-reward" tabindex="0">
+                            <div class="rewards-contain">
+                                <div th:each="reward : ${systemRewards}" class="reward-item system-reward-item" >
+                                    <div class="reward-name d-flex align-items-center">
+                                        <i th:class="'system-reward-icon ' + ${reward.icon}"></i>
+                                        <div>
+                                            <div th:text="${reward.title}" class="reward-title"></div>
+                                            <small th:text="${reward.description}"></small>
+                                        </div>
+                                    </div>
+                                    <button class="reward-points system-reward-points d-flex flex-column justify-content-center align-items-center"
+                                            th:onclick="|buySystemReward(${reward.id}, ${reward.cost})|">
+                                        <img src="/images/coin-icon.png" alt="coin" class="coin-icon">
+                                        <span th:text="${reward.cost}"></span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -250,6 +288,27 @@
                 </div>
             </div>
 
+<!--            modal exchange sys reward-->
+            <div class="modal fade" id="sysExchangeModal" tabindex="-1" aria-labelledby="sysExchangeLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" >Đổi phần thưởng</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Bạn có chắc chắn muốn đổi phần thưởng với số xu:
+                            <span id="costExchange" class="ms-1"></span>
+                            <img src="/images/coin-icon.png" style="width: 20px;height: 20px" alt="">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <a id="exSysReward" class="btn btn-primary">Đồng ý</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 <!--            modal calendar-->
             <div class="modal fade" id="calendarDayModal" tabindex="-1" aria-labelledby="calendarDayModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -354,8 +413,14 @@
 
         // Function to open edit reward modal
         window.openEditRewardModal = function (rewardId) {
-            fetch('/rewards/' + rewardId)
-                .then(response => response.json())
+            fetch(`/rewards/${rewardId}`)
+                .then(response => {
+                    if(response.url.includes("/login")){
+                        window.location.href='/login'
+                        return;
+                    }
+                return response.json();
+                })
                 .then(reward => {
                     document.getElementById('updateRewardId').value = reward.rewardId;
                     document.getElementById('updateTitle').value = reward.title;
@@ -407,6 +472,40 @@
                 e.preventDefault();
             }
         });
+
+        // Reward
+        window.exchangeReward = function(rewardId) {
+            fetch(`/rewards/exchange/${rewardId}`)
+                .then(response => {
+                    if (response.url.includes("/login")) {
+                        window.location.href = '/login'
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === "exchange") {
+
+                        showResponseToast(data.exchange, 'exchange');
+
+                        document.querySelector(".user-coin").nextElementSibling.textContent -= data.exchange;
+                    } else {
+                        showResponseToast(data.message || 'Lỗi khi đổi phần thưởng!', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showResponseToast('Lỗi khi đổi phần thưởng!', 'error');
+                });
+        }
+
+        window.buySystemReward = function(rewardId, cost) {
+            document.getElementById("costExchange").textContent = cost
+            document.getElementById("exSysReward").setAttribute("href",`/rewards/buy/${rewardId}`)
+
+            const modal = new bootstrap.Modal(document.getElementById("sysExchangeModal"));
+            modal.show();
+        }
 
         // Calendar functionality
         const now = new Date();

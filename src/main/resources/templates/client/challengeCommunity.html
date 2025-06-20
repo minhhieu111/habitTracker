@@ -65,9 +65,17 @@
                     Mô tả: Duy trì chơi thể thao thay đổi hình thể
                 </div>
                 <div class="challenge-duration" th:text="'Thời gian: ' +${post.challenge.day}+ ' ngày'">20 Ngày</div>
-                <div class="participants-badge" th:text="${post.challenge.participantCount} + ' người tham gia'">
-                    2345 người tham gia
+                <div class="w-100 d-flex justify-content-between">
+                    <div class="participants-badge" th:text="${post.challenge.participantCount} + ' người tham gia'">
+                        2345 người tham gia
+                    </div>
+                    <div class="d-flex rounded-pill text-warning p-2 align-items-center">
+                        <span class="d-flex align-items-center fw-bold me-2" th:text="'Xu dự kiến: '+${post.challenge.coinEarnExpect}"></span>
+                        <img src="/images/coin-icon.png" style="height: 20px;width: 20px" alt="">
+                    </div>
                 </div>
+
+
             </div>
             <!-- Empty State -->
             <div id="emptyState" class="empty-state d-none w-100">
@@ -193,6 +201,9 @@
                                         Thay đổi thói quen trở nên lành mạnh
                                     </div>
                                 </div>
+                            </div>
+                            <div class="w-100 d-flex justify-content-center">
+                                <p id="challengeStartDate" class="me-2 fw-bold"></p>đến<p id="challengeLastDate" class="ms-2 fw-bold"></p>
                             </div>
                             <hr class="bg-white opacity-50">
                             <div class="row text-center">
@@ -492,10 +503,10 @@
                             <div class="bg-light rounded-pill p-3 mb-3 d-flex justify-content-between align-items-center">
                                 <span>${habit.title}</span>
                                 <div class="habit-toggles d-flex">
-                                    <button class="btn btn-success btn-sm rounded-circle me-2" style="display:${hiddenPositive};width: 30px; height: 30px;">
+                                    <button class="btn btn-success btn-sm rounded-circle" style="display:${hiddenPositive};width: 30px; height: 30px;">
                                         <i class="fas fa-plus"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm rounded-circle" style="display:${hiddenNegative};width: 30px; height: 30px;">
+                                    <button class="btn btn-danger btn-sm rounded-circle ms-2" style="display:${hiddenNegative};width: 30px; height: 30px;">
                                         <i class="fas fa-minus"></i>
                                     </button>
                                 </div>
@@ -572,10 +583,10 @@
                             <div class="bg-light rounded-pill p-3 mb-3 d-flex justify-content-between align-items-center">
                                 <span>${habit.title}</span>
                                 <div class="habit-toggles d-flex">
-                                    <button class="btn btn-success btn-sm rounded-circle me-2" style="display:${hiddenPositive};width: 30px; height: 30px;">
+                                    <button class="btn btn-success btn-sm rounded-circle" style="display:${hiddenPositive};width: 30px; height: 30px;">
                                         <i class="fas fa-plus"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm rounded-circle" style="display:${hiddenNegative};width: 30px; height: 30px;">
+                                    <button class="btn btn-danger btn-sm rounded-circle ms-2" style="display:${hiddenNegative};width: 30px; height: 30px;">
                                         <i class="fas fa-minus"></i>
                                     </button>
                                 </div>
@@ -630,6 +641,8 @@
                     document.getElementById('bestStreak').textContent = data.bestStreak;
                     document.getElementById('completionRate').textContent = data.progress + '%';
                     document.getElementById('totalHabits').textContent = data.totalCompletedTasks;
+                    document.getElementById("challengeStartDate").textContent = data.startDate;
+                    document.getElementById("challengeLastDate").textContent = data.endDate;
 
                     // Initialize charts
                     initLineChart(data.dailyProgresses);

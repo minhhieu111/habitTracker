@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 @Service
 public class ChallengeService {
     private final ChallengeRepository challengeRepository;
-    private final UserService userService;
     private final HabitService habitService;
     private final DailyService dailyService;
     private final UserChallengeRepository userChallengeRepository;
@@ -26,10 +25,10 @@ public class ChallengeService {
     private final UserHabitRepository userHabitRepository;
     private final UserDailyRepository userDailyRepository;
     private final HabitHistoryRepository habitHistoryRepository;
+    private final CoinCalculationService coinCalculationService;
 
-    public ChallengeService(ChallengeRepository challengeRepository, UserService userService, HabitService habitService, DailyService dailyService, UserChallengeRepository userChallengeRepository, UserChallengeDPRepository userChallengeDPRepository, ChallengeProgressService challengeProgressService, UserHabitRepository userHabitRepository, UserDailyRepository userDailyRepository, HabitHistoryRepository habitHistoryRepository) {
+    public ChallengeService(ChallengeRepository challengeRepository, HabitService habitService, DailyService dailyService, UserChallengeRepository userChallengeRepository, UserChallengeDPRepository userChallengeDPRepository, ChallengeProgressService challengeProgressService, UserHabitRepository userHabitRepository, UserDailyRepository userDailyRepository, HabitHistoryRepository habitHistoryRepository, CoinCalculationService coinCalculationService) {
         this.challengeRepository = challengeRepository;
-        this.userService = userService;
         this.habitService = habitService;
         this.dailyService = dailyService;
         this.userChallengeRepository = userChallengeRepository;
@@ -38,10 +37,11 @@ public class ChallengeService {
         this.userHabitRepository = userHabitRepository;
         this.userDailyRepository = userDailyRepository;
         this.habitHistoryRepository = habitHistoryRepository;
+        this.coinCalculationService = coinCalculationService;
     }
     @Transactional
     public List<UserChallenge> getChallenges(Long userId) {
-        return this.challengeRepository.findUnCompleteChallengeByUsers_Username(userId).get();
+        return this.challengeRepository.findUnCompleteChallengeByUsersId(userId).get();
     }
 
     @Transactional
@@ -92,6 +92,11 @@ public class ChallengeService {
     }
 
     @Transactional
+    public List<UserChallenge> getAllActiveChallenges(User user){
+        return userChallengeRepository.findByUserAndChallengeIsActive(user);
+    }
+
+    @Transactional
     public ChallengeDTO getUserChallengeDetail(User user, Long challengeId) {
         Challenge challenge = this.challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Challenge với ID: " + challengeId));
@@ -119,6 +124,10 @@ public class ChallengeService {
                 .dailyProgresses(dailyProgressDTOs)
                 .completedTasksList(userChallenge.getCompletedTasksList())
                 .status(userChallenge.getStatus())
+                .startDate(userChallenge.getStartDate())
+                .endDate(userChallenge.getEndDate())
+                .day(challenge.getDay())
+                .totalExpectedTasks(userChallenge.getTotalExpectedTasks())
                 .build();
     }
     @Transactional
@@ -210,6 +219,10 @@ public class ChallengeService {
 
         challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),startDate);
         challengeProgressService.recalculateUserChallengeProgress(userChallenge);
+
+        //cập nhật coinExpect
+        challenge.setCoinEarnExpect(this.coinCalculationService.calculateChallengeCompletionReward(challenge,userChallenge,true));
+        this.challengeRepository.save(challenge);
     }
 
     @Transactional

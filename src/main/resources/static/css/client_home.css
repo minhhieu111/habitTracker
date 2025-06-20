@@ -330,6 +330,18 @@ select {
     height: 20px;
 }
 
+.system-reward-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    height: 70px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
 /*calendar-content*/
 .tasks-contain{
     max-height: calc(2 * 62px);

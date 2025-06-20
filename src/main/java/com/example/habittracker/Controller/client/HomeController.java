@@ -9,10 +9,7 @@ import com.example.habittracker.DTO.LoginResponse;
 import com.example.habittracker.Domain.*;
 import com.example.habittracker.Repository.UserAchievementRepository;
 import com.example.habittracker.Repository.UserChallengeRepository;
-import com.example.habittracker.Service.AchievementService;
-import com.example.habittracker.Service.CalendarService;
-import com.example.habittracker.Service.ChallengeService;
-import com.example.habittracker.Service.UserService;
+import com.example.habittracker.Service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -37,8 +34,10 @@ public class HomeController {
     private final UserChallengeRepository userChallengeRepository;
     private final AchievementService achievementService;
     private final UserAchievementRepository userAchievementRepository;
+    private final SystemRewardProvider systemRewardProvider;
 
-    public HomeController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, CalendarService calendarService, UserChallengeRepository userChallengeRepository, AchievementService achievementService, UserAchievementRepository userAchievementRepository) {
+
+    public HomeController(UserService userService, TokenUtil tokenUtil, JwtUtil jwtUtil, ChallengeService challengeService, CalendarService calendarService, UserChallengeRepository userChallengeRepository, AchievementService achievementService, UserAchievementRepository userAchievementRepository, SystemRewardProvider systemRewardProvider) {
         this.userService = userService;
         this.tokenUtil = tokenUtil;
         this.jwtUtil = jwtUtil;
@@ -47,6 +46,7 @@ public class HomeController {
         this.userChallengeRepository = userChallengeRepository;
         this.achievementService = achievementService;
         this.userAchievementRepository = userAchievementRepository;
+        this.systemRewardProvider = systemRewardProvider;
     }
 
     @GetMapping("/home")
@@ -59,8 +59,16 @@ public class HomeController {
         model.addAttribute("userAchievement", achievement);
 
         //challenge
-        List<UserChallenge> userChallenges  = this.challengeService.getValidChallenges(user.getUserId());
+        List<UserChallenge> userChallenges  = this.challengeService.getAllActiveChallenges(user);
         model.addAttribute("userChallenges", userChallenges);
+
+        //welcome box challenge
+        UserChallenge userChallenge = null;
+        if(!userChallenges.isEmpty()) {
+            userChallenge = userChallenges.get(userChallenges.size()-1);
+        }
+
+        model.addAttribute("challengeWelcomeBox", userChallenge);
 
         LocalDate today = LocalDate.now();
         int currentYear = today.getYear();
@@ -75,6 +83,9 @@ public class HomeController {
 
         model.addAttribute("newReward", new Reward());
         model.addAttribute("updateReward", new Reward());
+
+        //system Reward
+        model.addAttribute("systemRewards", systemRewardProvider.getSystemRewards());
         return "client/home";
     }
 
