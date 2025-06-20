@@ -16,7 +16,6 @@ public class UserHabit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userHabitId;
-    private Long currentCount;
     private Long targetCount;
     private String emailMessage;
     private LocalDateTime timeSendEmail;

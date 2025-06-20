@@ -1,8 +1,6 @@
 package com.example.habittracker.DTO;
 
-import com.example.habittracker.Domain.Challenge;
 import com.example.habittracker.Domain.Habit;
-import com.example.habittracker.Domain.UserHabit;
 import lombok.*;
 
 @Getter

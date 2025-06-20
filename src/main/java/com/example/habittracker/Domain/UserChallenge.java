@@ -27,7 +27,6 @@ public class UserChallenge {
     private Long bestStreak = 0L;
     private Long totalCompletedTasks = 0L;
     private Long totalExpectedTasks = 0L;
-    private Long completedTasks = 0L;
     private Long skippedTasks = 0L;
 
 //   để tính streak

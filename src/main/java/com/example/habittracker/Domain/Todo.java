@@ -22,8 +22,6 @@ public class Todo {
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
     private LocalDate execution_date;
-    private String EmailMessage;
-    private LocalDateTime timeSendEmail;
     private LocalDate created_at = LocalDate.now();
     private boolean isCompleted = false;
 

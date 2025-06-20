@@ -35,11 +35,8 @@ public class AuthController {
     }
 
     @GetMapping("/login")
-    public String login(Model model, @RequestParam(value = "logout", required = false) String logout) {
+    public String login(Model model) {
         model.addAttribute("userLogin", new Login());
-        if (logout != null) {
-            model.addAttribute("message", "Bạn đã đăng xuất thành công!");
-        }
         return "auth/login";
     }
 

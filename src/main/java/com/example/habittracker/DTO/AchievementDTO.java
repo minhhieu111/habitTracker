@@ -1,6 +1,5 @@
 package com.example.habittracker.DTO;
 
-import com.example.habittracker.Domain.User;
 import lombok.*;
 
 @Setter
