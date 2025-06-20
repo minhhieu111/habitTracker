@@ -41,7 +41,7 @@ public class ChallengeService {
     }
     @Transactional
     public List<UserChallenge> getChallenges(Long userId) {
-        return this.challengeRepository.findUnCompleteChallengeByUsersId(userId).get();
+        return this.userChallengeRepository.findUnCompleteChallengeByUsersId(userId).get();
     }
 
     @Transactional

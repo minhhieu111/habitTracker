@@ -1,5 +1,6 @@
 package com.example.habittracker.Service;
 
+import com.example.habittracker.DTO.RecentActivityDTO;
 import com.example.habittracker.DTO.UserChallengeStats;
 import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.*;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,9 +36,10 @@ public class UserService {
     private final TodoRepository todoRepository;
     private Long coinLimit = 500L ;
     private final EmailService emailService;
-    private final ChallengeRepository challengeRepository;
+    private final UserAchievementRepository userAchievementRepository;
+    private final UserChallengeRepository userChallengeRepository;
 
-    public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, TodoRepository todoRepository, EmailService emailService, ChallengeRepository challengeRepository) {
+    public UserService(UserRepository userRepository, ImageService imageService, PasswordEncoder passwordEncoder, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, TodoHistoryRepository todoHistoryRepository, UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, TodoRepository todoRepository, EmailService emailService, UserAchievementRepository userAchievementRepository, UserChallengeRepository userChallengeRepository) {
         this.userRepository = userRepository;
         this.imageService = imageService;
         this.passwordEncoder = passwordEncoder;
@@ -47,7 +50,8 @@ public class UserService {
         this.userHabitRepository = userHabitRepository;
         this.todoRepository = todoRepository;
         this.emailService = emailService;
-        this.challengeRepository = challengeRepository;
+        this.userAchievementRepository = userAchievementRepository;
+        this.userChallengeRepository = userChallengeRepository;
     }
 
     @Transactional
@@ -269,9 +273,59 @@ public class UserService {
     public void checkUserLogin(User user) {
         LocalDate lastLogin = user.getLastLogin().toLocalDate();
         LocalDate now = LocalDate.now();
-        List<UserChallenge> userChallenges= this.challengeRepository.findUnCompleteChallengeByUsersId(user.getUserId()).orElse(null);
+        List<UserChallenge> userChallenges= this.userChallengeRepository.findUnCompleteChallengeByUsersId(user.getUserId()).orElse(null);
         if(ChronoUnit.DAYS.between(lastLogin, now) >= 2){
             this.emailService.sendReminderLogin(user,userChallenges,ChronoUnit.DAYS.between(lastLogin, now));
         }
+    }
+
+    @Transactional
+    public List<RecentActivityDTO> getCombinedRecentActivities(int limit) {
+        List<RecentActivityDTO> combinedList = new ArrayList<>();
+        LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
+
+        List<User> recentUsers = userRepository.findAll().stream()
+                .filter(u ->u.getCreateAt().isAfter(twoDaysAgo))
+                .toList();
+        for (User user : recentUsers) {
+            combinedList.add(RecentActivityDTO.builder()
+                    .userName(user.getUserName())
+                    .userAvatar(user.getAvatar())
+                    .activityType("Đăng Ký Mới")
+                    .description("Người dùng '" + user.getUserName() + "' đã tham gia.")
+                    .timestamp(user.getCreateAt())
+                    .build());
+        }
+
+        List<UserAchievement> recentAchievements = userAchievementRepository.findAll().stream()
+                .filter(ua -> ua.getEarnedDate() != null && ua.getEarnedDate().isAfter(twoDaysAgo))
+                .toList();
+        for (UserAchievement ua : recentAchievements) {
+            combinedList.add(RecentActivityDTO.builder()
+                    .userName(ua.getUser().getUserName())
+                    .userAvatar(ua.getUser().getAvatar())
+                    .activityType("Thành Tựu Mới")
+                    .description("'" + ua.getUser().getUserName() + "' đã đạt được thành tựu '" + ua.getAchievement().getTitle() + "'.")
+                    .timestamp(ua.getEarnedDate())
+                    .build());
+        }
+
+        List<UserChallenge> completedChallenges = userChallengeRepository.findByStatus(UserChallenge.Status.COMPLETE).stream()
+                .filter(uc -> uc.getEndDate() != null && uc.getEndDate().isAfter(LocalDate.now().minusDays(2)))
+                .toList();
+        for(UserChallenge uc : completedChallenges) {
+            combinedList.add(RecentActivityDTO.builder()
+                    .userName(uc.getUser().getUserName())
+                    .userAvatar(uc.getUser().getAvatar())
+                    .activityType("Hoàn Thành Thử Thách")
+                    .description("Chúc mừng '" + uc.getUser().getUserName() + "' đã hoàn thành thử thách '" + uc.getChallenge().getTitle() + "'.")
+                    .timestamp(uc.getEndDate().atStartOfDay())
+                    .build());
+        }
+
+        return combinedList.stream()
+                .sorted(Comparator.comparing(RecentActivityDTO::getTimestamp).reversed())
+                .limit(limit)
+                .collect(Collectors.toList());
     }
 }
