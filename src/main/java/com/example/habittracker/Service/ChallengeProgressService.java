@@ -41,13 +41,13 @@ public class ChallengeProgressService {
         UserChallenge userChallenge = userChallengeRepository.findById(userChallengeId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy dữ liệu(userChallenge)"));
 
-        // Lấy tất cả Daily Habits của người dùng thuộc challenge này mà HOẠT ĐỘNG
+        // lấy daily trong challenge đang hoạt động
         List<UserDaily> activeUserDailies = userDailyRepository.findByUserAndDailyChallengeAndUnavailableFalse(userChallenge.getUser(), userChallenge.getChallenge());
 
-        // Lấy tất cả Habits của người dùng thuộc challenge này mà HOẠT ĐỘNG
+        // lấy habit trong challenge đang hoạt động
         List<UserHabit> activeUserHabits = userHabitRepository.findByUserAndHabitChallengeAndUnavailableFalse(userChallenge.getUser(), userChallenge.getChallenge());
 
-        // --- Tính Total Expected Tasks cho ngày targetDate ---
+        // tính tổng task dự kiến cần hoàn thành trong ngày
         long expectedTasksForDay = 0L;
         for (UserDaily ud : activeUserDailies) {
             if (enableToday(ud, targetDate)) {
@@ -59,7 +59,7 @@ public class ChallengeProgressService {
         }
 
 
-        // --- Tính Total Completed Tasks cho ngày targetDate ---
+        // tính tổng task hoàn thành trong ngày
         long completedTasksForDay = 0L;
 
         completedTasksForDay += dailyHistoryRepository.countByUserDailyInAndDateAndIsCompletedTrue(activeUserDailies, targetDate);
@@ -67,7 +67,7 @@ public class ChallengeProgressService {
         completedTasksForDay += habitHistoryRepository.countByUserHabitInAndDateAndIsCompletedTrue(activeUserHabits, targetDate);
 
 
-        // --- Tính completionPercentage cho ngày targetDate ---
+        // tính phần trăm hoàn thành trong ngày
         int completionPercentage = 0;
         if (expectedTasksForDay > 0) {
             completionPercentage = (int) Math.round((double) completedTasksForDay / expectedTasksForDay * 100.0);
@@ -75,9 +75,8 @@ public class ChallengeProgressService {
             completionPercentage = 100;
         }
 
-        // --- Lưu hoặc cập nhật UserChallengeDailyProgress ---
-        UserChallengeDailyProgress dailyProgress = userChallengeDPRepository
-                .findByUserChallengeAndDate(userChallenge, targetDate)
+        //lưu, cập nhât UserChallengeDailyProgress
+        UserChallengeDailyProgress dailyProgress = userChallengeDPRepository.findByUserChallengeAndDate(userChallenge, targetDate)
                 .orElse(UserChallengeDailyProgress.builder()
                         .userChallenge(userChallenge)
                         .date(targetDate)
@@ -86,7 +85,7 @@ public class ChallengeProgressService {
         dailyProgress.setCompletionPercentage(completionPercentage);
         userChallengeDPRepository.save(dailyProgress);
 
-//        lưu ngày hoàn thành cho calendar
+        //lưu ngày hoàn thành cho calendar
         int completionThreshold = 100;
         UserChallengeDailyProgress userChallengeDailyProgress = this.userChallengeDPRepository.findByUserChallengeAndDate(userChallenge,targetDate).get();
         if(userChallengeDailyProgress.getCompletionPercentage() >= completionThreshold){
@@ -105,20 +104,16 @@ public class ChallengeProgressService {
     @Transactional
     public void recalculateUserChallengeProgress(UserChallenge userChallenge) {;
 
-        // --- BƯỚC 1: Xác định phạm vi ngày của thử thách của người dùng ---
         LocalDate challengeStartDate = userChallenge.getStartDate();
         LocalDate challengeEndDate = userChallenge.getEndDate();
 
-        // --- BƯỚC 2: Lấy các UserDaily, UserHabit, Todo (active) thuộc thử thách này của người dùng ---
         List<UserDaily> activeUserDailies = userDailyRepository.findByUserAndDailyChallengeAndUnavailableFalse(userChallenge.getUser(), userChallenge.getChallenge());
         List<UserHabit> activeUserHabits = userHabitRepository.findByUserAndHabitChallengeAndUnavailableFalse(userChallenge.getUser(), userChallenge.getChallenge());
 
-        // --- BƯỚC 3: Tính Total Expected Tasks và completed/skipped cho biểu đồ tròn ---
         long totalExpectedTasks = 0L;
         long completedTasksForChart = 0L;
         long skippedTasksForChart = 0L;
 
-        // Tổng hợp từ Daily Habits
         for (UserDaily ud : activeUserDailies) {
             long expectedDailyTasks = calculateExpectedDailyTasksInPeriod(ud, challengeStartDate, challengeEndDate);
             totalExpectedTasks += expectedDailyTasks;
@@ -128,7 +123,6 @@ public class ChallengeProgressService {
             completedTasksForChart += actualCompletedDailyTasks;
         }
 
-        // Tổng hợp từ Habits
         for (UserHabit uh : activeUserHabits) {
             long expectedHabitTasks = calculateExpectedHabitTasksInPeriod(uh, challengeStartDate, challengeEndDate);
             totalExpectedTasks += expectedHabitTasks;
@@ -145,13 +139,10 @@ public class ChallengeProgressService {
             skippedTasksForChart = 0L;
         }
 
-
-        // --- BƯỚC 4: Cập nhật các trường trong UserChallenge ---
         userChallenge.setTotalExpectedTasks(totalExpectedTasks);
         userChallenge.setTotalCompletedTasks(completedTasksForChart);
         userChallenge.setSkippedTasks(skippedTasksForChart);
 
-        // Tính progress tổng
         if (totalExpectedTasks == 0) {
             userChallenge.setProgress(100.0);
         } else {
@@ -211,13 +202,11 @@ public class ChallengeProgressService {
         LocalDate today = LocalDate.now();
         int completionThreshold = 100;
 
-        // Kiểm tra hoàn thành ngày hôm nay
         UserChallengeDailyProgress userChallengeDailyProgress = this.userChallengeDPRepository
                 .findByUserChallengeAndDate(userChallenge, today).orElse(null);
         boolean isCompletedToday = userChallengeDailyProgress != null &&
                 userChallengeDailyProgress.getCompletionPercentage() >= completionThreshold;
 
-        // Kiểm tra hoàn thành ngày hôm qua
         LocalDate yesterday = today.minusDays(1);
         boolean wasCompletedYesterday = false;
         if (!yesterday.isBefore(userChallenge.getStartDate()) && !yesterday.isAfter(userChallenge.getEndDate())) {
@@ -254,7 +243,7 @@ public class ChallengeProgressService {
                     User user = userChallenge.getUser();
                     if (user.getStreakProtectionCount() != null && user.getStreakProtectionCount() > 0) {
                         user.setStreakProtectionCount(user.getStreakProtectionCount() - 1);
-                        userService.updateUser(user, null); // Lưu lại thay đổi
+                        userService.updateUser(user, null);
                         emailService.sendStreakProtectNotification(userChallenge, currentStreak,user.getStreakProtectionCount());
                     } else {
                         if (currentStreak > 0) {

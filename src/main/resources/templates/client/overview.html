@@ -1075,7 +1075,7 @@
             fetch(url)
                 .then(response =>{
                     if(response.url.includes("/login")){
-                        window.location.href("/login");
+                        window.location.href = "/login";
                         return;
                     }
                     return response.json()
@@ -1214,7 +1214,7 @@
             fetch(url)
                 .then(response =>{
                     if(response.url.includes("/login")){
-                        window.location.href("/login");
+                        window.location.href="/login";
                         return;
                     }
                     return response.json()

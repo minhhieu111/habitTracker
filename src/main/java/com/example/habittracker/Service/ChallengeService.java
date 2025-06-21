@@ -467,8 +467,8 @@ public class ChallengeService {
             this.challengeProgressService.updateChallengeStreak(uc,true);
 
             //cập nhật iscompleteToday của userchallenge
-            uc.setCompletedToday(false);
             uc.setDaysSinceStart(ChronoUnit.DAYS.between(uc.getStartDate(), LocalDate.now().plusDays(1)));
+            uc.setCompletedToday(false);
             this.userChallengeRepository.save(uc);
         }
     }

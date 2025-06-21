@@ -31,7 +31,7 @@ public class HabitController {
             this.habitService.save(habitDTO,userName);
             redirectAttributes.addFlashAttribute("success", "Tạo thói quen thành công!");
         }catch (Exception e){
-            redirectAttributes.addFlashAttribute("failed", "Tạo thói quen thất bại!");
+            redirectAttributes.addFlashAttribute("failed", "Tạo thói quen thất bại!" +e.getMessage());
             return "redirect:/overview";
         }
         return "redirect:/overview";

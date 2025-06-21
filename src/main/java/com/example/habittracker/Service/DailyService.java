@@ -63,9 +63,13 @@ public class DailyService {
     @Transactional
     public void createDaily(DailyDTO dailyDTO, String username) {
         User creator = userService.getUser(username);
-        Challenge challenge = challengeRepository.findById(dailyDTO.getChallengeId()).get();
+        Challenge challenge = null;
+        if(dailyDTO.getChallengeId() != null){
+            challenge = challengeRepository.findById(dailyDTO.getChallengeId()).orElse(null);
+        }
 
-        if(this.challengeProgressService.totalTaskPresent(creator)>=creator.getTaskLimit()){
+        //kiểm tra limit tạo thói quen (không trong thử thách)
+        if(this.challengeProgressService.totalTaskPresent(creator)>=creator.getTaskLimit() && dailyDTO.getChallengeId() == null){
             throw new RuntimeException("Không thể tạo thêm bạn đã đạt giới hạn! giới hạn cho các task của bạn là: "+creator.getTaskLimit());
         }
 
@@ -133,6 +137,10 @@ public class DailyService {
         Challenge challenge = null;
         if(dailyDTO.getChallengeId()!=null){
             challenge = challengeRepository.findById(dailyDTO.getChallengeId()).orElse(null);
+        }
+
+        if(this.challengeProgressService.totalTaskPresent(user)>=user.getTaskLimit() && dailyDTO.getChallengeId() == null){
+            throw new RuntimeException("Không thể cập nhật bạn đã đạt giới hạn! giới hạn cho các thói quen không trong thử thách của bạn là: "+user.getTaskLimit());
         }
 
         daily.setTitle(dailyDTO.getTitle());
