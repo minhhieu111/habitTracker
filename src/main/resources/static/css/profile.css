@@ -385,7 +385,6 @@ body {
 
 .task-completion-modal .stat-item {
     text-align: center;
-    flex: 1;
 }
 
 .task-completion-modal .stat-number {
