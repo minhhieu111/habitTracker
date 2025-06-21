@@ -70,9 +70,12 @@ public class HabitService {
         if(habitDTO.getTargetCount() < 1 || habitDTO.getTargetCount() == null){
             throw new RuntimeException("Tạo Thói quen thất Bại! Mục tiêu không được để trống và mục tiêu phải lớn hơn 1");
         }
-        Challenge challenge = this.challengeRepository.findById(habitDTO.getChallengeId()).get();
+        Challenge challenge=null;
+        if(habitDTO.getChallengeId() != null){
+            challenge = this.challengeRepository.findById(habitDTO.getChallengeId()).get();
+        }
 
-        if(this.challengeProgressService.totalTaskPresent(user)>=user.getTaskLimit()){
+        if(this.challengeProgressService.totalTaskPresent(user)>=user.getTaskLimit() && habitDTO.getChallengeId() == null){
             throw new RuntimeException("Không thể tạo thêm bạn đã đạt giới hạn! giới hạn cho các task của bạn là: "+user.getTaskLimit());
         }
 
@@ -149,6 +152,10 @@ public class HabitService {
         Challenge challenge = null;
         if(habitDTO.getChallengeId()!=null){
             challenge = this.challengeRepository.findById(habitDTO.getChallengeId()).orElse(null);
+        }
+
+        if(this.challengeProgressService.totalTaskPresent(user)>=user.getTaskLimit() && habitDTO.getChallengeId() == null){
+            throw new RuntimeException("Không thể cập nhật bạn đã đạt giới hạn! giới hạn cho các thói quen không trong thử thách của bạn là: "+user.getTaskLimit());
         }
 
         habit.setTitle(habitDTO.getTitle());
