@@ -30,9 +30,9 @@ public class EmailService {
         body.append("Chào ").append(newUser.getUserName()).append(",\n\n");
         body.append("Chào mừng bạn đã gia nhập cộng đồng Bebet! Chúng tôi rất vui mừng khi bạn quyết định cùng chúng tôi xây dựng những thói quen tốt và chinh phục các thử thách.\n\n");
         body.append("Tại Bebet, bạn có thể:\n");
-        body.append("- Tạo và theo dõi các nhiệm vụ hàng ngày (Dailies).\n");
-        body.append("- Xây dựng và duy trì những thói quen tích cực (Habits) hoặc từ bỏ những thói quen tiêu cực.\n");
-        body.append("- Quản lý các công việc cần làm (To-Dos).\n");
+        body.append("- Tạo và theo dõi các nhiệm vụ hàng ngày.\n");
+        body.append("- Xây dựng và duy trì những thói quen tích cực hoặc từ bỏ những thói quen tiêu cực.\n");
+        body.append("- Quản lý các công việc cần làm.\n");
         body.append("- Tham gia vào các thử thách thú vị và kết nối với cộng đồng.\n");
         body.append("- Ghi lại hành trình của bạn với nhật ký cá nhân.\n\n");
         body.append("Hãy bắt đầu hành trình của bạn ngay hôm nay bằng cách tạo thử thách đầu tiên hoặc thêm một thói quen mới.\n");
@@ -46,6 +46,8 @@ public class EmailService {
         message.setTo(recipientEmail);
         message.setSubject(subject);
         message.setText(body.toString());
+
+        mailSender.send(message);
     }
 
     public void sendEmailCompleteChallenge(UserChallenge userChallenge) {
@@ -178,6 +180,8 @@ public class EmailService {
         message.setTo(recipientEmail);
         message.setSubject(subject);
         message.setText(body.toString());
+
+        mailSender.send(message);
     }
 
     public void sendStreakProtectNotification(UserChallenge userChallenge, long currentStreak, Integer streakProtectionCount) {

@@ -66,7 +66,7 @@ public class UserService {
 
     @Transactional
     public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(()->new RuntimeException("Không tìm thấy Email!"));
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     @Transactional

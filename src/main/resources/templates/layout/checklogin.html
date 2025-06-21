@@ -33,10 +33,10 @@
                         data.achievementsCompleted.forEach(achivement=>{
                             bodyContent += `<p>Bạn đã đạt được thành tựu <strong>${achivement.achievementTitle}</strong></p>`
                             if(achivement.bonusChallenge!=null){
-                                bodyContent += `<li>Bạn thêm được <strong>+${achivement.bonusChallenge}</strong> thử thách nữa</li>>`
+                                bodyContent += `<li>Bạn thêm được <strong>+${achivement.bonusChallenge}</strong> thử thách nữa</li>`
                             }
                             if(achivement.bonusTask!=null){
-                                bodyContent += `<li>Bạn thêm được <strong>+${achivement.bonusTask}</strong> các thói quen nữa</li>>`
+                                bodyContent += `<li>Bạn thêm được <strong>+${achivement.bonusTask}</strong> các thói quen nữa</li>`
                             }
                         })
                     }

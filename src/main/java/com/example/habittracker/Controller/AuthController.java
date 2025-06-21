@@ -101,11 +101,11 @@ public class AuthController {
             String avatar = principal.getAttribute("picture");
 
             User user = this.userService.findUserByEmail(email);
-            if(user.isLocked()) {
-                throw new RuntimeException("Tài khoản của bạn đã bị khóa!");
-            }
             if(user == null) {
                 user = this.authService.createOAuth2User(username,email,avatar);
+            }
+            if(user.isLocked()) {
+                throw new RuntimeException("Tài khoản của bạn đã bị khóa!");
             }
             String token = jwtUtil.generateToken(user.getEmail(), user.getRole().toString());
             user.setToken(token);
