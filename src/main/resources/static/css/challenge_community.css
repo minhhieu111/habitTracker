@@ -403,7 +403,7 @@ select {
 
 .modal-dialog-left{
     position: absolute;
-    right:80%;
+    left:5%;
     width: 30%;
 }
 

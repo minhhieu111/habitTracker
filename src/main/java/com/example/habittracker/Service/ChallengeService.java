@@ -26,8 +26,10 @@ public class ChallengeService {
     private final UserDailyRepository userDailyRepository;
     private final HabitHistoryRepository habitHistoryRepository;
     private final CoinCalculationService coinCalculationService;
+    private final UserService userService;
+    private final EmailService emailService;
 
-    public ChallengeService(ChallengeRepository challengeRepository, HabitService habitService, DailyService dailyService, UserChallengeRepository userChallengeRepository, UserChallengeDPRepository userChallengeDPRepository, ChallengeProgressService challengeProgressService, UserHabitRepository userHabitRepository, UserDailyRepository userDailyRepository, HabitHistoryRepository habitHistoryRepository, CoinCalculationService coinCalculationService) {
+    public ChallengeService(ChallengeRepository challengeRepository, HabitService habitService, DailyService dailyService, UserChallengeRepository userChallengeRepository, UserChallengeDPRepository userChallengeDPRepository, ChallengeProgressService challengeProgressService, UserHabitRepository userHabitRepository, UserDailyRepository userDailyRepository, HabitHistoryRepository habitHistoryRepository, CoinCalculationService coinCalculationService, UserService userService, EmailService emailService) {
         this.challengeRepository = challengeRepository;
         this.habitService = habitService;
         this.dailyService = dailyService;
@@ -38,6 +40,8 @@ public class ChallengeService {
         this.userDailyRepository = userDailyRepository;
         this.habitHistoryRepository = habitHistoryRepository;
         this.coinCalculationService = coinCalculationService;
+        this.userService = userService;
+        this.emailService = emailService;
     }
     @Transactional
     public List<UserChallenge> getChallenges(Long userId) {
@@ -188,14 +192,14 @@ public class ChallengeService {
         if (challengeDTO.getHabits() != null) {
             for (HabitDTO habitDTO : challengeDTO.getHabits()) {
                 habitDTO.setChallengeId(challenge.getChallengeId());
-                habitService.save(habitDTO, creator.getUserName());
+                habitService.save(habitDTO, creator.getEmail());
             }
         }
 
         if (challengeDTO.getDailies() != null) {
             for (DailyDTO dailyDTO : challengeDTO.getDailies()) {
                 dailyDTO.setChallengeId(challenge.getChallengeId());
-                dailyService.createDaily(dailyDTO, creator.getUserName());
+                dailyService.createDaily(dailyDTO, creator.getEmail());
             }
         }
 
@@ -256,8 +260,6 @@ public class ChallengeService {
         userChallenge.setEndDate(challengeDTO.getEndDate());
         userChallengeRepository.save(userChallenge);
 
-        challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),LocalDate.now());
-        challengeProgressService.recalculateUserChallengeProgress(userChallenge);
 
         // Xử lý Habits
         List<HabitDTO> existingHabits = habitService.getHabitsByUser_ChallengeId(challenge.getChallengeId());
@@ -277,7 +279,7 @@ public class ChallengeService {
         for (HabitDTO habitDTO : challengeDTO.getHabits()) {
             if (habitDTO.getHabitId() == null) {
                 habitDTO.setChallengeId(challenge.getChallengeId());
-                habitService.save(habitDTO, creator.getUserName());
+                habitService.save(habitDTO, creator.getEmail());
             }
         }
 
@@ -299,9 +301,11 @@ public class ChallengeService {
         for (DailyDTO dailyDTO : challengeDTO.getDailies()) {
             if (dailyDTO.getDailyId() == null) {
                 dailyDTO.setChallengeId(challenge.getChallengeId());
-                dailyService.createDaily(dailyDTO, creator.getUserName());
+                dailyService.createDaily(dailyDTO, creator.getEmail());
             }
         }
+        challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),LocalDate.now());
+        challengeProgressService.recalculateUserChallengeProgress(userChallenge);
     }
 
     @Transactional
@@ -489,6 +493,14 @@ public class ChallengeService {
         Challenge challenge = this.challengeRepository.findById(challengeId).orElseThrow(()->new RuntimeException("Không tìm thấy thử thách!"));
         challenge.setIsPublic(approve?Challenge.Visibility.PUBLIC:Challenge.Visibility.PRIVATE);
         this.challengeRepository.save(challenge);
+        User creator = this.userService.getUserById(challenge.getCreatorId());
+        if(creator != null){
+            if(approve){
+                this.emailService.sendChallengeApprovedEmail(creator, challenge);
+            }else {
+                emailService.sendChallengeRejectedEmail(creator, challenge);
+            }
+        }
     }
 
 }

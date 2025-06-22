@@ -97,7 +97,7 @@ public class RewardController {
             rewardService.exchangeSystemReward(user,rewardId);
             redirectAttributes.addFlashAttribute("success","Mua vật phẩm thành công!");
         } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("fail","Mua vật phẩm không thành công!");
+            redirectAttributes.addFlashAttribute("failed","Mua vật phẩm không thành công! "+e.getMessage());
             return "redirect:/home";
         }
         return "redirect:/home";

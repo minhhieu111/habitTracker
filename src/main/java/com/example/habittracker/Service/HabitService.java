@@ -158,13 +158,16 @@ public class HabitService {
             throw new RuntimeException("Không thể cập nhật bạn đã đạt giới hạn! giới hạn cho các thói quen không trong thử thách của bạn là: "+user.getTaskLimit());
         }
 
-        if(!habit.getChallenge().getIsPublic().equals(Challenge.Visibility.PUBLIC)){
-            habit.setTitle(habitDTO.getTitle());
-            habit.setDescription(habitDTO.getDescription());
-            habit.setChallenge(challenge);
-        }else{
-            throw new RuntimeException("Không thể chỉnh sửa thói quen đã đăng lên cộng đồng!");
+        if(habit.getChallenge()!=null){
+            if(!habit.getChallenge().getIsPublic().equals(Challenge.Visibility.PUBLIC)){
+                habit.setTitle(habitDTO.getTitle());
+                habit.setDescription(habitDTO.getDescription());
+                habit.setChallenge(challenge);
+            }else{
+                throw new RuntimeException("Không thể chỉnh sửa thói quen đã đăng lên cộng đồng!");
+            }
         }
+
 
         UserHabit userHabit = this.userHabitRepository.findUserHabitByHabitAndUser(habit,user).orElseThrow(()->new RuntimeException("Lỗi khi lưu dữ liệu chỉnh sửa!"));
         Habit.HabitType oldType = habit.getType();
