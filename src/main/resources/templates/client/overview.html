@@ -958,13 +958,17 @@
                         checkbox.checked = daily.repeatMonthDays.includes(Number(checkbox.value));
                     });
 
-
+console.log(daily)
 
                     if(daily.public){
                         dailyInput.readOnly = true
                         dailyDes.readOnly = true
                         dailyInputUpdateChallenge.addEventListener('mousedown', function(event) {event.preventDefault();});
                         dailyDifficult.readOnly = true
+                    }else{
+                        dailyInput.readOnly = false
+                        dailyDes.readOnly = false
+                        dailyDifficult.readOnly = false
                     }
 
                     const form = document.getElementById('dailyForm');
