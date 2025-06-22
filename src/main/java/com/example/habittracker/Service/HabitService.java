@@ -158,9 +158,13 @@ public class HabitService {
             throw new RuntimeException("Không thể cập nhật bạn đã đạt giới hạn! giới hạn cho các thói quen không trong thử thách của bạn là: "+user.getTaskLimit());
         }
 
-        habit.setTitle(habitDTO.getTitle());
-        habit.setDescription(habitDTO.getDescription());
-        habit.setChallenge(challenge);
+        if(!habit.getChallenge().getIsPublic().equals(Challenge.Visibility.PUBLIC)){
+            habit.setTitle(habitDTO.getTitle());
+            habit.setDescription(habitDTO.getDescription());
+            habit.setChallenge(challenge);
+        }else{
+            throw new RuntimeException("Không thể chỉnh sửa thói quen đã đăng lên cộng đồng!");
+        }
 
         UserHabit userHabit = this.userHabitRepository.findUserHabitByHabitAndUser(habit,user).orElseThrow(()->new RuntimeException("Lỗi khi lưu dữ liệu chỉnh sửa!"));
         Habit.HabitType oldType = habit.getType();
@@ -274,7 +278,7 @@ public class HabitService {
             habitDTO.setCompleted(true);
 
             if(!(habit.getType().name().equals("NEGATIVE")) && habitHistory.getCoinEarned()==0){
-                Long coinEarn = this.coinCalculationService.calculatePositiveHabitCoins(habit, habit.getChallenge() != null);
+                Long coinEarn = this.coinCalculationService.calculatePositiveHabitCoins(userHabit, habit.getChallenge() != null);
                 Long actualCoinEarned = this.userService.getCoinComplete(user, coinEarn);
                 habitHistory.setCoinEarned(actualCoinEarned);
                 String message;
@@ -343,7 +347,7 @@ public class HabitService {
 
             Long coinEarn = 0L;
             if(userHabit.getHabit().getType().name().equals("NEGATIVE")){
-                coinEarn = this.coinCalculationService.calculateNegativeHabitCoins(userHabit.getHabit(),userHabit.getNegativeCount(), userHabit.getHabit().getChallenge() != null);
+                coinEarn = this.coinCalculationService.calculateNegativeHabitCoins(userHabit,userHabit.getNegativeCount(), userHabit.getHabit().getChallenge() != null);
                 Long actualCoinEarn = 0L;
                 if(userHabit.getUser().getLimitCoinsEarnedPerDay()<=coinLimitDefault){
                     actualCoinEarn = this.userService.getCoinComplete(userHabit.getUser(),coinEarn);

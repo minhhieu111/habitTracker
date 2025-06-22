@@ -15,25 +15,26 @@ public class CoinCalculationService {
             Habit.Difficulty.HARD, 35
     );
 
-    public long calculatePositiveHabitCoins(Habit habit, boolean isInChallenge) {
-        int baseCoins = BASE_COINS.get(habit.getDifficulty());
+    public long calculatePositiveHabitCoins(UserHabit userHabit, boolean isInChallenge) {
+        int baseCoins = BASE_COINS.get(userHabit.getDifficulty());
 
         double challengeMultiplier = isInChallenge ? 1.3 : 1.0;
 
-        int totalCoins = (int) ((baseCoins) * challengeMultiplier);
+        double targetBonus = Math.min(1.5, 1.0 + (userHabit.getTargetCount() / 5.0) * 0.1);
+
+        int totalCoins = (int) ((baseCoins) * challengeMultiplier * targetBonus);
         return Math.min(totalCoins, 50);
     }
 
-    public long calculateNegativeHabitCoins(Habit habit, long dailyNegativeCount, boolean isInChallenge) {
-        int baseCoins = BASE_COINS.get(habit.getDifficulty());
+    public long calculateNegativeHabitCoins(UserHabit userHabit, long dailyNegativeCount, boolean isInChallenge) {
+        int baseCoins = BASE_COINS.get(userHabit.getDifficulty());
 
         // Chỉ được xu nếu không vượt target trong ngày
-        if (dailyNegativeCount >= habit.getTargetCount()) {
+        if (dailyNegativeCount >= userHabit.getTargetCount()) {
             return 0;
         }
 
-        // Tính success rate dựa trên việc tránh được thói quen xấu
-        double successRate = Math.max(0, 1.0 - (double)dailyNegativeCount / habit.getTargetCount());
+        double successRate = Math.max(0, 1.0 - (double)dailyNegativeCount / userHabit.getTargetCount());
         double challengeMultiplier = isInChallenge ? 1.3 : 1.0;
 
         int dailyCoins = (int)(baseCoins * successRate);
@@ -43,7 +44,7 @@ public class CoinCalculationService {
     }
 
     public long calculateDailyCoins(UserDaily userDaily, boolean isInChallenge) {
-        int baseCoins = BASE_COINS.get(convertToHabitDifficulty(userDaily.getDaily().getDifficulty(),null));
+        int baseCoins = BASE_COINS.get(convertToHabitDifficulty(userDaily.getDifficulty(),null));
         long streakBonus = Math.min(userDaily.getStreak() / 7, 8);
         double challengeMultiplier = isInChallenge ? 1.3 : 1.0;
 

@@ -143,10 +143,14 @@ public class DailyService {
             throw new RuntimeException("Không thể cập nhật bạn đã đạt giới hạn! giới hạn cho các thói quen không trong thử thách của bạn là: "+user.getTaskLimit());
         }
 
-        daily.setTitle(dailyDTO.getTitle());
-        daily.setDescription(dailyDTO.getDescription());
-        daily.setChallenge(challenge);
-        this.dailyRepository.save(daily);
+        if(!daily.getChallenge().getIsPublic().equals(Challenge.Visibility.PUBLIC)){
+            daily.setTitle(dailyDTO.getTitle());
+            daily.setDescription(dailyDTO.getDescription());
+            daily.setChallenge(challenge);
+            this.dailyRepository.save(daily);
+        }else{
+            throw new RuntimeException("Không thể chỉnh sửa thói quen đã đăng lên cộng đồng!");
+        }
 
         //cập nhật lại thử thách khi thêm thói quen vào
         UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, daily.getChallenge()).orElse(null);;
