@@ -235,4 +235,45 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    @Async
+    public void sendChallengeApprovedEmail(User recipient, Challenge challenge) {
+        String subject = "Chúc mừng! Thử thách \"" + challenge.getTitle() + "\" của bạn đã được duyệt!";
+        StringBuilder body = new StringBuilder();
+        body.append("Chào ").append(recipient.getUserName()).append(",\n\n");
+        body.append("Chúng tôi rất vui mừng thông báo rằng thử thách cộng đồng của bạn, \"").append(challenge.getTitle()).append("\", đã được quản trị viên duyệt.\n\n");
+        body.append("Giờ đây, thử thách của bạn đã công khai và mọi người có thể tham gia cùng bạn.\n");
+        body.append("Hãy chuẩn bị cho một hành trình đầy thú vị và truyền cảm hứng cho cộng đồng nhé!\n\n");
+        body.append("Trân trọng,\n");
+        body.append("Đội ngũ Bebet");
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderEmail);
+        message.setTo(recipient.getEmail());
+        message.setSubject(subject);
+        message.setText(body.toString());
+
+        mailSender.send(message);
+    }
+
+    @Async
+    public void sendChallengeRejectedEmail(User recipient, Challenge challenge) {
+        String subject = "Thông báo: Thử thách \"" + challenge.getTitle() + "\" của bạn không được duyệt.";
+        StringBuilder body = new StringBuilder();
+        body.append("Chào ").append(recipient.getUserName()).append(",\n\n");
+        body.append("Chúng tôi xin thông báo rằng thử thách cộng đồng của bạn, \"").append(challenge.getTitle()).append("\", đã không được quản trị viên duyệt.\n\n");
+        body.append("Có thể có một số lý do khiến thử thách của bạn không được duyệt, chẳng hạn như nội dung không phù hợp hoặc vi phạm các nguyên tắc cộng đồng.\n");
+        body.append("Bạn có thể chỉnh sửa lại thử thách và gửi lại để được xem xét.\n\n");
+        body.append("Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi để được hỗ trợ.\n\n");
+        body.append("Trân trọng,\n");
+        body.append("Đội ngũ Bebet");
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderEmail);
+        message.setTo(recipient.getEmail());
+        message.setSubject(subject);
+        message.setText(body.toString());
+
+        mailSender.send(message);
+    }
 }

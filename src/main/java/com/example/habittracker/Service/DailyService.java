@@ -142,14 +142,15 @@ public class DailyService {
         if(this.challengeProgressService.totalTaskPresent(user)>=user.getTaskLimit() && dailyDTO.getChallengeId() == null){
             throw new RuntimeException("Không thể cập nhật bạn đã đạt giới hạn! giới hạn cho các thói quen không trong thử thách của bạn là: "+user.getTaskLimit());
         }
-
-        if(!daily.getChallenge().getIsPublic().equals(Challenge.Visibility.PUBLIC)){
-            daily.setTitle(dailyDTO.getTitle());
-            daily.setDescription(dailyDTO.getDescription());
-            daily.setChallenge(challenge);
-            this.dailyRepository.save(daily);
-        }else{
-            throw new RuntimeException("Không thể chỉnh sửa thói quen đã đăng lên cộng đồng!");
+        daily.setChallenge(challenge);
+        if(daily.getChallenge()!=null){
+            if(!daily.getChallenge().getIsPublic().equals(Challenge.Visibility.PUBLIC)){
+                daily.setTitle(dailyDTO.getTitle());
+                daily.setDescription(dailyDTO.getDescription());
+                this.dailyRepository.save(daily);
+            }else{
+                throw new RuntimeException("Không thể chỉnh sửa thói quen đã đăng lên cộng đồng!");
+            }
         }
 
         //cập nhật lại thử thách khi thêm thói quen vào
@@ -265,8 +266,8 @@ public class DailyService {
             userDaily.setStreak(userDaily.getStreak() - 1);
 
             Long coinBack = this.dailyHistoryRepository.findCoinEarnedByUserDailyAndUser(userDaily,today);
-            dailyDTO.setCoinEarned(coinBack);
             Long actualCoinBack = this.userService.getCoinComplete(user,-coinBack);
+            dailyDTO.setCoinEarned(actualCoinBack);
             String message;
             if(actualCoinBack<0){
                 message = ""+actualCoinBack;

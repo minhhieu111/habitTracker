@@ -851,11 +851,7 @@
                     if (data.userCoinMessage != null) {
                         showResponseToast(data.userCoinMessage, 'completeTask');
                         let currentCoins = parseInt(document.querySelector(".user-coin").nextElementSibling.textContent);
-                        if (data.completed) {
-                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
-                        } else {
-                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins - data.coinEarned;
-                        }
+                        document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
                     }
                 })
                 .catch(error=>{
@@ -958,7 +954,6 @@
                         checkbox.checked = daily.repeatMonthDays.includes(Number(checkbox.value));
                     });
 
-console.log(daily)
 
                     if(daily.public){
                         dailyInput.readOnly = true
@@ -1105,11 +1100,7 @@ console.log(daily)
                     if (data.userCoinMessage != null) {
                         showResponseToast(data.userCoinMessage, 'completeTask');
                         let currentCoins = parseInt(document.querySelector(".user-coin").nextElementSibling.textContent);
-                        if (data.completed) {
-                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
-                        } else {
-                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins - data.coinEarned;
-                        }
+                        document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
                     }
                 })
                 .catch(error => {
@@ -1250,11 +1241,7 @@ console.log(daily)
                     if (data.userCoinMessage != null) {
                         showResponseToast(data.userCoinMessage, 'completeTask');
                         let currentCoins = parseInt(document.querySelector(".user-coin").nextElementSibling.textContent);
-                        if (data.completed) {
-                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
-                        } else {
-                            document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins - data.coinEarned;
-                        }
+                        document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;
                     }
                 })
                 .catch(error => {

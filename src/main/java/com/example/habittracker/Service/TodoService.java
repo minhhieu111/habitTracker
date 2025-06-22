@@ -175,7 +175,7 @@ public class TodoService {
                 todoHistory.setCoinEarned(0L);
                 String message;
                 if(actualCoinBack<0){
-                    message = ""+coinBack;
+                    message = ""+actualCoinBack;
                 }else{
                     message ="";
                 }
@@ -215,7 +215,7 @@ public class TodoService {
                 todoHistory.setCoinEarned(0L);
                 String message;
                 if(actualCoinBack<0){
-                    message = ""+coinBack;
+                    message = ""+actualCoinBack;
                 }else{
                     message ="";
                 }
