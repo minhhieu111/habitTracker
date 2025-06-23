@@ -17,6 +17,7 @@ public class DiaryDTO {
     private String content;
     private MultipartFile image;
     private String imageUrl;
+    private Long challengeId;
     private List<TaskDTO> completedTasks;
     private LocalDate today;
     private String userCoinMessage;

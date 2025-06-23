@@ -19,6 +19,7 @@ public class Diary {
     private LocalDate date;
     private String content;
     private String imageUrl;
+    private Long challengeId;
 
     @ManyToOne()
     @JoinColumn(name="user_id")
