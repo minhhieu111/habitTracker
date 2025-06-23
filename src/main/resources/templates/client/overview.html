@@ -221,7 +221,6 @@
             </div>
         </div>
 
-
         <!--Modal Delete Habit-->
         <div class="modal fade" id="deleteHabitModal" tabindex="-1">
             <div class="modal-dialog">
@@ -575,7 +574,13 @@
                                     <div class="d-flex justify-content-center w-100">
                                         <img id="diaryImagePreview" class="img-fluid mt-1" style="max-width: 300px; max-height: 400px; display: none;" />
                                     </div>
-
+                                </div>
+                                <div class="mb-3" >
+                                    <label for="diaryChallenge"  class="form-label">Viết nhật ký cho thử thách</label>
+                                    <select class="form-control"  id="diaryChallenge" th:field="*{challengeId}">
+                                        <option th:value="${null}" selected>Không có</option>
+                                        <option th:each="challenge : ${userChallenges}" th:value="${challenge.getChallenge().getChallengeId()}" th:text="${challenge.getChallenge().getTitle()}"></option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -1272,6 +1277,7 @@
             document.getElementById("diaryImagePreview").style.display = 'none';
             document.getElementById("diaryImagePreview").src = '';
             document.getElementById("completedTasksList").innerHTML = '';
+            document.getElementById("diaryChallenge").value = '';
 
             document.getElementById("deleteDiaryButton").style.display = 'none';
             document.getElementById("updateTasksButton").style.display = 'block';
@@ -1309,6 +1315,7 @@
                     } else {
                         document.getElementById("diaryImagePreview").style.display = 'none';
                     }
+                    document.getElementById("diaryChallenge").value=diary.challengeId==null?'':diary.challengeId;
 
                     // Load completed tasks
                     const completedTasksList = document.getElementById("completedTasksList");

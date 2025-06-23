@@ -49,6 +49,7 @@ public class DiaryService {
     public List<Diary> getDiariesByUser(User user) {
         return diaryRepository.findByUser(user);
     }
+
     @Transactional
     public DiaryDTO getDiaryDTO(Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
@@ -82,6 +83,7 @@ public class DiaryService {
                 .date(diary.getDate())
                 .content(diary.getContent())
                 .imageUrl(diary.getImageUrl())
+                .challengeId(diary.getChallengeId())
                 .completedTasks(completedTasks)
                 .today(LocalDate.now())
                 .build();
@@ -93,6 +95,7 @@ public class DiaryService {
         Diary diary = Diary.builder()
                 .date(today)
                 .content(diaryDTO.getContent())
+                .challengeId(diaryDTO.getChallengeId())
                 .user(user)
                 .userHabitList(new ArrayList<>())
                 .userDailyList(new ArrayList<>())
@@ -135,10 +138,9 @@ public class DiaryService {
         Diary diary = diaryRepository.findById(diaryDTO.getDiaryId())
                 .orElseThrow(() -> new RuntimeException("Nhật ký không tìm thấy"));
 
-        // Cập nhật nội dung
         diary.setContent(diaryDTO.getContent());
+        diary.setChallengeId(diaryDTO.getChallengeId());
 
-        // Xử lý ảnh
         if (image != null && !image.isEmpty()) {
             try {
                 String filePath = imageService.saveImage(image, photoFolder);;
@@ -148,12 +150,10 @@ public class DiaryService {
             }
         }
 
-        // Xóa tất cả quan hệ cũ
         diary.getUserHabitList().clear();
         diary.getUserDailyList().clear();
         diary.getTodoList().clear();
 
-        // Lấy danh sách task hoàn thành dựa trên ngày của Diary
         LocalDate today = diary.getDate();
         List<Long> habitIds = habitHistoryRepository.findCompletedHabitIdsByUserAndDate(diary.getUser(), today);
         List<Long> dailyIds = dailyHistoryRepository.findCompletedDailyIdsByUserAndDate(diary.getUser(), today);
@@ -163,7 +163,6 @@ public class DiaryService {
         List<UserDaily> completedDailies = dailyIds.isEmpty() ? new ArrayList<>() : userDailyRepository.findAllById(dailyIds);
         List<Todo> completedTodos = todoIds.isEmpty() ? new ArrayList<>() : todoRepository.findAllById(todoIds);
 
-        // Gán task mới
         diary.getUserHabitList().addAll(completedHabits);
         diary.getUserDailyList().addAll(completedDailies);
         diary.getTodoList().addAll(completedTodos);
@@ -182,7 +181,7 @@ public class DiaryService {
     public DiaryDTO updateDiaryTasks(Long diaryId, User user) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new RuntimeException("Nhật ký không tìm thấy"));
-        LocalDate today = LocalDate.now(); // Sử dụng ngày của Diary
+        LocalDate today = LocalDate.now();
 
         List<Long> habitIds = habitHistoryRepository.findCompletedHabitIdsByUserAndDate(user, today);
         List<Long> dailyIds = dailyHistoryRepository.findCompletedDailyIdsByUserAndDate(user, today);
@@ -208,14 +207,12 @@ public class DiaryService {
     public List<TaskDTO> getCompletedTasks(User user) {
         LocalDate today = LocalDate.now();
 
-        // Lấy tất cả ID
         List<Long> habitIds = habitHistoryRepository.findCompletedHabitIdsByUserAndDate(user, today);
         List<Long> dailyIds = dailyHistoryRepository.findCompletedDailyIdsByUserAndDate(user, today);
         List<Long> todoIds = todoHistoryRepository.findCompletedTodoIdsByUserAndDate(user, today);
 
         List<TaskDTO> completedTasks = new ArrayList<>();
 
-        // Lấy tất cả habits
         if (!habitIds.isEmpty()) {
             List<UserHabit> habits = userHabitRepository.findAllById(habitIds);
             habits.forEach(habit -> completedTasks.add(TaskDTO.builder()
@@ -224,7 +221,6 @@ public class DiaryService {
                     .build()));
         }
 
-        // Lấy tất cả dailies
         if (!dailyIds.isEmpty()) {
             List<UserDaily> dailies = userDailyRepository.findAllById(dailyIds);
             dailies.forEach(daily -> completedTasks.add(TaskDTO.builder()
@@ -233,7 +229,6 @@ public class DiaryService {
                     .build()));
         }
 
-        // Lấy tất cả todos
         if (!todoIds.isEmpty()) {
             List<Todo> todos = todoRepository.findAllById(todoIds);
             todos.forEach(todo -> completedTasks.add(TaskDTO.builder()
@@ -254,6 +249,7 @@ public class DiaryService {
 
         List<Diary> diaries = diaryRepository.findDiaryInChallenge(
                 userChallenge.getUser(),
+                userChallenge.getChallenge().getChallengeId(),
                 userChallenge.getStartDate(),
                 endDate
         );

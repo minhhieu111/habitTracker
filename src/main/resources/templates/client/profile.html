@@ -442,7 +442,7 @@
             <div class="modal-header text-white text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 30px 20px 20px;">
                 <div class="w-100">
                     <h4 class="modal-title fw-bold mb-2" id="diaryModalLabel">Nhật ký</h4>
-                    <p class="mb-0 opacity-75" id="diaryCount" th:text="'Bạn đã viết '+ ${journalEntries.size()}">Thử thách có thể chia sẻ: 3</p>
+                    <p class="mb-0 opacity-75" id="diaryCount" th:text="'Bạn đã viết '+ ${journalEntries.size()}"></p>
                 </div>
                 <button type="button" class="btn-close btn-close-white position-absolute" style="top: 15px; right: 15px;" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -595,7 +595,7 @@
 </div>
 
 <!--diary detail-->
-<div class="modal fade" id="modalDiary" tabindex="-1">
+<div class="modal fade" id="modalDiary" style="background-color: rgba(44,44,44,0.59)" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header text-bg-warning p-4">
@@ -604,8 +604,7 @@
                     <input type="text" id="diaryId" style="display: none">
                     <div class="mb-3">
                         <label for="diaryContentInput" class="form-label">Nội dung <span class="text-danger">*</span></label>
-                        <textarea class="form-control" readonly id="diaryContentInput" rows="3"></textarea>
-
+                        <textarea class="form-control" style="background-color: rgba(253, 253, 253, 0.5);" id="diaryContentInput" rows="3" readonly></textarea>
                     </div>
                     <div class="mb-3">
                         <div class="d-flex justify-content-center w-100">
