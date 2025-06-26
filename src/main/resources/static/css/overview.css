@@ -23,6 +23,13 @@ body {
     background-color: #fff;
     font-family: "Nunito", sans-serif;
 }
+.form-control::-webkit-scrollbar{
+    width: 8px;
+}
+.form-control::-webkit-scrollbar-thumb{
+    background-color: #cccccc;
+    border-radius: 4px;
+}
 
 .coin-icon {
     width: 20px;
@@ -114,6 +121,15 @@ body {
 .challenge-subtitle {
     font-size: 18px;
     margin-bottom: 10px;
+    overflow-y: auto;
+    height: 80px;
+}
+.challenge-subtitle::-webkit-scrollbar{
+    width: 8px;
+}
+.challenge-subtitle::-webkit-scrollbar-thumb{
+    background-color: #ff812d;
+    border-radius: 4px;
 }
 
 .challenge-progress {
@@ -299,6 +315,7 @@ body {
 }
 
 .task-column {
+    width: 20%;
     min-height: 482px;
     background-color: #f2f2f2;
     border-radius: 10px;
@@ -413,6 +430,8 @@ body {
     font-size: 12px;
     color: #666;
     text-overflow: ellipsis;
+    height: 15px;
+    overflow-y: hidden;
 }
 
 .task-actions {
@@ -572,6 +591,9 @@ body {
 .todo-title {
     font-weight: 500;
     font-size: 1rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .todo-menu-button {

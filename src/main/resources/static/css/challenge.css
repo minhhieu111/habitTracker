@@ -220,8 +220,10 @@ body {
     font-size: 0.9rem;
     color: #666;
     margin-bottom: 15px;
-    overflow-x: hidden;
     height: 21.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .challenge-progress {
@@ -390,6 +392,19 @@ select {
     height: 70px;
 }
 
+.challengeOverviewDescription{
+    height: 100px;
+    overflow-y: auto;
+}
+
+.challengeOverviewDescription::-webkit-scrollbar{
+    width: 6px;
+}
+.challengeOverviewDescription::-webkit-scrollbar-thumb{
+    background-color: #cccccc;
+    border-radius: 4px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     #sidebar {
@@ -421,3 +436,4 @@ select {
         grid-template-columns: 1fr;
     }
 }
+
