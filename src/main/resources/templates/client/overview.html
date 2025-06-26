@@ -772,13 +772,19 @@
 
                     deleteHabit.setAttribute("href","/habits/delete/"+habitId);
 
-                    if(habit.inChallenge){
+                    if(habit.public){
                         deleteHabitButton.style.display='none';
                         habitCreateChallenge.disabled = true
                         habitUpdateChallenge.disabled = false
                         document.getElementById("habitCreateChallengeField").setAttribute("style","display: none")
                         document.getElementById("habitUpdateChallengeField").setAttribute("style","display: block")
                         habitUpdateChallenge.value = habit.challengeId === null ? '' : habit.challengeId;
+
+                        habitTitle.readOnly = true;
+                        habitDescription.readOnly = true;
+                        habitDifficulty.readOnly = true;
+                        habitType.readOnly = true;
+                        habitUpdateChallenge.addEventListener('mousedown', function(event) {event.preventDefault();});
                     }else{
                         deleteHabitButton.style.display='block';
                         habitCreateChallenge.disabled = false
@@ -786,14 +792,6 @@
                         document.getElementById("habitCreateChallengeField").setAttribute("style","display: block")
                         document.getElementById("habitUpdateChallengeField").setAttribute("style","display: none")
                         habitCreateChallenge.value = habit.challengeId === null ? '' : habit.challengeId;
-                    }
-
-                    if(habit.public){
-                        habitTitle.readOnly = true;
-                        habitDescription.readOnly = true;
-                        habitDifficulty.readOnly = true;
-                        habitType.readOnly = true;
-                        habitUpdateChallenge.addEventListener('mousedown', function(event) {event.preventDefault();});
                     }
 
                     const form = document.getElementById('habitForm');
@@ -1102,7 +1100,8 @@
                         dailycheckbox.innerHTML = '';
                     }
 
-                    if (data.userCoinMessage != null) {
+                    console.log(data)
+                    if (data.userCoinMessage != null && data.userCoinMessage !== "") {
                         showResponseToast(data.userCoinMessage, 'completeTask');
                         let currentCoins = parseInt(document.querySelector(".user-coin").nextElementSibling.textContent);
                         document.querySelector(".user-coin").nextElementSibling.textContent = currentCoins + data.coinEarned;

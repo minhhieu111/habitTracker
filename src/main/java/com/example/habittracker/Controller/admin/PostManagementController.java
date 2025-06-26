@@ -50,7 +50,7 @@ public class PostManagementController {
     public String postManagement(@RequestParam(value = "approve")Boolean isApprove , @PathVariable("challengeId") Long challengeId, RedirectAttributes redirectAttributes) {
         try{
             this.challengeService.ChallengeApprove(challengeId, isApprove);
-            redirectAttributes.addFlashAttribute("success", "Duyệt thử thách thành công!");
+            redirectAttributes.addFlashAttribute("success", (isApprove?"Duyệt thử thách thành công!":"Từ chối thách thành công!"));
         }catch(RuntimeException e){
             redirectAttributes.addFlashAttribute("fail", "Duyệt thử thách thất bại!"+e.getMessage());
             return "redirect:/admin/posts";

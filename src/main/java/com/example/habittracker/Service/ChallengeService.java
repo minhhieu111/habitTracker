@@ -68,10 +68,6 @@ public class ChallengeService {
         return this.userChallengeRepository.findByUserAndChallenge(user,challenge).orElseThrow(()->new RuntimeException("Không tìm thấy dữ liệu thử thách!"));
     }
 
-    @Transactional
-    public List<Challenge> getAllPendingChallenge(){
-        return this.challengeRepository.findAll().stream().filter(challenge->challenge.getIsPublic().equals(Challenge.Visibility.PENDING)).collect(Collectors.toList());
-    }
 
     @Transactional
     //lấy list uc mà đag active và uc hoàn thành thử thach bằng progress 100
@@ -451,6 +447,9 @@ public class ChallengeService {
             userDailyRepository.save(userDaily);
         }
 
+
+        challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),LocalDate.now());
+        challengeProgressService.recalculateUserChallengeProgress(userChallenge);
         // Cập nhật participantCount
         challenge.setParticipantCount(challenge.getParticipantCount() + 1);
         challengeRepository.save(challenge);
