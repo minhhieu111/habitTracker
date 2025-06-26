@@ -192,6 +192,9 @@ body {
     opacity: 0.9;
     margin-bottom: 15px;
     line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .challenge-duration {
@@ -237,6 +240,15 @@ body {
     width: 80%;
     color: #a0a0a0;;
 }
+.challenge-modal-descrip::-webkit-scrollbar{
+    width: 6px;
+}
+.challenge-modal-descrip::-webkit-scrollbar-thumb{
+    background-color: #cccccc;
+    border-radius: 4px;
+}
+
+.challenge-modal-descrip
 
 .participants{
     background-color: #5e00ffcf;
@@ -390,6 +402,9 @@ select {
     opacity: 0.9;
     margin-bottom: 10px;
     line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .challenge-card-content .challenge-duration {
@@ -540,3 +555,17 @@ select {
 .spinner-border {
     color: #667eea;
 }
+
+.challengeOverviewDescription{
+    height: 100px;
+    overflow-y: auto;
+}
+
+.challengeOverviewDescription::-webkit-scrollbar{
+    width: 6px;
+}
+.challengeOverviewDescription::-webkit-scrollbar-thumb{
+    background-color: #cccccc;
+    border-radius: 4px;
+}
+

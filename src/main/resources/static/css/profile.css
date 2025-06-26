@@ -226,6 +226,13 @@ body {
     width: 80%;
     color: #a0a0a0;;
 }
+.challenge-modal-descrip::-webkit-scrollbar{
+    width: 6px;
+}
+.challenge-modal-descrip::-webkit-scrollbar-thumb{
+    background-color: #cccccc;
+    border-radius: 4px;
+}
 
 /*participate*/
 .challenge-card {
@@ -285,6 +292,9 @@ body {
     opacity: 0.9;
     margin-bottom: 10px;
     line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .challenge-card-content .challenge-duration {
