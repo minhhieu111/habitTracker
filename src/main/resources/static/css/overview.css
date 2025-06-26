@@ -122,7 +122,7 @@ body {
     font-size: 18px;
     margin-bottom: 10px;
     overflow-y: auto;
-    height: 80px;
+    max-height: 80px;
 }
 .challenge-subtitle::-webkit-scrollbar{
     width: 8px;

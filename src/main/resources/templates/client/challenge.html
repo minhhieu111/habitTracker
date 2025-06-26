@@ -214,7 +214,7 @@
                         </div>
 
                         <!-- Repeat Every -->
-                        <div class="mb-3" id="repeatEverySection" style="display: none">
+                        <div class="mb-3" id="repeatEverySection">
                             <label for="repeatEvery" class="form-label">Lặp lại sau mỗi</label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="repeatEvery" min="1" />
@@ -743,13 +743,11 @@
             document.getElementById("repeatMonthDaysError").style.display = 'none';
 
             const repeatFrequency = document.getElementById("repeatFrequency");
-            const repeatEverySection = document.getElementById("repeatEverySection");
             const repeatDaysSection = document.getElementById("repeatDaysSection");
             const repeatMonthDaysSection = document.getElementById("repeatMonthDaysSection");
 
             function updateRepeatSections() {
                 const freq = repeatFrequency.value;
-                repeatEverySection.style.display = freq === 'DAILY' ? 'block' : 'none';
                 repeatDaysSection.style.display = freq === 'WEEKLY' ? 'block' : 'none';
                 repeatMonthDaysSection.style.display = freq === 'MONTHLY' ? 'block' : 'none';
                 document.getElementById("repeatEveryUnit").textContent = freq === 'DAILY' ? 'Days' : freq === 'WEEKLY' ? 'Weeks' : 'Months';

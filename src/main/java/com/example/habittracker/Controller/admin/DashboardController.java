@@ -5,8 +5,8 @@ import com.example.habittracker.Auth.TokenUtil;
 import com.example.habittracker.DTO.RecentActivityDTO;
 import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.Achievement;
-import com.example.habittracker.Domain.Challenge;
 import com.example.habittracker.Domain.User;
+import com.example.habittracker.Domain.UserChallenge;
 import com.example.habittracker.Service.AchievementService;
 import com.example.habittracker.Service.ChallengeService;
 import com.example.habittracker.Service.UserService;
@@ -46,7 +46,7 @@ public class DashboardController {
         List<UserDTO> newUsers = this.userService.getAllNewUser();
         model.addAttribute("newUsers", newUsers);
 
-        List<Challenge> pendingChallenge = this.challengeService.getAllPendingChallenge();
+        List<UserChallenge> pendingChallenge = this.challengeService.getPendingChallenges();
         model.addAttribute("pendingChallenge", pendingChallenge);
 
         List<Achievement> achievements = this.achievementService.getAllAchievement();

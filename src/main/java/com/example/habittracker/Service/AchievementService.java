@@ -82,7 +82,7 @@ public class AchievementService {
         for (Achievement achievement : achievements) {
             //kiểm tra đã có achievement chưa
             UserAchievement userAchievement = this.achievementRepository.getUserAchievemenByUserAchievement(user,achievement).orElse(null);
-            if(userAchievement==null)continue;
+            if(userAchievement!=null)continue;
 
             if(totalChallengeValid >0 && totalCompletedTask > 0){
                 if(totalChallengeValid >= achievement.getRequiredChallenge() && totalCompletedTask >= achievement.getRequiredTask()){
