@@ -276,4 +276,26 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    public void sendPasswordResetEmail(User user, String token) {
+        String subject = "Đặt lại mật khẩu cho tài khoản Bebet của bạn";
+        String resetUrl = "http://localhost:8080/reset-password?token=" + token;
+
+        StringBuilder body = new StringBuilder();
+        body.append("Chào ").append(user.getUserName()).append(",\n\n");
+        body.append("Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản Bebet của bạn.\n\n");
+        body.append("Vui lòng nhấp vào liên kết dưới đây để đặt lại mật khẩu của bạn:\n");
+        body.append(resetUrl).append("\n\n");
+        body.append("Liên kết này sẽ hết hạn sau 30 phút. Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n\n");
+        body.append("Trân trọng,\n");
+        body.append("Đội ngũ Bebet\n");
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderEmail);
+        message.setTo(user.getEmail());
+        message.setSubject(subject);
+        message.setText(body.toString());
+
+        mailSender.send(message);
+    }
 }

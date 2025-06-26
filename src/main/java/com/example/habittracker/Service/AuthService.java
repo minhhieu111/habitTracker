@@ -5,8 +5,10 @@ import com.example.habittracker.DTO.Login;
 import com.example.habittracker.DTO.Register;
 import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.Achievement;
+import com.example.habittracker.Domain.PasswordResetToken;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Domain.UserAchievement;
+import com.example.habittracker.Repository.PasswordResetTokenRepository;
 import com.example.habittracker.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -31,15 +34,18 @@ public class AuthService {
     private final Long taskLimitDefault = 10L;
     private final Long limitCoinsEarnedPerDayDefault = 500L;
     private final EmailService emailService;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final int EXPIRY_DATE = 30;
 
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, ImageService imageService, AchievementService achievementService, EmailService emailService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, ImageService imageService, AchievementService achievementService, EmailService emailService, PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.imageService = imageService;
         this.achievementService = achievementService;
         this.emailService = emailService;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     public void register(Register register) {
@@ -156,5 +162,45 @@ public class AuthService {
         UserAchievement userAchievement = UserAchievement.builder().user(user).achievement(achievement).earnedDate(LocalDateTime.now()).isNotification(false).build();
         this.achievementService.saveUserAchievement(userAchievement);
         this.emailService.sendWelcomeEmail(user);
+    }
+
+    @Transactional
+    public void createPasswordResetTokenAndSendEmail(String email){
+        User user = this.userRepository.findByEmail(email).orElse(null);
+        if(user != null){
+            String token = UUID.randomUUID().toString();
+            PasswordResetToken passwordResetToken = PasswordResetToken.builder()
+                    .token(token)
+                    .user(user)
+                    .expiryDate(LocalDateTime.now().plusMinutes(EXPIRY_DATE))
+                    .build();
+            this.passwordResetTokenRepository.save(passwordResetToken);
+
+            this.emailService.sendPasswordResetEmail(user,token);
+        }
+    }
+
+    @Transactional
+    public UserDTO validatePasswordResetToken(String token){
+        PasswordResetToken resetToken = this.passwordResetTokenRepository.findByToken(token);
+        if(resetToken.getExpiryDate().isBefore(LocalDateTime.now())){
+            this.passwordResetTokenRepository.delete(resetToken);
+            throw new RuntimeException("Đã hết hạn phiên đặt lại mật khẩu.Vui lòng thử lại!");
+        }
+        return UserDTO.builder()
+                .userId(resetToken.getUser().getUserId())
+                .build();
+    }
+
+    @Transactional
+    public void resetPassword(UserDTO userDTO){
+        User user = this.userRepository.findById(userDTO.getUserId()).orElse(null);
+        if(user != null){
+            if(userDTO.getPassword().equals(userDTO.getConfirmPassword())){
+                user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+                this.userRepository.save(user);
+            }
+        }
+        this.passwordResetTokenRepository.deleteByUser(user);
     }
 }
