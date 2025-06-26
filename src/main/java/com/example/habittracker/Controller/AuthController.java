@@ -3,6 +3,7 @@ package com.example.habittracker.Controller;
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.DTO.Login;
 import com.example.habittracker.DTO.Register;
+import com.example.habittracker.DTO.UserDTO;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Repository.UserRepository;
 import com.example.habittracker.Service.AuthService;
@@ -127,5 +128,40 @@ public class AuthController {
             redirectAttributes.addFlashAttribute("fail", "Lỗi xảy ra khi đăng nhập! " + e.getMessage());
             return "redirect:/login";
         }
+    }
+
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordForm() {
+        return "auth/forgot_password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String processForgotPasswordRequest(@RequestParam("email") String email, RedirectAttributes redirectAttributes) {
+        try {
+            this.authService.createPasswordResetTokenAndSendEmail(email);
+            redirectAttributes.addFlashAttribute("success", " Một email chứa liên kết đặt lại mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("fail", e.getMessage());
+        }
+        return "redirect:/forgot-password";
+    }
+
+    @GetMapping("/reset-password")
+    public String showResetPasswordForm(@RequestParam("token") String token, Model model, RedirectAttributes redirectAttributes) {
+        UserDTO userDTO = this.authService.validatePasswordResetToken(token);
+        model.addAttribute("userDTO", userDTO);
+        return "auth/reset_password";
+    }
+
+    @PostMapping("/reset-password")
+    public String processResetPassword(@ModelAttribute("userDTO")UserDTO userDTO, RedirectAttributes redirectAttributes) {
+        try {
+            this.authService.resetPassword(userDTO);
+            redirectAttributes.addFlashAttribute("success", "Mật khẩu của bạn đã được đặt lại thành công. Vui lòng đăng nhập.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("fail", e.getMessage());
+            return "redirect:/login";
+        }
+        return "redirect:/login";
     }
 }

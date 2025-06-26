@@ -39,7 +39,9 @@ public class SecurityConfig{
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/home").permitAll()
+                                "/home",
+                                "/forgot-password",
+                                "/reset-password").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/home").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()

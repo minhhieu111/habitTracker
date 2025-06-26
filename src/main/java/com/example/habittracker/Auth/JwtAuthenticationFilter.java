@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         // Bỏ qua filter cho các đường dẫn /login và /register
         String requestPath = request.getServletPath();
-        if (requestPath.equals("/login") || requestPath.equals("/register")|| requestPath.equals("/css/auth_login.css")|| requestPath.equals("/css/auth_register.css") || requestPath.equals("/login_with_google")) {
+        if (requestPath.equals("/login") || requestPath.equals("/register")|| requestPath.equals("/css/auth_login.css")|| requestPath.equals("/css/auth_register.css") || requestPath.equals("/login_with_google")|| requestPath.equals("/forgot-password")|| requestPath.equals("/reset-password")) {
             filterChain.doFilter(request, response);
             return;
         }
