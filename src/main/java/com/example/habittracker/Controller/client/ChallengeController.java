@@ -2,13 +2,13 @@ package com.example.habittracker.Controller.client;
 
 import com.example.habittracker.Auth.JwtUtil;
 import com.example.habittracker.Auth.TokenUtil;
-import com.example.habittracker.DTO.ChallengeDTO;
-import com.example.habittracker.DTO.DailyDTO;
-import com.example.habittracker.DTO.HabitDTO;
+import com.example.habittracker.DTO.*;
 import com.example.habittracker.Domain.Challenge;
 import com.example.habittracker.Domain.User;
 import com.example.habittracker.Service.ChallengeService;
+import com.example.habittracker.Service.GeminiService;
 import com.example.habittracker.Service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,13 +33,15 @@ public class ChallengeController {
     private final TokenUtil tokenUtil;
     private final UserService userService;
     private final ObjectMapper objectMapper;
+    private final GeminiService geminiService;
 
-    public ChallengeController(ChallengeService challengeService, JwtUtil jwtUtil, TokenUtil tokenUtil, UserService userService, ObjectMapper objectMapper) {
+    public ChallengeController(ChallengeService challengeService, JwtUtil jwtUtil, TokenUtil tokenUtil, UserService userService, ObjectMapper objectMapper, GeminiService geminiService) {
         this.challengeService = challengeService;
         this.jwtUtil = jwtUtil;
         this.tokenUtil = tokenUtil;
         this.userService = userService;
         this.objectMapper = objectMapper;
+        this.geminiService = geminiService;
     }
 
     @PostMapping("/save")
@@ -152,6 +154,14 @@ public class ChallengeController {
         return ResponseEntity.ok().body(challengeDTO);
     }
 
+    @PostMapping("/get_suggest")
+    @ResponseBody
+    public ResponseEntity<ChallengeDTO> suggestTask(@RequestBody SuggestRequest request) throws JsonProcessingException {
+        String jsonResponse = this.geminiService.suggestHabits(request);
+        ChallengeSuggestionWrapper wrapper = objectMapper.readValue(jsonResponse, ChallengeSuggestionWrapper.class);
+        ChallengeDTO challengeDTO = wrapper.getChallengeDTO();
+        return ResponseEntity.ok().body(challengeDTO);
+    }
 
     private User getUserFromRequest(HttpServletRequest request) {
         String token = tokenUtil.getTokenFromCookies(request);

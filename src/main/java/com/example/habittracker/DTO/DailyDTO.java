@@ -16,6 +16,7 @@ public class DailyDTO {
     private Long dailyId;
     private Long userId;
     private Long challengeId;
+    private String challengeTitle;
     private String title;
     private String description;
     private Daily.Difficulty difficulty;
