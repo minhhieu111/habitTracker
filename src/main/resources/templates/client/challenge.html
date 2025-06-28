@@ -155,7 +155,7 @@
                             </div>
 
                             <div id="tasksError" class="text-danger mt-1" style="display: none;">
-                                Vui lòng thêm ít nhất một Daily Task và Habit.
+                                Vui lòng thêm ít nhất một Thói quen và Thói quen hàng ngày.
                             </div>
 
                         </div>
@@ -919,7 +919,7 @@
                 challengeDurationError.style.display = "none";
             }
 
-            if (dailiesList.length === 0 && habitsList.length === 0) {
+            if (dailiesList.length === 0 || habitsList.length === 0) {
                 tasksError.style.display = "block";
                 valid = false;
             } else {
