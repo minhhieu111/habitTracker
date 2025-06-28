@@ -938,6 +938,7 @@
                         document.getElementById("dailyCreateChallengeField").setAttribute("style", "display: none;");
                         document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: block;");
                         dailyInputUpdateChallenge.value = daily.challengeId || '';
+                        dailyInputUpdateChallenge.textContent = daily.challengeTitle;
                     }else{
                         deleteDailyButton.style.display='block'
                         dailyInputCreateChallenge.disabled = false
@@ -945,6 +946,7 @@
                         document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: none;");
                         document.getElementById("dailyCreateChallengeField").setAttribute("style", "display: block;");
                         dailyInputCreateChallenge.value = daily.challengeId || '';
+                        dailyInputUpdateChallenge.textContent = daily.challengeTitle;
                     }
 
                     deleteDaily.setAttribute("href","dailies/delete/"+dailyId);

@@ -123,12 +123,13 @@ public class DailyService {
                 .isPublic(isPublic)
                 .isInChallenge(userDaily.isInChallenge())
                 .challengeId(daily.getChallenge() != null? daily.getChallenge().getChallengeId() : null)
+                .challengeTitle(daily.getChallenge() != null? daily.getChallenge().getTitle() : "Không có")
                 .build();
     }
 
     @Transactional
     public void updateDaily(DailyDTO dailyDTO, String username) {
-        User user = userService.getUser(username);
+            User user = userService.getUser(username);
 
         Daily daily = dailyRepository.findById(dailyDTO.getDailyId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy"));
