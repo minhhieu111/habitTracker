@@ -56,9 +56,16 @@
 
                 </div>
             </div>
-            <button class="btn edit-profile-btn" id="editProfile">
-                <i class="fas fa-edit"></i>
-            </button>
+            <div class="d-flex flex-column justify-content-between align-items-end">
+                <button class="btn edit-profile-btn" id="editProfile">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <div>
+                    <p class="text-muted" th:text="'Giới hạn thử thách: '+${user.challengeLimit}"></p>
+                    <p class="text-muted" th:text="'Giới hạn thói quen: '+${user.taskLimit}"></p>
+                </div>
+            </div>
+
 
         </div>
 
@@ -147,7 +154,7 @@
 
                     <div class="mb-4">
                         <label for="editEmailAddress" class="form-label text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">Địa chỉ Email</label>
-                        <input type="email" readonly class="form-control edit-profile-input" id="editEmailAddress" th:field="*{email}"  required>
+                        <input type="email" readonly class="form-control edit-profile-input" id="editEmailAddress" th:field="*{email}" required>
                     </div>
 
                     <div class="mb-3">
