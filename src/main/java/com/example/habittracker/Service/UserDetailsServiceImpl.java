@@ -18,8 +18,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(userName).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng: " + userName));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email).orElseThrow(()->new RuntimeException("Không tìm thấy người dùng: " + email));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUserName(),

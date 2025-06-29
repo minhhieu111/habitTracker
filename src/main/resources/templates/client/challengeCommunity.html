@@ -304,7 +304,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
                     <!-- Modal Header with Purple Gradient -->
-                    <div class="modal-header text-white text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 30px 20px 20px;">
+                    <div class="modal-header text-white text-center" style="background: linear-gradient(135deg, #0c34e7 0%, #764ba2 100%); border: none; padding: 30px 20px 20px;">
                         <div class="w-100">
                             <h4 class="modal-title fw-bold mb-2" id="shareChallengeModalLabel">Chia sẻ thử thách</h4>
                             <p class="mb-0 opacity-75" id="shareableCount" th:text="'Thử thách có thể chia sẻ '+ ${userCompleteChallenge.size()}">Thử thách có thể chia sẻ: 3</p>
@@ -329,8 +329,8 @@
             </div>
         </div>
 
-            <div class="modal fade" id="challengeDetailShareModal" tabindex="-1" aria-labelledby="challengeDetailShareModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-left" style="">
+            <div class="modal fade" id="challengeDetailShareModal" style="background-color: rgba(44,44,44,0.69)" tabindex="-1" aria-labelledby="challengeDetailShareModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" style="">
                     <div class="modal-content" style="border-radius: 20px; overflow: hidden;width: 100%">
                         <!-- Modal Header with Challenge Info (Purple Gradient Background) -->
                         <div class="modal-header text-white p-4" style="background: #4900F2; border: none;">

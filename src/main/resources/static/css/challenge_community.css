@@ -360,7 +360,7 @@ select {
 
 /*share challenge*/
 .shareable-challenge-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #000f50 0%, #764ba2 100%);
     border-radius: 15px;
     padding: 20px;
     color: white;
