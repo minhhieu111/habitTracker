@@ -225,7 +225,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
             <!-- Modal Header with Purple Gradient -->
-            <div class="modal-header text-white text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 30px 20px 20px;">
+            <div class="modal-header text-white text-center" style="background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%); border: none; padding: 30px 20px 20px;">
                 <div class="w-100">
                     <h4 class="modal-title fw-bold mb-2" id="participateChallengeModalLabel">Thử thách đang tham gia</h4>
                     <p class="mb-0 opacity-75" id="participateCount" th:text="'Thử thách đang tham gia '+ ${participatingChallenges.size()}">Thử thách có thể chia sẻ: 3</p>
@@ -237,7 +237,7 @@
             <div class="modal-body" style="padding: 20px; background-color: #f8f9fa;">
                 <div class="challenge-contain">
                     <!-- Challenge Card 1 -->
-                    <div th:each="challenge : ${participatingChallenges}" class="challenge-card mb-3" >
+                    <div th:each="challenge : ${participatingChallenges}" style="background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);" class="challenge-card mb-3" >
                         <div class="challenge-card-content">
                             <h5 class="challenge-name" th:text="${challenge.challenge.title}">Chơi Thể Thao</h5>
                             <p class="challenge-desc" th:text="${challenge.challenge.description}">Mô tả: Duy trì chơi thể thao thay đổi hình thể</p>
@@ -256,7 +256,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
             <!-- Modal Header with Purple Gradient -->
-            <div class="modal-header text-white text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 30px 20px 20px;">
+            <div class="modal-header text-white text-center" style="background: linear-gradient(90deg, #00d2ff 0%, #3a47d5 100%); border: none; padding: 30px 20px 20px;">
                 <div class="w-100">
                     <h4 class="modal-title fw-bold mb-2" id="completeChallengeModalLabel">Thử thách đã hoàn thành</h4>
                     <p class="mb-0 opacity-75" id="completeCount" th:text="'Thử thách đã hoàn thành: '+ ${completedChallenges.size()}"></p>
@@ -268,7 +268,7 @@
             <div class="modal-body" style="padding: 20px; background-color: #f8f9fa;">
                 <div class="challenge-contain">
                     <!-- Challenge Card 1 -->
-                    <div th:each="challenge : ${completedChallenges}" class="challenge-card mb-3" >
+                    <div th:each="challenge : ${completedChallenges}" style="background: linear-gradient(90deg, #00d2ff 0%, #3a47d5 100%);" class="challenge-card mb-3" >
                         <div class="challenge-card-content" th:onclick="|openChallengeStats(${challenge.challenge.challengeId},${challenge.userChallengeId})|">
                             <h5 class="challenge-name" th:text="${challenge.challenge.title}"></h5>
                             <p class="challenge-desc" th:text="${challenge.challenge.description}"></p>
@@ -446,7 +446,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden;">
             <!-- Modal Header with Purple Gradient -->
-            <div class="modal-header text-white text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 30px 20px 20px;">
+            <div class="modal-header text-white text-center" style="background: linear-gradient(90deg, #d53369 0%, #daae51 100%); border: none; padding: 30px 20px 20px;">
                 <div class="w-100">
                     <h4 class="modal-title fw-bold mb-2" id="diaryModalLabel">Nhật ký</h4>
                     <p class="mb-0 opacity-75" id="diaryCount" th:text="'Bạn đã viết '+ ${journalEntries.size()}"></p>
@@ -458,7 +458,7 @@
             <div class="modal-body" style="padding: 20px; background-color: #f8f9fa;">
                 <div class="challenge-contain">
                     <!-- Challenge Card 1 -->
-                    <div th:each="journal : ${journalEntries}" class="challenge-card mb-3" >
+                    <div th:each="journal : ${journalEntries}" style="background: linear-gradient(90deg, #d53369 0%, #daae51 100%)" class="challenge-card mb-3" >
                         <div class="challenge-card-content" th:onclick="|openDiaryUpdateModal(${journal.diaryId})|">
                             <h5 class="challenge-name" th:text="${journal.date}">Chơi Thể Thao</h5>
                         </div>
