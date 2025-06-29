@@ -1,12 +1,17 @@
 package com.example.habittracker.Service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -14,40 +19,51 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ImageService {
-    static final String UPLOAD_DIR = "src/main/resources/static";
-    static final String UPLOAD_TARGET = "target/classes/static";
+    @Value("${cloudinary.cloud_name}")
+    private String cloudName;
+    @Value("${cloudinary.api_key}")
+    private String apiKey;
+    @Value("${cloudinary.api_secret}")
+    private String apiSecret;
 
+    private Cloudinary cloudinary;
+
+    @PostConstruct
+    public void init() {
+        cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret
+        ));
+    }
     @Transactional
     public String saveImage(MultipartFile image, String photoFolder) throws IOException {
         if (image == null || image.isEmpty()) {
             return null; // Không có ảnh được tải lên
         }
 
-        // Tạo tên file duy nhất
+        try {
+            // Chuyển MultipartFile thành File để Cloudinary có thể upload
+            // Hoặc có thể upload trực tiếp từ InputStream nếu thư viện hỗ trợ
+            File tempFile = Files.createTempFile("upload", image.getOriginalFilename()).toFile();
+            image.transferTo(tempFile);
 
-        String relativePath = "/images/" + photoFolder + "/" + System.currentTimeMillis() + "_" + image.getOriginalFilename();
-        try{
-            // Lưu vào thư mục src/main/resources/static
-            Path srcPath = Paths.get(UPLOAD_DIR + relativePath);
-            Files.createDirectories(srcPath.getParent()); // Tạo thư mục nếu chưa tồn tại
-            Files.write(srcPath, image.getBytes());
+            // Tải ảnh lên Cloudinary
+            Map uploadResult = cloudinary.uploader().upload(tempFile,
+                    ObjectUtils.asMap("folder", "habittracker/" + photoFolder)); // Đặt tên thư mục trên Cloudinary
 
-            // Lưu vào thư mục target/classes/static (môi trường runtime)
-            Path targetPath = Paths.get(UPLOAD_TARGET + relativePath);
-            Files.createDirectories(targetPath.getParent()); // Tạo thư mục nếu chưa tồn tại
-            Files.write(targetPath, image.getBytes());
+            // Xóa tệp tạm thời sau khi upload
+            tempFile.delete();
 
-            // Trả về đường dẫn tương đối để lưu vào DB
-            return relativePath;
-        }catch(IOException e){
-            throw new RuntimeException("Lỗi khi lưu ảnh: "+e.getMessage());
+            // Trả về URL an toàn của ảnh từ Cloudinary
+            return (String) uploadResult.get("secure_url");
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi lưu ảnh lên Cloudinary: " + e.getMessage(), e);
         }
-
     }
 
     @Transactional
@@ -56,28 +72,16 @@ public class ImageService {
             return null; // Không có URL
         }
 
-        // Tạo tên file duy nhất
-        String relativePath = "/images/" + photoFolder + "/" + System.currentTimeMillis() + "_avatar.jpg";
         try {
-            // Tải ảnh từ URL
-            URL url = new URL(imageUrl);
-            InputStream inputStream = url.openStream();
-            byte[] imageBytes = inputStream.readAllBytes();
+            // Tải ảnh từ URL lên Cloudinary trực tiếp
+            Map uploadResult = cloudinary.uploader().upload(imageUrl,
+                    ObjectUtils.asMap("folder", "habittracker/" + photoFolder));
 
-            // Lưu vào thư mục src/main/resources/static
-            Path srcPath = Paths.get(UPLOAD_DIR + relativePath);
-            Files.createDirectories(srcPath.getParent()); // Tạo thư mục nếu chưa tồn tại
-            Files.write(srcPath, imageBytes);
-
-            // Lưu vào thư mục target/classes/static (môi trường runtime)
-            Path targetPath = Paths.get(UPLOAD_TARGET + relativePath);
-            Files.createDirectories(targetPath.getParent()); // Tạo thư mục nếu chưa tồn tại
-            Files.write(targetPath, imageBytes);
-
-            // Trả về đường dẫn tương đối để lưu vào DB
-            return relativePath;
-        } catch (IOException e) {
-            throw new RuntimeException("Lỗi khi lưu avatar từ URL: " + e.getMessage());
+            // Trả về URL an toàn của ảnh từ Cloudinary
+            return (String) uploadResult.get("secure_url");
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi lưu avatar từ URL lên Cloudinary: " + e.getMessage(), e);
         }
     }
+
 }
