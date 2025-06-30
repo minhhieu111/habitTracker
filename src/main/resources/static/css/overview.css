@@ -418,8 +418,14 @@ body {
     text-align: left;
     border: none;
     background-color: inherit;
-
 }
+
+.task-detail div{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .task-detail:hover{
     background-color: rgba(102, 102, 102, 0.18);
     transition: 0.5s ease;
