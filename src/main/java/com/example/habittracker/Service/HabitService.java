@@ -131,7 +131,7 @@ public class HabitService {
                 .type(habit.getType())
                 .difficulty(userHabit.getDifficulty())
                 .targetCount(userHabit.getTargetCount())
-                .isPublic(isPublic)
+                .isPublic(isPublic)//cân nhắc bỏ
                 .isInChallenge(userHabit.isInChallenge())
                 .challengeId(habit.getChallenge() != null ? habit.getChallenge().getChallengeId() : null)
                 .build();
