@@ -792,7 +792,7 @@
                     document.getElementById("habitTitleError").style.display = 'none';
                 }
 
-                if (!targetCount || targetCount <= 1) {
+                if (!targetCount || targetCount < 1) {
                     document.getElementById("habitTargetError").style.display = 'block';
                     valid = false;
                 } else {
@@ -924,6 +924,7 @@
                 valid = false;
             } else {
                 tasksError.style.display = "none";
+            }
             }
 
             if (!valid) return;

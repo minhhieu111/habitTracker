@@ -244,13 +244,10 @@
 
         <!-- Dailies Column -->
         <div class="task-column">
-
             <div class="column-header">Hàng ngày</div>
-
             <button class="add-task-button" onclick="openDailyCreateModal()">
                 <i class="fas fa-plus"></i> Thêm công việc
             </button>
-
             <div class="tasks-contain">
                 <div class="tasks-contain">
                     <!-- Daily task item -->
@@ -273,12 +270,9 @@
                                 <span th:id="daily-streak-+${userDaily.getDaily().getDailyId()}" class="task-count"
                                       th:text="${userDaily.getStreak()}">11</span>
                             </div>
-
                         </div>
-
                     </div>
                 </div>
-
             </div>
 
             <div class="column-footer" th:if="${userDailies.size()<4}">
@@ -517,7 +511,7 @@
             </div>
         </div>
 
-        <!-- Delete Confirmation Modal -->
+        <!-- Delete Todo Confirmation Modal -->
         <div class="modal fade" id="deleteTodoModal" tabindex="-1">
             <div class="modal-dialog modal-dialog">
                 <div class="modal-content">
@@ -607,7 +601,7 @@
             </div>
         </div>
 
-        <!-- Delete Confirmation Modal -->
+        <!-- Delete Diary Confirmation Modal -->
         <div class="modal fade" id="deleteDiaryModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">

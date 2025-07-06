@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Controller
@@ -65,7 +66,8 @@ public class HomeController {
         //welcome box challenge
         UserChallenge userChallenge = null;
         if(!userChallenges.isEmpty()) {
-            userChallenge = userChallenges.get(userChallenges.size()-1);
+            int randomUserChallenge = ThreadLocalRandom.current().nextInt(0,userChallenges.size()-1);
+            userChallenge = userChallenges.get(randomUserChallenge);
         }
 
         model.addAttribute("challengeWelcomeBox", userChallenge);
