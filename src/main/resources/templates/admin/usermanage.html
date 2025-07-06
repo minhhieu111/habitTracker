@@ -77,9 +77,9 @@
                                     </div>
                                 </td>
                                 <td th:text="${user.email}"></td>
-                                <td th:text="${user.createAt.toLocalDate()}"></td>
+                                <td th:text="${#temporals.format(user.createAt, 'dd-MM-yyyy')}"></td>
                                 <td th:text="${user.role}"></td>
-                                <td th:text="${user.lastLogin}"></td>
+                                <td th:text="${#temporals.format(user.lastLogin, 'dd-MM-yyyy HH:mm')}"></td>
                                 <td>
                                     <div th:class="${!user.isLocked()? 'status-badge status-confirmed' : 'status-badge status-canceled'}"
                                          th:text="${!user.isLocked()? 'kích hoạt' : 'khóa'}">Confirmed</div>

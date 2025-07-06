@@ -75,9 +75,7 @@
                                 </div>
                                 <div class="habit-info">
                                     <div class="habit-title" th:text="${challenge.getChallenge().getTitle()}">Chơi Thể Thao</div>
-                                    <div class="habit-tasks" th:text="'Bạn có ' + ${challenge.skippedTasks} + ' công việc chưa hoàn thành'">
-                                        Bạn có 4 công việc cần làm
-                                    </div>
+                                    <div class="habit-tasks" th:text="'Bạn đã hoàn thành '+${challenge.totalCompletedTasks}+ ' và bỏ qua ' + ${challenge.skippedTasks} + ' công việc'"></div>
                                 </div>
                             </div>
                         </a>
