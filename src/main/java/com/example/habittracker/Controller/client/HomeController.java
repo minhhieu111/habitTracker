@@ -66,7 +66,7 @@ public class HomeController {
         //welcome box challenge
         UserChallenge userChallenge = null;
         if(!userChallenges.isEmpty()) {
-            int randomUserChallenge = ThreadLocalRandom.current().nextInt(0,userChallenges.size()-1);
+            int randomUserChallenge = ThreadLocalRandom.current().nextInt(userChallenges.size());
             userChallenge = userChallenges.get(randomUserChallenge);
         }
 

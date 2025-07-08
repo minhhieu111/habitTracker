@@ -32,7 +32,7 @@ public class AuthService {
     private final Long coinsDefault = 0L;
     private final Long challengeLimitDefault = 3L;
     private final Long taskLimitDefault = 10L;
-    private final Long limitCoinsEarnedPerDayDefault = 500L;
+    private final Long limitCoinsEarnedPerDayDefault = 0L;
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final int EXPIRY_DATE = 30;
