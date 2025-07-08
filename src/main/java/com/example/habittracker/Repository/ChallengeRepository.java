@@ -20,7 +20,8 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("SELECT c.dailies FROM Challenge c WHERE c.challengeId = :challengeId")
     List<Daily> findDailiesByChallengeId(@Param("challengeId") Long challengeId);
 
-    @Query("SELECT uc FROM UserChallenge uc WHERE uc.challenge.creatorId = :userId AND uc.user.userId = :userId AND uc.status='ACTIVE'")
+    @Query("SELECT uc FROM UserChallenge uc WHERE uc.challenge.creatorId = :userId AND uc.user.userId = :userId")
+        //    AND uc.status='ACTIVE'
     Optional<List<UserChallenge>> findUserChallengeOwner(@Param("userId")Long userId);
 
     @Query("SELECT uc FROM UserChallenge uc WHERE uc.user.userId = :user")
