@@ -127,9 +127,9 @@
                         </button>
                     </div>
 
-                    <div th:id="habit-task-content-+${habit.getHabit().getHabitId()}" th:class="  ${habit.isCompleted()} ? 'task-content completed' : 'task-content'">
+                    <div th:id="habit-task-content-+${habit.getHabit().getHabitId()}" th:class="  ${habit.isCompleted()} ? 'task-content completed' : 'task-content'" th:style="${habit.habit.type.name() == 'BOTH'? 'width:63%' :''}">
                         <button class="task-detail" th:onclick="|openHabitUpdateModal(${habit.getHabit().getHabitId()})|">
-                            <div class="fw-bold mb-1" th:text="${habit.getHabit().getTitle()}">Uống nước</div>
+                            <div class="fw-bold mb-1"  th:text="${habit.getHabit().getTitle()}">Uống nước</div>
                             <div class="task-description" th:text="${habit.getHabit().getDescription()}">Uống nước mỗi 1 giờ</div>
                         </button>
                         <div class="task-count d-flex justify-content-end"><span th:id="habit-+${habit.getHabit().getHabitId()}" th:text="'+'+${habit.positiveCount}+'|'+${habit.negativeCount}+'-'">+11 | 2-</span></div>
@@ -898,6 +898,7 @@
             dailyInputCreateChallenge.removeEventListener("mousedown",null);
             dailyDifficult.readOnly = false
 
+            // mục đích disable để tránh lấy giá trị của input còn lại
             dailyInputCreateChallenge.disabled = false
             dailyInputUpdateChallenge.disabled = true
             document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: none;");

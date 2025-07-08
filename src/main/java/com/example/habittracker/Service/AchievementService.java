@@ -185,7 +185,7 @@ public class AchievementService {
 
     @Transactional
     public void updateAchievement(AchievementDTO achievementDTO) {
-        Achievement achievement = this.achievementRepository.getAchievementById(achievementDTO.getAchievementId());
+         Achievement achievement = this.achievementRepository.getAchievementById(achievementDTO.getAchievementId());
 
         if(achievement == null){
             throw new RuntimeException("Không tìm thấy thành tựu!");
@@ -195,18 +195,15 @@ public class AchievementService {
             throw new RuntimeException("Tên thành tựu không được trống!");
         }
 
-        achievement = Achievement.builder()
-                .achievementId(achievementDTO.getAchievementId())
-                .title(achievementDTO.getAchievementTitle())
-                .description(achievementDTO.getAchievementDescription())
-                .requiredChallenge(achievementDTO.getRequiredChallenge())
-                .requiredTask(achievementDTO.getRequiredTask())
-                .challengeBonus(achievementDTO.getBonusChallenge())
-                .taskBonus(achievementDTO.getBonusTask())
-                .icon(achievementDTO.getIcon())
-                .coinBonus(achievementDTO.getCoinBonus())
-                .color(achievementDTO.getColor())
-                .build();
+        achievement.setTitle(achievementDTO.getAchievementTitle());
+        achievement.setDescription(achievementDTO.getAchievementDescription());
+        achievement.setRequiredChallenge(achievementDTO.getRequiredChallenge());
+        achievement.setRequiredTask(achievementDTO.getRequiredTask());
+        achievement.setChallengeBonus(achievementDTO.getBonusChallenge());
+        achievement.setTaskBonus(achievementDTO.getBonusTask());
+        achievement.setIcon(achievementDTO.getIcon());
+        achievement.setCoinBonus(achievementDTO.getCoinBonus());
+        achievement.setColor(achievementDTO.getColor());
 
         this.achievementRepository.save(achievement);
     }
