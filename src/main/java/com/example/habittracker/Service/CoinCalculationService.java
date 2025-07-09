@@ -20,7 +20,7 @@ public class CoinCalculationService {
 
         double challengeMultiplier = isInChallenge ? 1.3 : 1.0;
 
-        double targetBonus = Math.min(1.5, 1.0 + (userHabit.getTargetCount() / 5.0) * 0.1);
+        double targetBonus = Math.min(1.5, 1.0 + (userHabit.getTargetCount() / 3.0) * 0.1);
 
         int totalCoins = (int) ((baseCoins) * challengeMultiplier * targetBonus);
         return Math.min(totalCoins, 50);
@@ -29,7 +29,6 @@ public class CoinCalculationService {
     public long calculateNegativeHabitCoins(UserHabit userHabit, long dailyNegativeCount, boolean isInChallenge) {
         int baseCoins = BASE_COINS.get(userHabit.getDifficulty());
 
-        // Chỉ được xu nếu không vượt target trong ngày
         if (dailyNegativeCount >= userHabit.getTargetCount()) {
             return 0;
         }
@@ -55,12 +54,10 @@ public class CoinCalculationService {
     public long calculateTodoCoins(Todo todo) {
         int baseCoins = BASE_COINS.get(convertToHabitDifficulty(null,todo.getDifficulty()));
 
-        // Subtask bonus
         int completedSubtasks = todo.getTodoSubTasks() != null ?
                 todo.getTodoSubTasks().stream().mapToInt(sub -> sub.isCompleted() ? 1 : 0).sum() : 0;
         int subtaskBonus = completedSubtasks * 3;
 
-        // Urgency bonus (hoàn thành trước deadline)
         int urgencyBonus = calculateUrgencyBonus(todo, baseCoins);
 
         int totalCoins = baseCoins + subtaskBonus + urgencyBonus;
@@ -86,7 +83,6 @@ public class CoinCalculationService {
     public long calculateDiaryCoins(Diary diary) {
         int baseCoins = 12;
 
-        // Quality bonus
         int qualityBonus = 0;
 
         if (diary.getImageUrl() != null && !diary.getImageUrl().isEmpty()) {
@@ -123,15 +119,6 @@ public class CoinCalculationService {
         else if (finalCompletionRate >= 0.6) performanceMultiplier = 1.1;
 
         return (int)(baseReward * performanceMultiplier) + streakBonus;
-    }
-
-
-    public long calculateDailyCompletionBonus(int completedTasks) {
-        if (completedTasks >= 8) return 30; // Siêu productive
-        if (completedTasks >= 6) return 20; // Rất productive
-        if (completedTasks >= 4) return 15; // Productive
-        if (completedTasks >= 2) return 8;  // Ổn định
-        return 0;
     }
 
     public static Habit.Difficulty convertToHabitDifficulty(Daily.Difficulty dailyDifficulty, Todo.Difficulty todoDifficulty) {
