@@ -7,7 +7,6 @@ import com.example.habittracker.Repository.UserRepository;
 import com.example.habittracker.Service.*;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -38,11 +37,13 @@ public class SchedulerConfig {
         this.dailyService.resetDaily();
         this.habitService.resetHabit();
         this.userService.resetLimitCoin();
+        System.out.println("method ResetHabitCountAndDailyAndLimitCoinsEarned run ");
     }
 
    @Scheduled(cron="0 59 23 * * *")
     public void calChallengeProgress(){
         this.challengeService.CalChallengeProgressEndDay();
+       System.out.println("method calChallengeProgress run ");
    }
 
    @Scheduled(cron="30 59 23 * * *")
@@ -51,20 +52,24 @@ public class SchedulerConfig {
        for (User user : users) {
            this.achievementService.receiveAchievement(user);
        }
+       System.out.println("method achievementCheck run ");
     }
 
    @Scheduled(cron="1 0 0 * * *")
-    public void setTaskHistory(){
+    public void setTaskHistoryAndChallengeProgress(){
         this.habitService.setHabitHistoryNewDay();
         this.dailyService.setDailyHistoryNewDay();
+        this.challengeService.calChallengeProgressNewDay();
+       System.out.println("method setTaskHistory run ");
    }
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0 0 * * *")
     public void checkAllChallenges() {
         this.challengeService.checkChallengeCompleted();
+        System.out.println("method checkAllChallenges run ");
     }
 
-    @Scheduled(cron = "0 0 21 * * ?")
+    @Scheduled(cron = "0 0 21 * * *")
     public void sendUncompletedTasksEmailForAllUsers() {
         List<User> users = userRepository.findAll();
 
@@ -73,13 +78,13 @@ public class SchedulerConfig {
             List<UserDaily> userDailiesUnComplete = this.dailyService.getDailyUnCompleteEnableToday(user);
             this.emailService.sendEmailTaskUnComplete(userDailiesUnComplete,userHabitsUnComplete, user);
         });
+        System.out.println("method sendUncompletedTasksEmailForAllUsers run ");
     }
 
     @Scheduled(cron="0 0 9 * * *")
     public void sendEmailReminderLogin(){
         List<User> users = userRepository.findAll();
-        users.forEach(user -> {
-            this.userService.checkUserLogin(user);
-        });
+        users.forEach(this.userService::checkUserLogin);
+        System.out.println("method sendEmailReminderLogin run ");
     }
 }

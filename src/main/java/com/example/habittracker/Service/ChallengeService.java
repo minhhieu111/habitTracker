@@ -475,6 +475,20 @@ public class ChallengeService {
             this.userChallengeRepository.save(uc);
         }
     }
+
+    @Transactional
+    public void calChallengeProgressNewDay(){
+        LocalDate today = LocalDate.now();
+        List<UserChallenge> userChallenge = this.userChallengeRepository.findAll();
+
+        List<UserChallenge> activeUserChallenge = userChallenge.stream()
+                .filter(uc->uc.getStatus() == UserChallenge.Status.ACTIVE)
+                .filter(uc -> !today.isAfter(uc.getEndDate()) && !today.isBefore(uc.getStartDate()) )
+                .collect(Collectors.toList());
+        for(UserChallenge uc : activeUserChallenge){
+            this.challengeProgressService.calculateAndSaveDailyProgress(uc.getUserChallengeId(),LocalDate.now());
+        }
+    }
     @Transactional
     public void checkChallengeCompleted(){
         List<UserChallenge> activeChallenges = userChallengeRepository.findByStatus(UserChallenge.Status.ACTIVE);

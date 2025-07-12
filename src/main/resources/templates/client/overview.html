@@ -898,6 +898,7 @@
             dailyInputCreateChallenge.removeEventListener("mousedown",null);
             dailyDifficult.readOnly = false
 
+            // mục đích disable để tránh lấy giá trị của input còn lại
             dailyInputCreateChallenge.disabled = false
             dailyInputUpdateChallenge.disabled = true
             document.getElementById("dailyUpdateChallengeField").setAttribute("style", "display: none;");
