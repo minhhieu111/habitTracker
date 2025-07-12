@@ -13,6 +13,7 @@
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 <body>
 
 <div th:replace="layout/toastnotification.html :: toast(failed=${failed}, success=${success})"></div>
@@ -374,7 +375,7 @@
                                 <div class="chart-container" style="position: relative; height:250px;">
                                     <canvas id="habitCompletionChart"></canvas>
                                 </div>
-                                <p class="text-center mt-2">Biểu đồ hoàn thiện các thói quen</p>
+                                <p class="text-center mt-2 fw-bold">Biểu đồ hoàn thiện các thói quen</p>
                             </div>
                         </div>
 
@@ -384,17 +385,17 @@
                                 <div class="chart-container" style="position: relative; height:250px;">
                                     <canvas id="habitProgressChart"></canvas>
                                 </div>
-                                <div class="d-flex justify-content-center mt-2">
+                                <div class="d-flex justify-content-center mt-3 mb-3">
                                     <div class="me-3">
                                         <span class="badge rounded-pill" style="background-color: #0066ff;">&nbsp;</span>
-                                        <span>Bỏ qua</span>
+                                        <span>Chưa Hoàn Thành</span>
                                     </div>
                                     <div>
                                         <span class="badge rounded-pill" style="background-color: #05ff12;">&nbsp;</span>
                                         <span>Hoàn Thành</span>
                                     </div>
                                 </div>
-                                <p class="text-center">Biểu đồ về tiến độ thói quen</p>
+                                <p class="text-center fw-bold">Biểu đồ về tiến độ thói quen</p>
                             </div>
 
                             <div class="col-md-6 d-flex justify-content-between">
@@ -915,11 +916,11 @@
                 console.log(data.description)
 
                 // Update modal with challenge data
-                $('#challengeOverviewTitle').text(data.title);
-                $('#challengeOverviewDescription').text(data.description);
-                $('#bestStreak').text(data.bestStreak);
-                $('#completionRate').text(data.progress + '%');
-                $('#totalHabits').text(data.totalCompletedTasks);
+                document.getElementById('challengeOverviewTitle').textContent = data.title;
+                document.getElementById('challengeOverviewDescription').textContent = data.description;
+                document.getElementById('bestStreak').textContent = data.bestStreak;
+                document.getElementById('completionRate').textContent = data.progress + '%';
+                document.getElementById('totalHabits').textContent = data.totalCompletedTasks;
 
                 // Initialize charts
                 initLineChart(data.dailyProgresses);
@@ -983,6 +984,21 @@
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'x',
+                        },
+                        pan: {
+                            enabled: true,
+                            mode: 'x',
+                        }
                     }
                 }
             }
@@ -1029,8 +1045,8 @@
             const currentMonth = now.getMonth() + 1;
 
             // Update dropdowns
-            $('#calendar__month').val(currentMonth);
-            $('#calendar__year').val(currentYear);
+            document.getElementById('calendar__month').value = currentMonth;
+            document.getElementById('calendar__year').value = currentYear;
 
             // Generate calendar for current month
             generateCalendar(currentYear, currentMonth);
@@ -1094,10 +1110,12 @@
         }
 
         // Month and year change handlers
-        $('#calendar__month, #calendar__year').on('change', function () {
-            const selectedMonth = parseInt($('#calendar__month').val());
-            const selectedYear = parseInt($('#calendar__year').val());
-            generateCalendar(selectedYear, selectedMonth);
+        document.querySelectorAll('#calendar__month, #calendar__year').forEach(element => {
+            element.addEventListener('change', function() {
+                const selectedMonth = parseInt(document.getElementById('calendar__month').value, 10);
+                const selectedYear = parseInt(document.getElementById('calendar__year').value, 10);
+                generateCalendar(selectedYear, selectedMonth);
+            });
         });
 
     });

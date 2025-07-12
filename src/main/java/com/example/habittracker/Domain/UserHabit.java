@@ -1,9 +1,7 @@
 package com.example.habittracker.Domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +10,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserHabit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,7 @@ public class UserHabit {
     private LocalDateTime timeSendEmail;
     private Long negativeCount = 0L;
     private Long positiveCount = 0L;
-    private boolean isCompleted = false;
+    private boolean isCompleted;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

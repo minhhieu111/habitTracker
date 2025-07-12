@@ -1,9 +1,6 @@
 package com.example.habittracker.Service;
 
-import com.example.habittracker.Domain.UserChallenge;
-import com.example.habittracker.Domain.UserChallengeDailyProgress;
-import com.example.habittracker.Domain.UserDaily;
-import com.example.habittracker.Domain.UserHabit;
+import com.example.habittracker.Domain.*;
 import com.example.habittracker.Repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -141,6 +138,7 @@ public class ChallengeProgressService {
 
 
         // --- BƯỚC 4: Cập nhật các trường trong UserChallenge ---
+        userChallenge.setDaysSinceStart(ChronoUnit.DAYS.between(challengeStartDate, LocalDate.now()));
         userChallenge.setTotalExpectedTasks(totalExpectedTasks);
         userChallenge.setTotalCompletedTasks(completedTasksForChart);
         userChallenge.setCompletedTasks(completedTasksForChart);
@@ -155,6 +153,8 @@ public class ChallengeProgressService {
         }
 
         userChallengeRepository.save(userChallenge);
+
+        checkAndCompleteChallenge(userChallenge);
     }
 
     private Long calculateExpectedDailyTasksInPeriod(UserDaily userDaily, LocalDate startDate, LocalDate endDate) {
@@ -252,6 +252,32 @@ public class ChallengeProgressService {
         userChallengeRepository.save(userChallenge);
     }
 
+    @Transactional
+    public void checkAndCompleteChallenge(UserChallenge userChallenge) {
+
+        LocalDate today = LocalDate.now();
+
+        boolean isPastEndDate = today.isAfter(userChallenge.getEndDate());
+
+        boolean isProgressComplete = userChallenge.getProgress() != null && userChallenge.getProgress() >= 100.0;
+        if (isProgressComplete && userChallenge.getStatus() == UserChallenge.Status.COMPLETE) {
+            return;
+        }
+
+        if (isPastEndDate || isProgressComplete) {
+            if (userChallenge.getStatus() != UserChallenge.Status.COMPLETE) {
+                userChallenge.setNotificationShown(false);
+            }
+            userChallenge.setStatus(UserChallenge.Status.COMPLETE);
+            userChallengeRepository.save(userChallenge);
+
+
+        }else{
+            userChallenge.setStatus(UserChallenge.Status.ACTIVE);
+            userChallenge.setNotificationShown(true);
+            userChallengeRepository.save(userChallenge);
+        }
+    }
 
     public boolean enableToday(UserDaily userDaily, LocalDate today) {
         long daysSinceCreation = ChronoUnit.DAYS.between(userDaily.getDaily().getCreateAt(), today);

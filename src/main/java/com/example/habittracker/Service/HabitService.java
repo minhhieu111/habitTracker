@@ -68,7 +68,24 @@ public class HabitService {
         userHabit.setTargetCount(createHabit.getTargetCount());
         userHabit.setCurrentCount(0L);
         userHabit.setDifficulty(createHabit.getDifficulty());
+        if(habitDTO.getType() == Habit.HabitType.NEGATIVE){
+            userHabit.setCompleted(true);
+        }else{
+            userHabit.setCompleted(false);
+        }
         this.userHabitRepository.save(userHabit);
+
+        if (habitDTO.getType() == Habit.HabitType.NEGATIVE) {
+            HabitHistory initialHistory = HabitHistory.builder()
+                    .userHabit(userHabit)
+                    .date(LocalDate.now())
+                    .isCompleted(userHabit.isCompleted())
+                    .positiveCount(0L)
+                    .negativeCount(0L)
+                    .expEarned(0L)
+                    .build();
+            this.habitHistoryRepository.save(initialHistory);
+        };
     }
 
     @Transactional
@@ -102,13 +119,39 @@ public class HabitService {
 
         habit.setTitle(habitDTO.getTitle());
         habit.setDescription(habitDTO.getDescription());
-        habit.setType(habitDTO.getType());
         habit.setChallenge(challenge);
-        this.habitRepository.save(habit);
+
         UserHabit userHabit = this.userHabitRepository.findUserHabitByHabitAndUser(habit,user).orElseThrow(()->new RuntimeException("Lỗi khi lưu dữ liệu chỉnh sửa!"));
+        Habit.HabitType oldType = habit.getType();
+        Habit.HabitType newType = habitDTO.getType();
+
+        if(oldType != newType){
+            if(newType == Habit.HabitType.NEGATIVE){
+                userHabit.setCompleted(!(oldType == Habit.HabitType.BOTH && userHabit.getNegativeCount() >= userHabit.getTargetCount()));
+                userHabit.setPositiveCount(0L);
+                HabitHistory initialNegativeHistory = this.habitHistoryRepository.findDailyHistory(userHabit, LocalDate.now())
+                        .orElseGet(() -> HabitHistory.builder()
+                                .userHabit(userHabit)
+                                .date(LocalDate.now())
+                                .build());
+                initialNegativeHistory.setCompleted(userHabit.isCompleted());
+                initialNegativeHistory.setPositiveCount(0L);
+                initialNegativeHistory.setNegativeCount(0L);
+                initialNegativeHistory.setExpEarned(0L);
+                this.habitHistoryRepository.save(initialNegativeHistory);
+            } else if (newType == Habit.HabitType.POSITIVE) {
+                userHabit.setNegativeCount(0L);
+                userHabit.setCompleted(oldType == Habit.HabitType.BOTH && userHabit.getPositiveCount() >= userHabit.getTargetCount());
+            } else if (newType == Habit.HabitType.BOTH) {
+                userHabit.setCompleted(oldType == Habit.HabitType.POSITIVE && userHabit.getPositiveCount() - userHabit.getNegativeCount() >= userHabit.getTargetCount());
+            }
+        }
         userHabit.setTargetCount(habitDTO.getTargetCount());
         userHabit.setDifficulty(habitDTO.getDifficulty());
         this.userHabitRepository.save(userHabit);
+
+        habit.setType(habitDTO.getType());
+        this.habitRepository.save(habit);
     }
 
     @Transactional
@@ -160,7 +203,7 @@ public class HabitService {
         habitDTO.setNegativeCount(userHabit.getNegativeCount());
 
         if((habit.getType().name().equals("BOTH") && userHabit.getTargetCount() <= userHabit.getPositiveCount() - userHabit.getNegativeCount())
-        || (habit.getType().name().equals("NEGATIVE") && userHabit.getTargetCount() <= userHabit.getNegativeCount())
+        || (habit.getType().name().equals("NEGATIVE") && userHabit.getTargetCount() > userHabit.getNegativeCount())
         ||(habit.getType().name().equals("POSITIVE") && userHabit.getTargetCount() <= userHabit.getPositiveCount())){
             userHabit.setCompleted(true);
             habitHistory.setCompleted(true);
@@ -175,10 +218,12 @@ public class HabitService {
         this.habitHistoryRepository.save(habitHistory);
 
         if(habit.getChallenge() != null) {
-            UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, habit.getChallenge()).get();
-            this.challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),today);
-            this.challengeProgressService.recalculateUserChallengeProgress(userChallenge);
-            this.challengeProgressService.updateChallengeStreak(userChallenge);
+            UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, habit.getChallenge()).orElse(null);
+            if(userChallenge != null && userChallenge.getStatus() == UserChallenge.Status.ACTIVE){
+                this.challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),today);
+                this.challengeProgressService.recalculateUserChallengeProgress(userChallenge);
+                this.challengeProgressService.updateChallengeStreak(userChallenge);
+            }
         }
 
         return habitDTO;
@@ -206,8 +251,26 @@ public class HabitService {
 
             userHabit.setNegativeCount(0L);
             userHabit.setPositiveCount(0L);
-            userHabit.setCompleted(false);
+            userHabit.setCompleted(userHabit.getHabit().getType() == Habit.HabitType.NEGATIVE);
             this.userHabitRepository.save(userHabit);
+        }
+    }
+
+    @Transactional
+    public void setHabitHistoryNewDay(){
+        List<UserHabit> userHabits = this.userHabitRepository.findAll();
+        LocalDate today = LocalDate.now();
+        for(UserHabit userHabit : userHabits){
+            HabitHistory habitHistory = this.habitHistoryRepository.findByUserHabitAndDate(userHabit,today)
+                    .orElseGet(()->new HabitHistory().builder()
+                            .userHabit(userHabit)
+                            .negativeCount(userHabit.getNegativeCount())
+                            .positiveCount(userHabit.getPositiveCount())
+                            .date(today)
+                            .isCompleted(userHabit.isCompleted())
+                            .build()
+                    );
+            habitHistoryRepository.save(habitHistory);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.example.habittracker.DTO;
 
 import com.example.habittracker.Domain.Challenge;
+import com.example.habittracker.Domain.UserChallenge;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ public class ChallengeDTO {
     private Challenge.Visibility isPublic;
     private List<HabitDTO> habits;
     private List<DailyDTO> dailies;
+    private UserChallenge.Status status;
 
     private Double progress;
     private Long bestStreak;

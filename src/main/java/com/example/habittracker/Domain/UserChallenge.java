@@ -30,6 +30,8 @@ public class UserChallenge {
     private Long completedTasks;
     private Long skippedTasks;
 
+    private boolean isNotificationShown = false;
+
     @ElementCollection
     @CollectionTable(name = "user_challenge_completed_dates",
             joinColumns = @JoinColumn(name = "user_challenge_id"))

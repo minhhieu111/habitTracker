@@ -192,10 +192,12 @@ public class DailyService {
         this.dailyHistoryRepository.save(dailyHistory);
 
         if(daily.getChallenge() != null) {
-            UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, daily.getChallenge()).get();
-            this.challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),today);
-            this.challengeProgressService.recalculateUserChallengeProgress(userChallenge);
-            this.challengeProgressService.updateChallengeStreak(userChallenge);
+            UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, daily.getChallenge()).orElse(null);;
+            if(userChallenge != null && userChallenge.getStatus() == UserChallenge.Status.ACTIVE){
+                this.challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),today);
+                this.challengeProgressService.recalculateUserChallengeProgress(userChallenge);
+                this.challengeProgressService.updateChallengeStreak(userChallenge);
+            }
         }
 
         dailyDTO.setStreak(userDaily.getStreak());
@@ -252,6 +254,25 @@ public class DailyService {
                 userDaily.setCompleted(false);
 
                 this.userDailyRepository.save(userDaily);
+                this.dailyHistoryRepository.save(dailyHistory);
+            }
+        }
+    }
+
+    @Transactional
+    public void setDailyHistoryNewDay(){
+        List<UserDaily> userDailies = this.userDailyRepository.findAll();
+        LocalDate today = LocalDate.now();
+        for (UserDaily userDaily : userDailies) {
+            if (enableToday(userDaily, today)) {
+                DailyHistory dailyHistory = this.dailyHistoryRepository.findDailyHistory(userDaily, today)
+                        .orElseGet(() -> new DailyHistory().builder()
+                                .userDaily(userDaily)
+                                .date(today)
+                                .streak(0L)
+                                .isCompleted(false)
+                                .build());
+
                 this.dailyHistoryRepository.save(dailyHistory);
             }
         }

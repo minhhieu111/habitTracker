@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,12 +40,36 @@ public class ChallengeService {
         return this.challengeRepository.findChallengeByUsers_Username(userId).get();
     }
 
-    public ChallengeDTO getUserChallengeDetail(User user, Long challengeId) { // Đổi tên hàm cho rõ ràng hơn
+    public List<UserChallenge> getValidChallenges(Long userId) {
+        List<UserChallenge> userChallenges = this.challengeRepository.findChallengeByUsers_Username(userId).get();
+        LocalDate today = LocalDate.now();
+        return userChallenges.stream()
+                .filter(uc->{
+                        if (uc.getStatus() == UserChallenge.Status.ACTIVE) {
+                            return !today.isAfter(uc.getEndDate());
+                        }else if (uc.getStatus() == UserChallenge.Status.COMPLETE) {
+                            if (uc.getProgress() != null && uc.getProgress() >= 100.0) {
+                                return !today.isAfter(uc.getEndDate());
+                            }
+                        }return false;
+                        }
+                     ).collect(Collectors.toList());
+    }
+
+    public List<UserChallenge> getCompletedChallengesForNotification(User user) {
+        return userChallengeRepository.findByUserAndStatusAndIsNotificationShownFalse(user, UserChallenge.Status.COMPLETE);
+    }
+
+    public ChallengeDTO getUserChallengeDetail(User user, Long challengeId) {
         Challenge challenge = this.challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Challenge với ID: " + challengeId));
 
         UserChallenge userChallenge = this.userChallengeRepository.findByUserAndChallenge(user, challenge)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy UserChallenge của người dùng này cho Challenge đó."));
+
+//        challengeProgressService.calculateAndSaveDailyProgress(userChallenge.getUserChallengeId(),LocalDate.now());
+//        challengeProgressService.recalculateUserChallengeProgress(userChallenge);
+//        challengeProgressService.updateChallengeStreak(userChallenge);
 
         List<DailyProgressDTO> dailyProgressDTOs = userChallenge.getDailyProgresses()
                 .stream()
@@ -66,6 +91,7 @@ public class ChallengeService {
                 .completedTasksList(userChallenge.getCompletedTasksList())
                 .dailyProgresses(dailyProgressDTOs)
                 .completedTasksList(userChallenge.getCompletedTasksList())
+                .status(userChallenge.getStatus())
                 .build();
     }
 
@@ -140,11 +166,12 @@ public class ChallengeService {
                 .status(UserChallenge.Status.ACTIVE)
                 .streak(0L)
                 .bestStreak(0L)
-                .daysSinceStart(0L)
+                .daysSinceStart(ChronoUnit.DAYS.between(startDate, LocalDate.now()))
                 .totalCompletedTasks(0L)
                 .totalExpectedTasks(0L)
                 .completedTasks(0L)
                 .skippedTasks(0L)
+                .completedTasksList(new ArrayList<>())
                 .build();
         userChallengeRepository.save(userChallenge);
 
@@ -284,4 +311,23 @@ public class ChallengeService {
         }
     }
 
+    public void CalChallengeProgressEndDay(){
+        LocalDate today = LocalDate.now();
+        List<UserChallenge> userChallenge = this.userChallengeRepository.findAll();
+
+        List<UserChallenge> activeUserChallenge = userChallenge.stream()
+                .filter(uc->uc.getStatus() == UserChallenge.Status.ACTIVE)
+                .filter(uc -> !today.isAfter(uc.getEndDate()) && !today.isBefore(uc.getStartDate()) )
+                .collect(Collectors.toList());
+        for(UserChallenge uc : activeUserChallenge){
+            this.challengeProgressService.calculateAndSaveDailyProgress(uc.getUserChallengeId(),LocalDate.now());
+            this.challengeProgressService.recalculateUserChallengeProgress(uc);
+            this.challengeProgressService.updateChallengeStreak(uc);
+        }
+    }
+
+    public void checkChallengeCompleted(){
+        List<UserChallenge> activeChallenges = userChallengeRepository.findByStatus(UserChallenge.Status.ACTIVE);
+        activeChallenges.forEach(challengeProgressService::checkAndCompleteChallenge);
+    }
 }

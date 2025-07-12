@@ -60,13 +60,13 @@
                                     <svg viewBox="0 0 100 100">
                                         <circle class="background" cx="50" cy="50" r="40"></circle>
                                         <circle class="progress" cx="50" cy="50" r="40"
-                                                th:style="'--progress: ' + ${challenge.getStreak()}"></circle>
+                                                th:style="'--progress: ' + ${challenge.progress}"></circle>
                                     </svg>
-                                    <div class="habit-progress-text" th:text="${challenge.getStreak()} + '%'">50%</div>
+                                    <div class="habit-progress-text" th:text="${challenge.progress} + '%'">50%</div>
                                 </div>
                                 <div class="habit-info">
                                     <div class="habit-title" th:text="${challenge.getChallenge().getTitle()}">Chơi Thể Thao</div>
-                                    <div class="habit-tasks" th:text="'Bạn có ' + ${challenge.getBestStreak()} + ' công việc cần làm'">
+                                    <div class="habit-tasks" th:text="'Bạn có ' + ${challenge.skippedTasks} + ' công việc chưa hoàn thành'">
                                         Bạn có 4 công việc cần làm
                                     </div>
                                 </div>
@@ -342,12 +342,47 @@
     </div>
 </div>
 
+<!--modal complete challenge-->
+<div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="completionModalLabel">Chúc mừng!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Nội dung sẽ được điền động -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bootstrap JS Bundle with Popper -->
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/check-on-login')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                if (data.challengesCompleted && data.challengesCompleted.length > 0) {
+                    let bodyContent = '';
+                    data.challengesCompleted.forEach(challenge => {
+                        bodyContent += `<p>Thử thách <strong>${challenge.title}</strong> đã hoàn thành với tỷ lệ <strong>${challenge.progress}%</strong>!</p>`;
+                    });
+                    document.getElementById('modalBody').innerHTML = bodyContent;
+                    const modal = new bootstrap.Modal(document.getElementById('completionModal'));
+                    modal.show();
+                }
+            })
+            .catch(error => console.error('Error checking challenges:', error));
+    });
     document.addEventListener("DOMContentLoaded", function() {
 
         // Function to open edit reward modal
