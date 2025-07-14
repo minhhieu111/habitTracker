@@ -295,11 +295,14 @@
                 <!-- Main Stats Card -->
                 <div class="card mb-4" style="border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                     <div class="card-body text-center p-4">
+                        <div class="w-100 d-flex justify-content-center fw-bold">
+                            <span id="challengeDate">ngay</span>
+                        </div>
                         <!-- Circular Progress -->
                         <div class="d-flex justify-content-center mb-3">
                             <h1 class="fw-bold text-success mb-0" id="progressPercentage" >73%</h1>
                         </div>
-                        <p class="text-muted mb-0">Quá trình hoàn thành</p>
+                        <p class="text-muted mb-0">Tỷ lệ hoàn thành</p>
 
                         <!-- Streak Number -->
                         <div class="mb-3">
@@ -307,9 +310,10 @@
                             <p class="text-muted mb-3">Streak dài nhất</p>
                         </div>
 
-                        <div class="w-100 d-flex justify-content-center fw-bold">
-                            <span id="challengeDate">ngay</span>
+                        <div class="d-flex justify-content-center mb-3">
+                            <h1 class="fw-bold text-success mb-0" id="evaluationRate" >73%</h1>
                         </div>
+                        <p class="text-muted mb-0">Đánh giá tổng thể sự tiến bộ</p>
 
                     </div>
                 </div>
@@ -817,7 +821,8 @@
                 }).then(data=>{
                     console.log(data)
                     document.getElementById("challengeStatsModalLabel").textContent = data.title;
-                    document.getElementById("progressPercentage").textContent = data.progress;
+                    document.getElementById("progressPercentage").textContent = data.progress+"%";
+                    document.getElementById("evaluationRate").textContent = data.evaluationPercentage;
                     document.getElementById("streakNumber").textContent = data.bestStreak;
                     document.getElementById("completedTasks").textContent = data.completedTasks;
                     document.getElementById("totalTasks").textContent = data.totalExpectedTasks;

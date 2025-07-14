@@ -80,7 +80,7 @@ public class AchievementService {
         List<Achievement> achievements = this.achievementRepository.findAll();
 
         for (Achievement achievement : achievements) {
-            //kiểm tra đã có achievement chưa
+
             UserAchievement userAchievement = this.achievementRepository.getUserAchievemenByUserAchievement(user,achievement).orElse(null);
             if(userAchievement!=null)continue;
 
@@ -101,7 +101,7 @@ public class AchievementService {
                     user.setCoins(achievement.getCoinBonus()+user.getCoins());
                     this.userRepository.save(user);
                 }
-            } else if (totalCompletedTask>=achievement.getRequiredTask()) {
+            } else if (totalCompletedTask>=achievement.getRequiredTask() && totalChallengeValid == 0) {
                 UserAchievement newUserAchievement = UserAchievement.builder()
                         .user(user)
                         .achievement(achievement)
@@ -114,7 +114,7 @@ public class AchievementService {
                 user.setTaskLimit(achievement.getTaskBonus()+ user.getTaskLimit());
                 user.setCoins(achievement.getCoinBonus()+user.getCoins());
                 this.userRepository.save(user);
-            } else if (totalChallengeValid>=achievement.getRequiredChallenge()){
+            } else if (totalChallengeValid>=achievement.getRequiredChallenge() && totalCompletedTask == 0){
                 UserAchievement newUserAchievement = UserAchievement.builder()
                         .user(user)
                         .achievement(achievement)

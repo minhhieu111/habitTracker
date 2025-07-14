@@ -22,8 +22,9 @@ public class ChallengeProgressService {
     private final UserService userService;
     private final CoinCalculationService coinCalculationService;
     private final TodoRepository todoRepository;
+    private final DiaryRepository diaryRepository;
 
-    public ChallengeProgressService(UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, UserChallengeDPRepository userChallengeDPRepository, UserChallengeRepository userChallengeRepository, EmailService emailService, UserService userService, CoinCalculationService coinCalculationService, TodoRepository todoRepository) {
+    public ChallengeProgressService(UserDailyRepository userDailyRepository, UserHabitRepository userHabitRepository, HabitHistoryRepository habitHistoryRepository, DailyHistoryRepository dailyHistoryRepository, UserChallengeDPRepository userChallengeDPRepository, UserChallengeRepository userChallengeRepository, EmailService emailService, UserService userService, CoinCalculationService coinCalculationService, TodoRepository todoRepository, DiaryRepository diaryRepository) {
         this.userDailyRepository = userDailyRepository;
         this.userHabitRepository = userHabitRepository;
         this.habitHistoryRepository = habitHistoryRepository;
@@ -34,6 +35,7 @@ public class ChallengeProgressService {
         this.userService = userService;
         this.coinCalculationService = coinCalculationService;
         this.todoRepository = todoRepository;
+        this.diaryRepository = diaryRepository;
     }
 
     @Transactional
@@ -283,6 +285,9 @@ public class ChallengeProgressService {
             Long coinEarn = this.coinCalculationService.calculateChallengeCompletionReward(userChallenge.getChallenge(),userChallenge,false);
             this.userService.getCoinCompleteForCompleteChallenge(userChallenge.getUser(),coinEarn);
             userChallenge.setCoinEarn(coinEarn);
+
+            //tính toán độ tiến bộ
+            userChallenge.setEvaluateProgress(calculateOverallEvaluationScore(userChallenge));
             userChallengeRepository.save(userChallenge);
 
             this.emailService.sendEmailCompleteChallenge(userChallenge);
@@ -339,5 +344,52 @@ public class ChallengeProgressService {
         List<UserHabit> userHabits = this.userHabitRepository.findByUserAndNotInChallengeAndUnavailableFalse(user);
 
         return (long)(todos.size()+userDailies.size()+userHabits.size());
+    }
+
+    @Transactional
+    public double calculateOverallEvaluationScore(UserChallenge userChallenge) {
+        double W1_Maintenance = 0.4;
+        double W2_GoalProgress = 0.4;
+        double W3_Motivation = 0.2;
+
+        double completionRate = userChallenge.getTotalExpectedTasks() > 0 ?
+                (double) userChallenge.getTotalCompletedTasks() / userChallenge.getTotalExpectedTasks() : 1.0;
+
+        double streakScore = 0.0;
+        if (userChallenge.getChallenge().getDay() > 0) {
+            streakScore = (double) userChallenge.getStreak() / userChallenge.getChallenge().getDay();
+            if (streakScore > 1.0) streakScore = 1.0;
+        }
+
+        double maintenanceIndex = (0.6 * completionRate) + (0.4 * streakScore);
+
+        double goalProgressIndex = userChallenge.getProgress() / 100.0;
+
+
+        List<Diary> diariesInChallenge = diaryRepository.findDiaryInChallenge(
+                userChallenge.getUser(),
+                userChallenge.getChallenge().getChallengeId(),
+                userChallenge.getStartDate(),
+                userChallenge.getEndDate()
+        );
+        long numberOfDiariesWritten = diariesInChallenge.size();
+
+        double idealDiariesForMaxMotivation = userChallenge.getChallenge().getDay() / 5.0;
+
+        double diaryContributionRatio = (idealDiariesForMaxMotivation > 0) ? (double) numberOfDiariesWritten / idealDiariesForMaxMotivation : 0.0;
+        if (diaryContributionRatio > 1.0) diaryContributionRatio = 1.0;
+
+        double baseMotivationScore = 0.5;
+        double maxDiaryBonusForMotivation = 0.5;
+
+        double motivationIndex = baseMotivationScore + (diaryContributionRatio * maxDiaryBonusForMotivation);
+
+        if (motivationIndex > 1.0) motivationIndex = 1.0;
+
+        double overallScore = (W1_Maintenance * maintenanceIndex) +
+                (W2_GoalProgress * goalProgressIndex) +
+                (W3_Motivation * motivationIndex);
+
+        return Math.round(overallScore * 100.0) / 100.0;
     }
 }
