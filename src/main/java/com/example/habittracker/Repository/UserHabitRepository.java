@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserHabitRepository extends JpaRepository<UserHabit,Long> {
-    @Query("SELECT uh FROM UserHabit uh WHERE uh.user.userId = :userId")
+    @Query("SELECT uh FROM UserHabit uh WHERE uh.user.userId = :userId ORDER BY uh.userHabitId DESC")
     List<UserHabit> findHabitsForUser(@Param("userId")Long userId);
 
     Optional<UserHabit> findUserHabitByHabitAndUser(Habit habit, User user);
