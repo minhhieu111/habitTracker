@@ -390,6 +390,6 @@ public class ChallengeProgressService {
                 (W2_GoalProgress * goalProgressIndex) +
                 (W3_Motivation * motivationIndex);
 
-        return Math.round(overallScore * 100.0) / 100.0;
+        return Math.round(overallScore * 100.0);
     }
 }
