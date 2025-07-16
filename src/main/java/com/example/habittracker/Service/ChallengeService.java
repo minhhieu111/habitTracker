@@ -128,6 +128,7 @@ public class ChallengeService {
                 .endDate(userChallenge.getEndDate())
                 .day(challenge.getDay())
                 .totalExpectedTasks(userChallenge.getTotalExpectedTasks())
+                .evaluationPercentage(userChallenge.getEvaluateProgress())
                 .build();
     }
     @Transactional
@@ -246,7 +247,11 @@ public class ChallengeService {
             throw new RuntimeException("Thời gian thực hiện phải ít nhất 5 ngày!");
         }
 
-        // Cập nhật Challenge
+        if(challengeDTO.getEndDate().isBefore(LocalDate.now())) {
+            throw new RuntimeException("Thời gian kết thức phải trước thời gian hiện tại!");
+        }
+
+//        Cập nhật Challenge
         challenge.setTitle(challengeDTO.getTitle());
         challenge.setDescription(challengeDTO.getDescription());
         challenge.setDay(challengeDTO.getDay());
@@ -257,21 +262,21 @@ public class ChallengeService {
         userChallengeRepository.save(userChallenge);
 
 
-        // Xử lý Habits
+//        xử lý Habits
         List<HabitDTO> existingHabits = habitService.getHabitsByUser_ChallengeId(challenge.getChallengeId());
         List<Long> newHabitIds = challengeDTO.getHabits().stream()
                 .map(HabitDTO::getHabitId)
                 .filter(id -> id != null)
                 .collect(Collectors.toList());
 
-        // Xóa các Habit không còn trong danh sách mới
+//        xóa các Habit không còn trong danh sách mới
         for (HabitDTO existingHabit : existingHabits) {
             if (!newHabitIds.contains(existingHabit.getHabitId())) {
                 habitService.unlinkHabitFromChallenge(existingHabit.getHabitId());
             }
         }
 
-        // Thêm các Habit mới
+//        thêm các Habit mới
         for (HabitDTO habitDTO : challengeDTO.getHabits()) {
             if (habitDTO.getHabitId() == null) {
                 habitDTO.setChallengeId(challenge.getChallengeId());
@@ -279,21 +284,21 @@ public class ChallengeService {
             }
         }
 
-        // Xử lý Dailies
+//        xử lý Dailies
         List<DailyDTO> existingDailies = dailyService.getDailiesByChallengeId(challenge.getChallengeId());
         List<Long> newDailyIds = challengeDTO.getDailies().stream()
                 .map(DailyDTO::getDailyId)
                 .filter(id -> id != null)
                 .collect(Collectors.toList());
 
-        // Xóa các Daily không còn trong danh sách mới
+//       xóa các Daily không còn trong danh sách mới
         for (DailyDTO existingDaily : existingDailies) {
             if (!newDailyIds.contains(existingDaily.getDailyId())) {
                 dailyService.unlinkDailyFromChallenge(existingDaily.getDailyId());
             }
         }
 
-        // Thêm các Daily mới
+//        thêm các Daily mới
         for (DailyDTO dailyDTO : challengeDTO.getDailies()) {
             if (dailyDTO.getDailyId() == null) {
                 dailyDTO.setChallengeId(challenge.getChallengeId());
@@ -325,7 +330,6 @@ public class ChallengeService {
         }
 
     }
-
 
     //community----------------------------------------------------------------------------------------------------------
     @Transactional

@@ -37,6 +37,8 @@ public class UserChallenge {
 
     private Long coinEarn;
 
+    private double evaluateProgress;
+
     @ElementCollection
     @CollectionTable(name = "user_challenge_completed_dates",
             joinColumns = @JoinColumn(name = "user_challenge_id"))

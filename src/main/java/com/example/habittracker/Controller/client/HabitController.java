@@ -26,9 +26,9 @@ public class HabitController {
 
     @PostMapping("/save")
     public String save(HttpServletRequest request, @ModelAttribute("newHabit") HabitDTO habitDTO, RedirectAttributes redirectAttributes) {
-        String userName = getUserNameFromRequest(request);
+        String email = getUserEmailFromRequest(request);
         try{
-            this.habitService.save(habitDTO,userName);
+            this.habitService.save(habitDTO,email);
             redirectAttributes.addFlashAttribute("success", "Tạo thói quen thành công!");
         }catch (Exception e){
             redirectAttributes.addFlashAttribute("failed", "Tạo thói quen thất bại!" +e.getMessage());
@@ -40,16 +40,16 @@ public class HabitController {
     @GetMapping("/{habitId}")
     @ResponseBody
     public ResponseEntity<HabitDTO> UpdateHabit(HttpServletRequest request, @PathVariable Long habitId) {
-        String userName = getUserNameFromRequest(request);
-        HabitDTO updateHabit = this.habitService.getUpdateHabit(habitId,userName);
+        String email = getUserEmailFromRequest(request);
+        HabitDTO updateHabit = this.habitService.getUpdateHabit(habitId,email);
         return ResponseEntity.ok().body(updateHabit);
     }
 
     @PostMapping("/update")
     public String updateHabit(HttpServletRequest request,@ModelAttribute("newHabit") HabitDTO habitDTO, RedirectAttributes redirectAttributes) {
         try{
-            String userName = getUserNameFromRequest(request);
-            this.habitService.updateHabit(habitDTO, userName);
+            String email = getUserEmailFromRequest(request);
+            this.habitService.updateHabit(habitDTO, email);
             redirectAttributes.addFlashAttribute("success", "Chỉnh sửa thành công!");
         }catch (RuntimeException e){
             redirectAttributes.addFlashAttribute("failed", e.getMessage());
@@ -60,9 +60,9 @@ public class HabitController {
 
     @GetMapping("/delete/{habitId}")
     public String deleteHabit(HttpServletRequest request, @PathVariable Long habitId, RedirectAttributes redirectAttributes) {
-        String userName = getUserNameFromRequest(request);
+        String email = getUserEmailFromRequest(request);
         try{
-            this.habitService.deleteHabit(habitId, userName);
+            this.habitService.deleteHabit(habitId, email);
             redirectAttributes.addFlashAttribute("success","Xóa thành công!");
         }catch (RuntimeException e){
             redirectAttributes.addFlashAttribute("failed", e.getMessage());
@@ -74,12 +74,12 @@ public class HabitController {
     @GetMapping("/{habitId}/progress_count")
     @ResponseBody
     public ResponseEntity<HabitDTO> progressCount(HttpServletRequest request,@PathVariable Long habitId, @RequestParam String type) {
-        String userName = getUserNameFromRequest(request);
-        HabitDTO habitProgress = this.habitService.updateHabitCount(habitId,userName,type);
+        String email = getUserEmailFromRequest(request);
+        HabitDTO habitProgress = this.habitService.updateHabitCount(habitId,email,type);
         return ResponseEntity.ok().body(habitProgress);
     }
 
-    private String getUserNameFromRequest(HttpServletRequest request) {
+    private String getUserEmailFromRequest(HttpServletRequest request) {
         String token = tokenUtil.getTokenFromCookies(request);
         return jwtUtil.getEmailFromToken(token);
     }

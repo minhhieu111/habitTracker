@@ -295,11 +295,14 @@
                 <!-- Main Stats Card -->
                 <div class="card mb-4" style="border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                     <div class="card-body text-center p-4">
+                        <div class="w-100 d-flex justify-content-center fw-bold">
+                            <span id="challengeDate">ngay</span>
+                        </div>
                         <!-- Circular Progress -->
                         <div class="d-flex justify-content-center mb-3">
                             <h1 class="fw-bold text-success mb-0" id="progressPercentage" >73%</h1>
                         </div>
-                        <p class="text-muted mb-0">Quá trình hoàn thành</p>
+                        <p class="text-muted mb-0">Tỷ lệ hoàn thành</p>
 
                         <!-- Streak Number -->
                         <div class="mb-3">
@@ -307,9 +310,10 @@
                             <p class="text-muted mb-3">Streak dài nhất</p>
                         </div>
 
-                        <div class="w-100 d-flex justify-content-center fw-bold">
-                            <span id="challengeDate">ngay</span>
+                        <div class="d-flex justify-content-center mb-3">
+                            <h1 class="fw-bold text-success mb-0" id="evaluationRate" >73%</h1>
                         </div>
+                        <p class="text-muted mb-0">Đánh giá tổng thể sự tiến bộ</p>
 
                     </div>
                 </div>
@@ -697,39 +701,30 @@
         }
 
         function previewImage(event) {
-            const file = event.target.files[0];  // Lấy file đầu tiên từ danh sách file người dùng đã chọn
+            const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    // Cập nhật ảnh lên thẻ <img> với ID avatarImg
                     document.getElementById('avatarImg').src = e.target.result;
                 };
-                reader.readAsDataURL(file);  // Chuyển file thành URL dữ liệu để hiển thị ảnh
+                reader.readAsDataURL(file);
             }
         }
 
         document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
-            event.preventDefault();  // Ngừng gửi form theo cách mặc định
+            event.preventDefault();
 
             const oldPasswordField = document.getElementById('OldPassword');
             const newPasswordField = document.getElementById('newPassword');
             const confirmPasswordField = document.getElementById('confirmPassword');
 
-            // Kiểm tra mật khẩu cũ
-            // if (oldPasswordField.value.trim() === "") {
-            //     document.getElementById('error-message').textContent = "Mật khẩu cũ không được để trống.";
-            //     document.getElementById('error-message').style.display = 'block';
-            //     return;
-            // }
 
-            // Kiểm tra mật khẩu mới
             if (!newPasswordField.value || newPasswordField.value.trim() === "") {
                 document.getElementById('error-message').textContent = "Mật khẩu mới không được để trống.";
                 document.getElementById('error-message').style.display = 'block';
                 return;
             }
 
-            // Kiểm tra xác nhận mật khẩu
             if (!confirmPasswordField.value || confirmPasswordField.value.trim() === "") {
                 document.getElementById('error-message').textContent = "Xác nhận mật khẩu không được để trống.";
                 document.getElementById('error-message').style.display = 'block';
@@ -746,20 +741,15 @@
                 .then(data => {
                     if (data.type == "success") {
                         document.getElementById('error-message').style.display = 'none';
-
-                        // Đóng modal sau khi thành công
                         bootstrap.Modal.getInstance(document.getElementById('changePassword')).hide();
 
-                        // Hiển thị thông báo thành công
                         showResponseToast('Mật khẩu đã được thay đổi thành công!', 'success');
                     } else {
-                        // Hiển thị thông báo lỗi
                         document.getElementById('error-message').textContent = `Lỗi: ${data.message || 'Mật khẩu không hợp lệ.'}`;
                         document.getElementById('error-message').style.display = 'block';
                     }
                 })
                 .catch(error => {
-                    // Hiển thị thông báo lỗi nếu có sự cố trong quá trình gửi yêu cầu AJAX
                     document.getElementById('error-message').textContent = `Có lỗi xảy ra: ${error.message}`;
                     document.getElementById('error-message').style.display = 'block';
                 });
@@ -785,7 +775,6 @@
                         document.getElementById("diaryImagePreview").style.display = 'none';
                     }
 
-                    // Load completed tasks
                     const completedTasksList = document.getElementById("completedTasksList");
                     completedTasksList.innerHTML = '';
                     if (diary.completedTasks) {
@@ -817,7 +806,8 @@
                 }).then(data=>{
                     console.log(data)
                     document.getElementById("challengeStatsModalLabel").textContent = data.title;
-                    document.getElementById("progressPercentage").textContent = data.progress;
+                    document.getElementById("progressPercentage").textContent = data.progress+"%";
+                    document.getElementById("evaluationRate").textContent = data.evaluationPercentage+"/100";
                     document.getElementById("streakNumber").textContent = data.bestStreak;
                     document.getElementById("completedTasks").textContent = data.completedTasks;
                     document.getElementById("totalTasks").textContent = data.totalExpectedTasks;

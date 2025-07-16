@@ -40,7 +40,7 @@ public class SchedulerConfig {
         System.out.println("method ResetHabitCountAndDailyAndLimitCoinsEarned run ");
     }
 
-   @Scheduled(cron="0 59 23 * * *")
+   @Scheduled(cron="50 59 23 * * *")
     public void calChallengeProgress(){
         this.challengeService.CalChallengeProgressEndDay();
        System.out.println("method calChallengeProgress run ");

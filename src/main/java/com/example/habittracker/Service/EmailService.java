@@ -64,6 +64,7 @@ public class EmailService {
         body.append("- Chuỗi thực hiện tốt nhất của bạn: ").append(userChallenge.getBestStreak()).append(" ngày liên tiếp\n");
         body.append("- Tổng số lần bỏ lỡ thói quen: ").append(userChallenge.getSkippedTasks()).append("\n\n");
         body.append("Bạn nhận được \"").append(userChallenge.getCoinEarn()).append("\" xu khi hoàn thành thử thách!\n");
+        body.append("Đánh giá tổng thể sự tiến bộ: ").append(userChallenge.getEvaluateProgress()).append("\n");
         body.append("Đây là một thành tựu đáng tự hào! Bạn có thể chia sẻ hành trình và kết quả này với bạn bè và cộng đồng.\n\n");
         body.append("Trân trọng,\n");
         body.append("Đội ngũ ứng dụng của bạn\n");

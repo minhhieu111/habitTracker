@@ -61,8 +61,8 @@ public class HabitService {
     }
 
     @Transactional
-    public void save(HabitDTO habitDTO, String username) {
-        User user = this.userService.getUser(username);
+    public void save(HabitDTO habitDTO, String email) {
+        User user = this.userService.getUser(email);
 
         if(habitDTO.getTitle().equals("")){
             throw new RuntimeException("Tạo Thói quen thất Bại! Tiêu đề không được để trống");
@@ -131,7 +131,7 @@ public class HabitService {
                 .type(habit.getType())
                 .difficulty(userHabit.getDifficulty())
                 .targetCount(userHabit.getTargetCount())
-                .isPublic(isPublic)
+                .isPublic(isPublic)//cân nhắc bỏ
                 .isInChallenge(userHabit.isInChallenge())
                 .challengeId(habit.getChallenge() != null ? habit.getChallenge().getChallengeId() : null)
                 .build();
@@ -172,7 +172,7 @@ public class HabitService {
 
         if(oldType != newType){
             if(newType == Habit.HabitType.NEGATIVE){
-                userHabit.setCompleted(!(oldType == Habit.HabitType.BOTH && userHabit.getNegativeCount() >= userHabit.getTargetCount()));
+                userHabit.setCompleted(!((oldType == Habit.HabitType.BOTH) && (userHabit.getNegativeCount() >= userHabit.getTargetCount())));
                 userHabit.setPositiveCount(0L);
                 HabitHistory initialNegativeHistory = this.habitHistoryRepository.findDailyHistory(userHabit, LocalDate.now())
                         .orElseGet(() -> HabitHistory.builder()

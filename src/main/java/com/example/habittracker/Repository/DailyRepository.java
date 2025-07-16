@@ -15,10 +15,10 @@ public interface DailyRepository extends JpaRepository<Daily,Long> {
     @Query("SELECT ud.daily FROM UserDaily ud WHERE ud.user.userId = :userId")
     Optional<List<Daily>> findDailiesForUser(@Param("userId") Long userId);
 
-    @Query("SELECT ud FROM UserDaily ud WHERE ud.user.userId = :userId")
+    @Query("SELECT ud FROM UserDaily ud WHERE ud.user.userId = :userId ORDER BY ud.userDailyId DESC")
     List<UserDaily> findUserDailiesByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT ud FROM UserDaily ud WHERE ud.daily.challenge.challengeId = :challengeId")
+@Query("SELECT ud FROM UserDaily ud WHERE ud.daily.challenge.challengeId = :challengeId")
     List<UserDaily> findByChallenge_ChallengeId(@Param("challengeId")Long challengeId);
 
     @Query("SELECT d FROM Daily d WHERE d.challenge.challengeId = :challengeId")

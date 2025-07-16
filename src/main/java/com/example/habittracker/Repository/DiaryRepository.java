@@ -13,7 +13,9 @@ import java.util.List;
 
 @Repository
 public interface DiaryRepository extends JpaRepository<Diary, Long> {
-    List<Diary> findByUser(User user);
+
+    @Query("SELECT d FROM Diary d WHERE d.user = :user ORDER BY d.date DESC")
+    List<Diary> findByUser(@Param("user")User user);
 
     @Query("SELECT ud.diaryId FROM Diary ud WHERE ud.user = :user AND ud.date = :date")
     List<Long> findIdByUserAndDate(@Param("user")User user, @Param("date") LocalDate date);

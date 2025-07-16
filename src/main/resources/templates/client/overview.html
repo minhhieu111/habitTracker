@@ -766,7 +766,7 @@
 
                     deleteHabit.setAttribute("href","/habits/delete/"+habitId);
 
-                    if(habit.public){
+                    if(habit.inChallenge){
                         deleteHabitButton.style.display='none';
                         habitCreateChallenge.disabled = true
                         habitUpdateChallenge.disabled = false
