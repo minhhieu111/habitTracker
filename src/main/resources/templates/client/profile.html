@@ -806,8 +806,8 @@
                 }).then(data=>{
                     console.log(data)
                     document.getElementById("challengeStatsModalLabel").textContent = data.title;
-                    document.getElementById("progressPercentage").textContent = data.progress+"% / 100%";
-                    document.getElementById("evaluationRate").textContent = data.evaluationPercentage;
+                    document.getElementById("progressPercentage").textContent = data.progress+"%";
+                    document.getElementById("evaluationRate").textContent = data.evaluationPercentage+"/100";
                     document.getElementById("streakNumber").textContent = data.bestStreak;
                     document.getElementById("completedTasks").textContent = data.completedTasks;
                     document.getElementById("totalTasks").textContent = data.totalExpectedTasks;
